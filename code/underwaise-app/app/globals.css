@@ -120,3 +120,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+.layout {
+  display: grid;
+  grid-template-areas: "header" "main" "footer";
+  min-height: 100dvh;
+  width: 100%;
+}
