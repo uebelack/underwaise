@@ -7,6 +7,8 @@ public record ApplicationForm(
         String lastName,
         LocalDate birthDate,
         String email,
-        boolean smoker
+        boolean smoker,
+        String hobbies,
+        String healthConditions
 ) {
 }
