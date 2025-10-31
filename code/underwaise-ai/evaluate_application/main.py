@@ -1,16 +1,20 @@
 import numpy as np
+import joblib
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
-
+from sklearn.metrics import classification_report, accuracy_score
 # -------------------------------
 # 1. Configuration
 # -------------------------------
 # Choose between "ovr" (One-vs-Rest) and "ovo" (One-vs-One)
 MULTI_CLASS_STRATEGY = "ovr"  # options: "ovr" or "ovo"
+
+# Filenames for saving the model and scaler
+MODEL_FILENAME = f"svm_model_{MULTI_CLASS_STRATEGY}.joblib"
+SCALER_FILENAME = f"scaler_{MULTI_CLASS_STRATEGY}.joblib"
 
 # -------------------------------
 # 2. Generate 4-Class Dataset
@@ -79,26 +83,17 @@ accuracy = accuracy_score(y_test, y_pred)
 
 print("\n--- Model Evaluation ---")
 print(f"Accuracy: {accuracy * 100:.2f}%")
-
-print("\nConfusion Matrix:")
-print(confusion_matrix(y_test, y_pred))
-
 print("\nClassification Report:")
 print(classification_report(y_test, y_pred))
 
 # -------------------------------
-# 8. Example Prediction
+# 8. Save Model and Scaler
 # -------------------------------
-new_sample = X_test[0].reshape(1, -1)
-new_sample_scaled = scaler.transform(new_sample)
-prediction = model.predict(new_sample_scaled)
+joblib.dump(model, MODEL_FILENAME)
+joblib.dump(scaler, SCALER_FILENAME)
+print(f"\nModel saved as: {MODEL_FILENAME}")
+print(f"Scaler saved as: {SCALER_FILENAME}")
 
-# Note: predict_proba is available only if the base estimator supports it (OvO may not expose it cleanly)
-if hasattr(model, "predict_proba"):
-    prediction_prob = model.predict_proba(new_sample_scaled)
-else:
-    prediction_prob = "Not available for this strategy"
 
-print("\n--- Example Prediction ---")
-print(f"Predicted class: {prediction[0]}")
-print(f"Class probabilities: {prediction_prob}")
+
+
