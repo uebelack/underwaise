@@ -1,0 +1,21 @@
+.layout {
+  display: grid;
+  grid-template-areas: "header" "main";
+  max-height: 100dvh;
+  width: 100%;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  z-index: 999;
+  left: 0;
+  right: 0;
+  grid-area: header;
+  background-color: #fff;
+}
+
+main {
+  grid-area: main;
+  margin-top: 50px;
+}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Header from "@/components/layout/header";
 import Providers from "./providers";
+import Layout from "@/components/layout/layout/layout";
 
 export const metadata: Metadata = {
   title: "Life Insurance Application",
@@ -14,10 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <Providers>
-      <div className="layout">
-        <Header />
-        <main>{children}</main>
-      </div>
+      <Layout>{children}</Layout>
     </Providers>
   );
 }

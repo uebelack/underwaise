@@ -1,8 +1,13 @@
 import * as z from "zod";
 
 const formSchema = z.object({
+  firstName: z
+    .string()
+    .min(2, { message: "First name must be at least 2 characters" }),
+  lastName: z
+    .string()
+    .min(2, { message: "First name must be at least 2 characters" }),
   email: z.email({ message: "Please enter a valid email address" }),
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   birthDate: z.string().refine(
     (date) => {
       const birthDate = new Date(date);
@@ -12,8 +17,9 @@ const formSchema = z.object({
     },
     { message: "You must be between 18 and 100 years old" }
   ),
-  medicalConditions: z.string().min(1, {
-    message: "Please describe your medical conditions or enter 'None'",
+  smoker: z.boolean(),
+  healthConditions: z.string().min(1, {
+    message: "Please describe your health conditions or enter 'None'",
   }),
   hobbies: z
     .string()
