@@ -17,9 +17,10 @@ MULTI_CLASS_STRATEGY = "ovr"  # options: "ovr" or "ovo"
 MODEL_FILENAME = f"svm_model_{MULTI_CLASS_STRATEGY}.joblib"
 SCALER_FILENAME = f"scaler_{MULTI_CLASS_STRATEGY}.joblib"
 
-df = pd.read_csv('../../../assets/testdaten_underwriting.csv', encoding='latin1')
+df = pd.read_csv('../../../assets/testdaten_underwriting.csv', encoding='latin1',delimiter=';')
 
-target_col = 'Target'  # <-- Replace with the actual target column name
+
+target_col = 'Target'
 
 # Separate features and target
 y = df[target_col].values
@@ -34,7 +35,7 @@ X = X.values
 # Verify shapes
 print("Feature matrix shape:", X.shape)
 print("Target vector shape:", y.shape)
-print(df)
+print(X)
 
 # -------------------------------
 # 2. Generate 4-Class Dataset
@@ -113,7 +114,3 @@ joblib.dump(model, MODEL_FILENAME)
 joblib.dump(scaler, SCALER_FILENAME)
 print(f"\nModel saved as: {MODEL_FILENAME}")
 print(f"Scaler saved as: {SCALER_FILENAME}")
-
-
-
-
