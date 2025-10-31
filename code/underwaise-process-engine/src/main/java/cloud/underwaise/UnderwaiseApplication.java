@@ -16,21 +16,31 @@
  */
 package cloud.underwaise;
 
-import org.cibseven.bpm.engine.RuntimeService;
+import cloud.underwaise.model.ApplicationForm;
+import cloud.underwaise.services.UnderwritingService;
 import org.cibseven.bpm.spring.boot.starter.annotation.EnableProcessApplication;
+import org.cibseven.bpm.spring.boot.starter.event.PostDeployEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.event.EventListener;
+
+import java.time.LocalDate;
 
 @SpringBootApplication
 @EnableProcessApplication
 public class UnderwaiseApplication {
 
     @Autowired
-    private RuntimeService runtimeService;
+    private UnderwritingService underwritingService;
 
     public static void main(String... args) {
         SpringApplication.run(UnderwaiseApplication.class, args);
     }
 
+    @EventListener
+    public void processPostDeploy(PostDeployEvent event) {
+
+        underwritingService.start(new ApplicationForm("John", "Doe", LocalDate.of(2000, 1, 1), "john.doe@example.org", true, "Test", "Test"));
+    }
 }
