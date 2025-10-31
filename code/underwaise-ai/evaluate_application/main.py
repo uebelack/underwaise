@@ -89,5 +89,3 @@ print("\n--- Example Prediction ---")
 print(f"Sample features (scaled): {new_sample_scaled[0][:5]}...")
 print(f"Predicted class: {data.target_names[prediction[0]]} (Class {prediction[0]})")
 print(f"Class probabilities: {prediction_prob}")
-
-```
