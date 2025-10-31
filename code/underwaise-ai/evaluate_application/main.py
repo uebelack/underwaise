@@ -1,91 +1,99 @@
-
 import numpy as np
-from sklearn.datasets import load_breast_cancer
+import joblib
+from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
+from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
+from sklearn.metrics import classification_report, accuracy_score
+# -------------------------------
+# 1. Configuration
+# -------------------------------
+# Choose between "ovr" (One-vs-Rest) and "ovo" (One-vs-One)
+MULTI_CLASS_STRATEGY = "ovr"  # options: "ovr" or "ovo"
 
-# 1. Load Data
-# Using a sample dataset from sklearn.
-# Replace this with your own data loading (e.g., pd.read_csv)
-data = load_breast_cancer()
-X = data.data
-y = data.target
+# Filenames for saving the model and scaler
+MODEL_FILENAME = f"svm_model_{MULTI_CLASS_STRATEGY}.joblib"
+SCALER_FILENAME = f"scaler_{MULTI_CLASS_STRATEGY}.joblib"
+
+# -------------------------------
+# 2. Generate 4-Class Dataset
+# -------------------------------
+X, y = make_classification(
+    n_samples=1000,
+    n_features=20,
+    n_informative=10,
+    n_redundant=2,
+    n_classes=4,
+    n_clusters_per_class=1,
+    random_state=42
+)
 
 print(f"Features shape: {X.shape}")
 print(f"Target shape: {y.shape}")
+print(f"Unique classes: {np.unique(y)}")
 
-# 2. Split Data
-# Splitting the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+# -------------------------------
+# 3. Split Data
+# -------------------------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
 
-print(f"Training samples: {X_train.shape[0]}")
-print(f"Testing samples: {X_test.shape[0]}")
-
-# 3. Preprocess Data (Feature Scaling)
-# SVMs are sensitive to the scale of features.
-# It's crucial to scale the data.
+# -------------------------------
+# 4. Scale Features
+# -------------------------------
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test) # Only transform test data
+X_test_scaled = scaler.transform(X_test)
 
-# 4. Initialize SVM Model
-# Create the Support Vector Classifier object
-# --- Key Hyperparameters to Tune ---
-# C: Regularization parameter. A smaller C creates a wider margin
-#    at the cost of more misclassifications.
-# kernel: Specifies the kernel type.
-#    'linear': For linearly separable data.
-#    'rbf': (Radial Basis Function) Good default for non-linear data.
-#    'poly': Polynomial kernel.
-#    'sigmoid': Sigmoid kernel.
-# gamma: Kernel coefficient for 'rbf', 'poly', and 'sigmoid'.
-#    'scale' (default) or 'auto' are good starting points.
-#
-# For a linear kernel:
-# model = SVC(kernel='linear', C=1.0, random_state=42)
-#
-# For a non-linear (RBF) kernel:
-model = SVC(kernel='rbf', C=1.0, gamma='scale', random_state=42, probability=True)
-# probability=True allows using predict_proba() later, but is slower to train
+# -------------------------------
+# 5. Initialize Base SVM
+# -------------------------------
+base_svm = SVC(
+    kernel='rbf',
+    C=1.0,
+    gamma='scale',
+    probability=True,
+    random_state=42
+)
 
-# 5. Train the Model
-# Fit the model to the scaled training data
+# Wrap in Multi-Class Strategy
+if MULTI_CLASS_STRATEGY == "ovr":
+    model = OneVsRestClassifier(base_svm)
+    print("\nUsing One-vs-Rest (OvR) strategy.")
+elif MULTI_CLASS_STRATEGY == "ovo":
+    model = OneVsOneClassifier(base_svm)
+    print("\nUsing One-vs-One (OvO) strategy.")
+else:
+    raise ValueError("Invalid MULTI_CLASS_STRATEGY. Choose 'ovr' or 'ovo'.")
+
+# -------------------------------
+# 6. Train the Model
+# -------------------------------
 print("\nTraining SVM model...")
 model.fit(X_train_scaled, y_train)
 print("Training complete.")
 
-# 6. Make Predictions
-# Use the trained model to make predictions on the scaled test data
+# -------------------------------
+# 7. Evaluate Model
+# -------------------------------
 y_pred = model.predict(X_test_scaled)
-
-# 7. Evaluate the Model
-print("\n--- Model Evaluation ---")
-
-# Accuracy
 accuracy = accuracy_score(y_test, y_pred)
+
+print("\n--- Model Evaluation ---")
 print(f"Accuracy: {accuracy * 100:.2f}%")
-
-# Confusion Matrix
-print("\nConfusion Matrix:")
-print(confusion_matrix(y_test, y_pred))
-
-# Classification Report
-# Provides precision, recall, f1-score, and support
 print("\nClassification Report:")
-print(classification_report(y_test, y_pred, target_names=data.target_names))
+print(classification_report(y_test, y_pred))
 
-# 8. Example: Predict on new data
-# This new data must also be scaled using the *same* scaler
-# that was fit on the training data.
-# (Using the first test sample as an example)
-new_sample = X_test[0].reshape(1, -1)
-new_sample_scaled = scaler.transform(new_sample)
-prediction = model.predict(new_sample_scaled)
-prediction_prob = model.predict_proba(new_sample_scaled)
+# -------------------------------
+# 8. Save Model and Scaler
+# -------------------------------
+joblib.dump(model, MODEL_FILENAME)
+joblib.dump(scaler, SCALER_FILENAME)
+print(f"\nModel saved as: {MODEL_FILENAME}")
+print(f"Scaler saved as: {SCALER_FILENAME}")
 
-print("\n--- Example Prediction ---")
-print(f"Sample features (scaled): {new_sample_scaled[0][:5]}...")
-print(f"Predicted class: {data.target_names[prediction[0]]} (Class {prediction[0]})")
-print(f"Class probabilities: {prediction_prob}")
+
+
+
