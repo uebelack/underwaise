@@ -11,6 +11,35 @@ spring:
     import:
       - optional:classpath:cibseven-webclient.properties
 
+  # H2 Database Configuration (File-based)
+  datasource:
+    url: jdbc:h2:file:./data/underwaise-db;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password #  Very safe btw
+
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        hbm2ddl:
+          auto: validate
+
+  # H2 Console (for development)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # Liquibase Configuration
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
 underwaise:
   aiServiceUrl: http://localhost:8000
 

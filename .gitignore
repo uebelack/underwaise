@@ -4,3 +4,9 @@ target
 __pycache__
 .env
 *.joblib
+
+# H2 Database files
+data/
+*.db
+*.mv.db
+*.trace.db
