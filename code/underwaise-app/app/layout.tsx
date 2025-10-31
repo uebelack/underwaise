@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { QueryProvider } from "@/components/providers/query-provider";
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Life Insurance Application",
-  description: "Apply for life insurance coverage",
+  title: "PAX Life Insurance - Protect Your Family Since 1876",
+  description: "Life insurance that protects your loved ones financially if something happens to you. Death and disability coverage from Switzerland's trusted member-owned cooperative.",
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryProvider>{children}</QueryProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
