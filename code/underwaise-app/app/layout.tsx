@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Life Insurance Application",
-  description: "Apply for life insurance coverage",
+  title: "PAX Life Insurance - Protect Your Family Since 1876",
+  description: "Life insurance that protects your loved ones financially if something happens to you. Death and disability coverage from Switzerland's trusted member-owned cooperative.",
 };
 
 export default function RootLayout({
