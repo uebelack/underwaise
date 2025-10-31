@@ -1,18 +1,15 @@
 package cloud.underwaise;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties(prefix = "underwaise")
+@Data
 public class UnderwaiseProperties {
     private String aiServiceUrl;
 
-    public String getAiServiceUrl() {
-        return aiServiceUrl;
-    }
-
-    public void setAiServiceUrl(String aiServiceUrl) {
-        this.aiServiceUrl = aiServiceUrl;
-    }
+    private String mailgunApiKey;
+    private String mailgunDomain;
 }

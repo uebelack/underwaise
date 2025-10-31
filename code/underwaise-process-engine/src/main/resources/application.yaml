@@ -13,6 +13,8 @@ spring:
 
 underwaise:
   aiServiceUrl: http://localhost:8000
+  mailgun-domain: underwaise.ch
+  mailgun-api-key: 123
 
 cibseven:
   webclient:
