@@ -6,6 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
 from sklearn.metrics import classification_report, accuracy_score
+import pandas as pd
 # -------------------------------
 # 1. Configuration
 # -------------------------------
@@ -15,6 +16,25 @@ MULTI_CLASS_STRATEGY = "ovr"  # options: "ovr" or "ovo"
 # Filenames for saving the model and scaler
 MODEL_FILENAME = f"svm_model_{MULTI_CLASS_STRATEGY}.joblib"
 SCALER_FILENAME = f"scaler_{MULTI_CLASS_STRATEGY}.joblib"
+
+df = pd.read_csv('../../../assets/testdaten_underwriting.csv', encoding='latin1')
+
+target_col = 'Target'  # <-- Replace with the actual target column name
+
+# Separate features and target
+y = df[target_col].values
+X = df.drop(columns=[target_col])
+
+# Convert categorical variables to numeric (e.g., one-hot encoding)
+X = pd.get_dummies(X, drop_first=True)
+
+# Convert to NumPy arrays for sklearn compatibility
+X = X.values
+
+# Verify shapes
+print("Feature matrix shape:", X.shape)
+print("Target vector shape:", y.shape)
+print(df)
 
 # -------------------------------
 # 2. Generate 4-Class Dataset
