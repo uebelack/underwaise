@@ -67,4 +67,20 @@ public class ApplicationForm {
 
     @OneToMany(mappedBy = "applicationForm", cascade = CascadeType.ALL, orphanRemoval = true)
     List<IncapacityForm> incapacityForm;
+
+    public boolean getIsSmoker() {
+      return isSmoker;
+    }
+
+    public void setIsSmoker(boolean isSmoker) {
+      this.isSmoker = isSmoker;
+    }
+
+    public boolean getIsDrugUser() {
+      return isDrugUser;
+    }
+
+    public void setIsDrugUser(boolean isDrugUser) {
+      this.isDrugUser = isDrugUser;
+    }
 }
