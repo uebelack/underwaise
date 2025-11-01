@@ -39,7 +39,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="fk_feature_id" type="UUID">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
         </createTable>
 

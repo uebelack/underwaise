@@ -11,56 +11,45 @@
             <column name="feature_uuid" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="age" type="INT">
+            <column name="age" type="INT" defaultValueNumeric="0">
                 <constraints nullable="false"/>
-                 <defaultValueNumeric>0</defaultValueNumeric>
             </column>
-            <column name="height_in_cm" type="DECIMAL(5, 2)">
+            <column name="height_in_cm" type="DECIMAL(5, 2)" defaultValueNumeric="172.0">
                 <constraints nullable="false"/>
-                 <defaultValueNumeric>172.0</defaultValueNumeric>
             </column>
-            <column name="weight_in_kg" type="DECIMAL(5, 2)">
+            <column name="weight_in_kg" type="DECIMAL(5, 2)" defaultValueNumeric="73.9">
                 <constraints nullable="false"/>
-                  <defaultValueNumeric>73.9</defaultValueNumeric>
             </column>
-            <column name="BMI" type="DECIMAL(5, 2)">
+            <column name="BMI" type="DECIMAL(5, 2)" defaultValueNumeric="25.0">
                 <constraints nullable="false"/>
-                <defaultValueNumeric>25.0</defaultValueNumeric>
             </column>
-            <column name="smoker" type="BOOLEAN">
+            <column name="smoker" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
-                <defaultValueBoolean>false</defaultValueBoolean>
             </column>
-            <column name="drugs" type="BOOLEAN">
-              <constraints nullable="false"/>
-                <defaultValueBoolean>false</defaultValueBoolean>
+            <column name="drugs" type="BOOLEAN" defaultValue="false">
+                <constraints nullable="false"/>
             </column>
 
-            <column name="hobby_score" type="DECIMAL(5, 2)">
+            <column name="hobby_score" type="DECIMAL(5, 2)" defaultValueNumeric="5.0">
                 <constraints nullable="false"/>
-                <defaultValueNumeric>5.0</defaultValueNumeric>
             </column>
 
-              <column name="physical_health_score" type="DECIMAL(5, 2)">
+            <column name="physical_health_score" type="DECIMAL(5, 2)" defaultValue="5.0">
                 <constraints nullable="false"/>
-                <defaultValueNumeric>5.0</defaultValueNumeric>
             </column>
 
-              <column name="psychological_health_score" type="DECIMAL(5, 2)">
+            <column name="psychological_health_score" type="DECIMAL(5, 2)" defaultValueNumeric="5.0">
                 <constraints nullable="false"/>
-                <defaultValueNumeric>5.0</defaultValueNumeric>
             </column>
 
-            <column name="medication_health_score" type="DECIMAL(5, 2)">
+            <column name="medication_health_score" type="DECIMAL(5, 2)" defaultValueNumeric="5.0">
                 <constraints nullable="false"/>
-                <defaultValueNumeric>5.0</defaultValueNumeric>
             </column>
 
-            <column name="restrictions_score" type="DECIMAL(5, 2)">
+            <column name="restrictions_score" type="DECIMAL(5, 2)" defaultValueNumeric="5.0">
                 <constraints nullable="false"/>
-                <defaultValueNumeric>5.0</defaultValueNumeric>
             </column>
-            
+
         </createTable>
 
 
