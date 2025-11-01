@@ -21,6 +21,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import "./life-star-form.style.scss";
 import { ButtonGroup } from "../ui/button-group";
+import Link from "next/link";
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -83,7 +84,7 @@ export function LifeStarForm() {
             name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>First Name *</FormLabel>
+                <FormLabel className="form-label">First Name *</FormLabel>
                 <FormControl>
                   <div className="relative group">
                     <Input placeholder="John" {...field} />
@@ -98,7 +99,7 @@ export function LifeStarForm() {
             name="lastName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Last Name *</FormLabel>
+                <FormLabel className="form-label">Last Name *</FormLabel>
                 <FormControl>
                   <div className="relative group">
                     <Input
@@ -117,7 +118,7 @@ export function LifeStarForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email Address *</FormLabel>
+                <FormLabel className="form-label">Email Address *</FormLabel>
                 <FormControl>
                   <div className="relative group">
                     <Input
@@ -138,7 +139,7 @@ export function LifeStarForm() {
             name="birthDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Date of Birth *</FormLabel>
+                <FormLabel className="form-label">Date of Birth *</FormLabel>
                 <FormControl>
                   <div className="relative group">
                     <Input
@@ -158,7 +159,7 @@ export function LifeStarForm() {
             name="smoker"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Do you smoke? *</FormLabel>
+                <FormLabel className="form-label">Do you smoke? *</FormLabel>
                 <FormControl>
                   <ButtonGroup className="w-full">
                     <Button
@@ -191,7 +192,9 @@ export function LifeStarForm() {
             name="hobbies"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Please tell us your hobbies *</FormLabel>
+                <FormLabel className="form-label">
+                  Please tell us your hobbies *
+                </FormLabel>
                 <FormControl>
                   <div className="relative group">
                     <Textarea
@@ -212,7 +215,7 @@ export function LifeStarForm() {
             name="healthConditions"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
+                <FormLabel className="form-label">
                   Are you currently having any health conditions? *
                 </FormLabel>
                 <FormControl>
@@ -234,9 +237,18 @@ export function LifeStarForm() {
             <div className="wrapper">
               <Button
                 size="lg"
+                variant="secondary"
+                type="submit"
+                className="secondary-action"
+                asChild
+              >
+                <Link href="/">Back</Link>
+              </Button>
+              <Button
+                size="lg"
                 variant="default"
                 type="submit"
-                className="w-3/5"
+                className="primary-action"
                 disabled={mutation.isPending || !form.formState.isValid}
               >
                 {mutation.isPending ? (

@@ -2,12 +2,12 @@ header {
   height: 50px;
   width: 100%;
   border-bottom: 1px solid #d8d8d8;
-  padding: 0 16px;
 
   .content {
     height: 100%;
     max-width: var(--max-width);
     width: 100%;
+    padding: 0 1rem;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -17,9 +17,19 @@ header {
       font-size: 1rem;
       font-weight: 600;
     }
+    .spacer {
+      height: 24px;
+      width: 1px;
+      background-color: #d8d8d8;
+      margin: 0 1rem;
+    }
 
     span {
       font-size: 1rem;
+    }
+
+    .advice {
+      margin-left: auto;
     }
   }
 }
