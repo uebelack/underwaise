@@ -1,0 +1,178 @@
+{
+  "sections": [
+    {
+      "id": "personal_info",
+      "title": "Personal Information",
+      "fields": [
+        {
+          "id": "first_name",
+          "label": "First Name",
+          "type": "text",
+          "required": true,
+          "placeholder": "Enter your first name"
+        },
+        {
+          "id": "last_name",
+          "label": "Last Name",
+          "type": "text",
+          "required": true,
+          "placeholder": "Enter your last name"
+        },
+        {
+          "id": "birth_date",
+          "label": "Date of Birth",
+          "type": "date",
+          "required": true,
+          "placeholder": "YYYY-MM-DD",
+          "min": 18,
+          "max": 80,
+          "helperText": "You must be at least 18 years old"
+        },
+        {
+          "id": "email",
+          "label": "Email Address",
+          "type": "email",
+          "required": true,
+          "placeholder": "example@email.com"
+        },
+        {
+          "id": "height",
+          "label": "Height in cm",
+          "type": "number",
+          "required": true,
+          "placeholder": "180"
+        },
+        {
+          "id": "weight",
+          "label": "Weight in kg",
+          "type": "number",
+          "required": true,
+          "placeholder": "70"
+        }
+      ]
+    },
+    {
+      "id": "lifestyle",
+      "title": "Lifestyle Questions",
+      "fields": [
+        {
+          "id": "smoke",
+          "question": "Do you smoke?",
+          "type": "boolean",
+          "default": "no",
+          "required": true
+        },
+        {
+          "id": "drug_usage",
+          "question": "Have you ever consumed drugs or are you consuming drugs?",
+          "type": "boolean",
+          "default": "no",
+          "required": true
+        },
+        {
+          "id": "special_sports",
+          "question": "Do you practice any special sports or leisure activities, such as mountaineering, car or motorcycle sports, diving, sailing, or extreme sports?",
+          "type": "boolean",
+          "followUp": {
+            "trigger": "yes",
+            "fields": [
+              {
+                "id": "special_sports_details",
+                "label": "List your special sports or leisure activities",
+                "type": "textarea"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "health",
+      "title": "Health Questions",
+      "fields": [
+        {
+          "id": "physical_health_issues",
+          "question": "Have you had any health complaints, illnesses, consequences of accidents, or congenital conditions in the past five years for which you sought treatment for your physical health?",
+          "type": "boolean",
+          "required": true,
+          "followUp": {
+            "trigger": "yes",
+            "fields": [
+              {
+                "id": "physical_health_details",
+                "label": "Please provide details (Period, Reason, Name and address of the therapist, Treatment completed)",
+                "type": "textarea"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "health",
+      "title": "Health Questions",
+      "fields": [
+        {
+          "id": "mental_health_treatment",
+          "question": "Have you ever been advised or treated by a psychiatrist, psychologist, or psychotherapist?",
+          "type": "boolean",
+          "required": true,
+          "followUp": {
+            "trigger": "yes",
+            "fields": [
+              {
+                "id": "mental_health_details",
+                "label": "Please provide details (Period, Reason, Name and address of the therapist, Treatment completed)",
+                "type": "textarea"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "health",
+      "title": "Health Questions",
+      "fields": [
+        {
+          "id": "medication_usage",
+          "question": "Have you taken or do you take medication regularly in the past five years (excluding contraception)?",
+          "type": "boolean",
+          "required": true,
+          "followUp": {
+            "trigger": "yes",
+            "fields": [
+              {
+                "id": "medication_details",
+                "label": "Please provide details (Period, Reason, Name of the medication, Dosage, Treatment completed)",
+                "type": "textarea"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "health",
+      "title": "Health Questions",
+      "fields": [
+        {
+          "id": "work_ability_restriction",
+          "question": "Is your ability to work or earn currently restricted, or have you been fully or partially unable to work (or children unable to attend school) for more than four consecutive weeks in the past five years due to health reasons?",
+          "type": "boolean",
+          "required": true,
+          "followUp": {
+            "trigger": "yes",
+            "fields": [
+              {
+                "id": "work_restriction_details",
+                "label": "Please provide details (Period, Reason, Treatment completed)",
+                "type": "textarea"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
