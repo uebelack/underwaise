@@ -19,7 +19,7 @@ import {
   X,
 } from "lucide-react";
 import confetti from "canvas-confetti";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 
 export function LifeInsuranceLanding() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -93,6 +93,47 @@ export function LifeInsuranceLanding() {
     triggerConfetti();
     // Navigation will happen automatically via Link
   }, [triggerConfetti]);
+
+  // Subtiles Hintergrund-Konfetti
+  useEffect(() => {
+    const paxTextShape = confetti.shapeFromPath({
+      path: 'M313.288 144.806l44.794-58.06-44.365-57.495h43.368l25.82 34.954 26.11-34.954h38.802L403.309 86.46l45.79 58.347h-44.936l-25.391-33.952-25.968 33.952h-39.516zm-43.082-35.092V92.31c-4.992.71-9.416 1.425-22.111 3.566-13.41 2.283-17.835 7.418-17.835 13.84 0 7.131 3.995 12.266 14.269 12.266 7.704 0 18.402-5.278 25.677-12.267m4.99 35.092l-2.712-11.842c-12.266 9.988-23.965 14.698-39.368 14.698-22.974 0-39.092-13.124-39.092-34.382 0-21.543 14.55-33.528 43.94-38.09 16.69-2.57 25.11-3.853 31.383-4.563V66.77c0-10.412-5.277-15.122-17.114-15.122-13.13 0-17.835 5.282-18.407 14.126h-34.81c2.569-29.529 24.966-39.373 55.782-39.373 37.518 0 50.786 16.118 50.786 47.787v39.092c0 12.839.286 18.545 3.137 31.526h-33.524zM125.69 73.478c17.978 0 24.251-7.418 24.251-19.975 0-12.553-6.273-19.97-24.251-19.97h-18.83v39.945h18.83zm-56.207 71.328V5h59.344c41.233 0 59.348 20.256 59.348 48.503 0 28.251-18.115 48.507-59.348 48.507h-21.968v42.796H69.482z',
+    });
+
+    const defaults = {
+      startVelocity: 3, // Moderat
+      spread: 360,
+      ticks: 1200, // Sehr lange Lebensdauer für vollen Fall
+      zIndex: 0, // Im Hintergrund
+      scalar: 4.5,
+      gravity: 0.4, // Mehr Gravität für vollen Fall durch den Screen
+      drift: 0.1,
+    };
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval: NodeJS.Timeout = setInterval(function () {
+      const particleCount = 1; // Nur 1 Partikel pro Position
+
+      // Zufällige Farbe aus grün oder blau
+      const colors = Math.random() > 0.5
+        ? ["#8ccd0f", "#7cb50d"] // Grüne PAX-Farben
+        : ["#1a5ab8", "#1548a0"]; // Blaue PAX-Farben
+
+      // Zufällige PAX-Logos von oben
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.2, 0.8), y: 0 }, // Starten am oberen Rand
+        colors: colors,
+        shapes: [paxTextShape],
+      });
+    }, 2500); // Weniger häufig
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-white scroll-smooth">
@@ -703,9 +744,6 @@ export function LifeInsuranceLanding() {
                   <span className="text-gray-600">24/7 Premium-Support</span>
                 </li>
               </ul>
-              <Button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900" size="lg">
-                Mehr erfahren
-              </Button>
             </div>
           </div>
         </div>
