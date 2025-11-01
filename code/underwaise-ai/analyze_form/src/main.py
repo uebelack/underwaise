@@ -1,3 +1,4 @@
+#This throws an error
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,7 +11,7 @@ import json
 import os
 from langchain_openai import AzureChatOpenAI
 
-API_VERSION = "2025-11-01-preview"
+API_VERSION = "2025-04-01-preview"
 
 
 def get_gpt_mini_llm():
@@ -20,6 +21,9 @@ def get_gpt_mini_llm():
         azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
         api_key=os.getenv("AZURE_OPENAI_API_KEY"),
     )
+
+
+
 
 
 app = FastAPI()
@@ -40,40 +44,53 @@ class UnderwriteRequest(BaseModel):
 
 
 class UnderwriteResponse(BaseModel):
-    risk_score: float  # 0.0 (low) to 10.0 (high)
+    risk_score: int  # 1 (low) to 10 (high)
     explanation: str
 
 
 @app.post("/get_risk_from_hobbies", response_model=UnderwriteResponse)
 def get_risk_from_hobbies(req: UnderwriteRequest):
-    """Assess risk from hobbies/activities with a single score."""
+    """Assess risk from hobbies/activities with a single score.
+    
+    Example request:
+    {
+        "text": "Ich gehe regelmäßig Fallschirmspringen und Klettern. Außerdem spiele ich gerne Fußball am Wochenende."
+    }
+    
+    Example response:
+    {
+        "risk_score": 7,
+        "explanation": "Fallschirmspringen ist eine Hochrisiko-Sportart mit erhöhtem Verletzungs- und Todesrisiko. Klettern trägt ebenfalls zu einem erhöhten Risiko bei."
+    }
+    """
 
     prompt = f"""
 Du bist ein Underwriting-Assistant. Analysiere die Hobbys/Aktivitäten und gib EINEN Risikowert zurück.
 
 **Beispiele:**
-1. "Wingsuit-Fliegen monatlich" → risk_score: 9.5 (extrem gefährlich, hohes Todesrisiko)
-2. "Netflix und Pizza am Wochenende" → risk_score: 5.0 (sedentär, mittleres Gesundheitsrisiko)
-3. "Marathonläufer, 5x/Woche Training" → risk_score: 1.5 (sehr gesund, niedriges Risiko)
-4. "Gelegentlich Wandern" → risk_score: 1.0 (gesund und sicher)
+1. "Wingsuit-Fliegen monatlich" → risk_score: 10 (extrem gefährlich, hohes Todesrisiko)
+2. "Netflix und Pizza am Wochenende" → risk_score: 5 (sedentär, mittleres Gesundheitsrisiko)
+3. "Marathonläufer, 5x/Woche Training" → risk_score: 2 (sehr gesund, niedriges Risiko)
+4. "Gelegentlich Wandern" → risk_score: 1 (gesund und sicher)
 
 **Antworte NUR mit gültigem JSON:**
 
 {{
-  "risk_score": <float 0.0-10.0>,
+  "risk_score": <integer 1-10>,
   "explanation": "<Kurze Begründung warum dieser Wert gewählt wurde, 1-2 Sätze>"
 }}
 
-**Skala:**
-- 0.0-2.0: Sehr niedriges Risiko (gesunde, sichere Aktivitäten)
-- 2.1-4.0: Niedriges Risiko (normale Aktivitäten)
-- 4.1-6.0: Mittleres Risiko (sedentärer Lebensstil oder moderate Risiken)
-- 6.1-8.0: Hohes Risiko (gefährliche Sportarten, ungesunder Lebensstil)
-- 8.1-10.0: Sehr hohes Risiko (Extremsport, lebensgefährliche Aktivitäten)
+**Skala (nur ganze Zahlen):**
+- 1-2: Sehr niedriges Risiko (gesunde, sichere Aktivitäten)
+- 3-4: Niedriges Risiko (normale Aktivitäten)
+- 5-6: Mittleres Risiko (sedentärer Lebensstil oder moderate Risiken)
+- 7-8: Hohes Risiko (gefährliche Sportarten, ungesunder Lebensstil)
+- 9-10: Sehr hohes Risiko (Extremsport, lebensgefährliche Aktivitäten)
 
 **Regeln:**
 - Berücksichtige Häufigkeit: "selten" vs "regelmäßig"
-- Nur gültiges JSON, Dezimaltrenner ist Punkt (.)
+- Nur gültiges JSON
+- risk_score muss eine ganze Zahl zwischen 1 und 10 sein
 - Erklärung soll konkret auf den Text eingehen
 
 **Text:**
@@ -85,27 +102,21 @@ Du bist ein Underwriting-Assistant. Analysiere die Hobbys/Aktivitäten und gib E
 
 # ------------ Health Questions Risk Assessment ------------
 
-class TreatmentLine(BaseModel):
-    period: str
-    reason: str
-    therapist_name: Optional[str] = None
-    therapist_address: Optional[str] = None
-    treatment_completed: Optional[bool] = None
+class FlexibleHealthRequest(BaseModel):
+    """Accepts any list of treatment objects with flexible structure"""
+    treatments: List[dict] = Field(..., description="List of treatment objects with any structure")
 
 
-class HealthQuestionRequest(BaseModel):
-    treatments: List[str] = Field(..., description="List of treatment entries, one per line")
-
-
+# Remove all the specific treatment models, keep only response models
 class TreatmentRiskScore(BaseModel):
     line_number: int
     treatment_text: str
-    risk_score: float  # 0.0 to 10.0
+    risk_score: int  # 1 to 10
     explanation: str
 
 
 class HealthQuestionResponse(BaseModel):
-    overall_risk_score: float  # 0.0 to 10.0
+    overall_risk_score: int  # 1 to 10
     treatment_scores: List[TreatmentRiskScore]
     summary: str
 
@@ -127,7 +138,7 @@ def _assess_risk(prompt: str) -> UnderwriteResponse:
         
         parsed = json.loads(raw)
         
-        risk_score = max(0.0, min(10.0, float(parsed["risk_score"])))
+        risk_score = max(1, min(10, int(parsed["risk_score"])))
         explanation = parsed.get("explanation", "No explanation provided")
         
         return UnderwriteResponse(
@@ -140,28 +151,35 @@ def _assess_risk(prompt: str) -> UnderwriteResponse:
 
 
 # Reusable function for health question assessment
-def _assess_health_treatments(treatments: List[str], question_context: str) -> HealthQuestionResponse:
+def _assess_health_treatments(treatments: List[dict], question_context: str) -> HealthQuestionResponse:
     """Reusable function to assess multiple treatment lines."""
+    
+    # Convert treatment objects to readable strings for the LLM
+    treatment_strings = []
+    for i, t in enumerate(treatments):
+        treatment_str = json.dumps(t, ensure_ascii=False)
+        treatment_strings.append(f"{i+1}. {treatment_str}")
     
     prompt = f"""
 Du bist ein Underwriting-Assistant für Kranken- und Berufsunfähigkeitsversicherungen.
 
 **Kontext:** {question_context}
 
-**Aufgabe:** Bewerte jede Behandlung einzeln mit einem Risiko-Score von 0.0 bis 10.0.
+**Aufgabe:** Bewerte jede Behandlung einzeln mit einem Risiko-Score von 1 bis 10 (nur ganze Zahlen).
+Interpretiere die JSON-Daten flexibel - nicht alle Felder sind immer vorhanden.
 
 **Behandlungen:**
-{chr(10).join(f"{i+1}. {t}" for i, t in enumerate(treatments))}
+{chr(10).join(treatment_strings)}
 
 **Antworte NUR mit gültigem JSON:**
 
 {{
-  "overall_risk_score": <float 0.0-10.0>,
+  "overall_risk_score": <integer 1-10>,
   "treatment_scores": [
     {{
       "line_number": 1,
-      "treatment_text": "<Originaltext>",
-      "risk_score": <float 0.0-10.0>,
+      "treatment_text": "<Originaltext als JSON-String>",
+      "risk_score": <integer 1-10>,
       "explanation": "<Begründung für diesen Score>"
     }},
     ...
@@ -169,12 +187,12 @@ Du bist ein Underwriting-Assistant für Kranken- und Berufsunfähigkeitsversiche
   "summary": "<Gesamteinschätzung aller Behandlungen zusammen>"
 }}
 
-**Risiko-Skala:**
-- 0.0-2.0: Sehr niedriges Risiko (abgeschlossene Routinebehandlungen, normale Erkältungen)
-- 2.1-4.0: Niedriges Risiko (kleinere Beschwerden, vollständig ausgeheilt)
-- 4.1-6.0: Mittleres Risiko (chronische aber gut behandelbare Erkrankungen)
-- 6.1-8.0: Hohes Risiko (schwere Erkrankungen, laufende Behandlungen)
-- 8.1-10.0: Sehr hohes Risiko (lebensbedrohliche Erkrankungen, Berufsunfähigkeit)
+**Risiko-Skala (nur ganze Zahlen):**
+- 1-2: Sehr niedriges Risiko (abgeschlossene Routinebehandlungen, normale Erkältungen)
+- 3-4: Niedriges Risiko (kleinere Beschwerden, vollständig ausgeheilt)
+- 5-6: Mittleres Risiko (chronische aber gut behandelbare Erkrankungen)
+- 7-8: Hohes Risiko (schwere Erkrankungen, laufende Behandlungen)
+- 9-10: Sehr hohes Risiko (lebensbedrohliche Erkrankungen, Berufsunfähigkeit)
 
 **Bewertungskriterien:**
 - Schweregrad der Erkrankung
@@ -183,11 +201,13 @@ Du bist ein Underwriting-Assistant für Kranken- und Berufsunfähigkeitsversiche
 - Art der Therapie (ambulant vs. stationär)
 - Prognose und Heilungschancen
 
-**Regeln:**
-- Nur gültiges JSON
-- Dezimaltrenner ist Punkt (.)
+**WICHTIGE Regeln:**
+- Nur gültiges JSON zurückgeben
+- Alle risk_score Werte müssen ganze Zahlen zwischen 1 und 10 sein
 - Jede Behandlung einzeln bewerten
 - Overall_risk_score ist der Durchschnitt oder höchster Wert wenn eine Behandlung sehr kritisch ist
+- treatment_text muss den Original-JSON-String der Behandlung enthalten
+- Wenn Informationen fehlen, interpretiere basierend auf vorhandenen Daten
 """
 
     llm = get_gpt_mini_llm()
@@ -203,7 +223,7 @@ Du bist ein Underwriting-Assistant für Kranken- und Berufsunfähigkeitsversiche
         
         parsed = json.loads(raw)
         
-        overall_risk = max(0.0, min(10.0, float(parsed["overall_risk_score"])))
+        overall_risk = max(1, min(10, int(parsed["overall_risk_score"])))
         summary = parsed.get("summary", "No summary provided")
         
         treatment_scores = []
@@ -211,7 +231,7 @@ Du bist ein Underwriting-Assistant für Kranken- und Berufsunfähigkeitsversiche
             treatment_scores.append(TreatmentRiskScore(
                 line_number=int(ts["line_number"]),
                 treatment_text=ts["treatment_text"],
-                risk_score=max(0.0, min(10.0, float(ts["risk_score"]))),
+                risk_score=max(1, min(10, int(ts["risk_score"]))),
                 explanation=ts["explanation"]
             ))
         
@@ -226,19 +246,79 @@ Du bist ein Underwriting-Assistant für Kranken- und Berufsunfähigkeitsversiche
 
 
 @app.post("/assess_physical_health", response_model=HealthQuestionResponse)
-def assess_physical_health(req: HealthQuestionRequest):
+def assess_physical_health(req: FlexibleHealthRequest):
     """
     Endpoint 1: Physical health complaints, illnesses, accidents in past 5 years
     
     Question: Have you had any health complaints, illnesses, consequences of accidents, 
     or congenital conditions in the past five years for which you sought treatment?
     
-    Expected format per line: Period, Reason, Name and address of therapist, Treatment completed?
+    Expected format: List of treatment objects with flexible structure
+    
+    Example request:
+    {
+        "treatments": [
+            {
+                "period_start": "2022-01",
+                "period_end": "2023-06",
+                "reason": "Rückenschmerzen",
+                "therapist_name": "Dr. Schmidt",
+                "therapist_address": "Orthopädie München",
+                "treatment_completed": true
+            },
+            {
+                "period_start": "2021-02",
+                "period_end": "2021-03",
+                "reason": "Grippeerkrankung",
+                "therapist_name": "Dr. Müller",
+                "therapist_address": "Hausarzt Berlin",
+                "treatment_completed": true
+            },
+            {
+                "period_start": "2020-06",
+                "reason": "Bluthochdruck",
+                "therapist_name": "Dr. Wagner",
+                "treatment_completed": false
+            }
+        ]
+    }
+    
+    Example response:
+    {
+        "overall_risk_score": 6,
+        "treatment_scores": [
+            {
+                "line_number": 1,
+                "treatment_text": "{\"period_start\": \"2022-01\", \"period_end\": \"2023-06\", \"reason\": \"Rückenschmerzen\", \"therapist_name\": \"Dr. Schmidt\", \"therapist_address\": \"Orthopädie München\", \"treatment_completed\": true}",
+                "risk_score": 4,
+                "explanation": "Rückenschmerzen sind häufig, die Behandlung ist abgeschlossen - moderates Risiko"
+            },
+            {
+                "line_number": 2,
+                "treatment_text": "{\"period_start\": \"2021-02\", \"period_end\": \"2021-03\", \"reason\": \"Grippeerkrankung\", \"therapist_name\": \"Dr. Müller\", \"therapist_address\": \"Hausarzt Berlin\", \"treatment_completed\": true}",
+                "risk_score": 1,
+                "explanation": "Normale Grippeerkrankung, vollständig ausgeheilt - sehr niedriges Risiko"
+            },
+            {
+                "line_number": 3,
+                "treatment_text": "{\"period_start\": \"2020-06\", \"reason\": \"Bluthochdruck\", \"therapist_name\": \"Dr. Wagner\", \"treatment_completed\": false}",
+                "risk_score": 6,
+                "explanation": "Chronischer Bluthochdruck, noch in Behandlung - mittleres bis hohes Risiko"
+            }
+        ],
+        "summary": "Überwiegend behandelbare Erkrankungen. Der laufende Bluthochdruck erhöht das Gesamtrisiko auf ein mittleres Niveau."
+    }
     """
     
     context = """
 Frage: Hatten Sie in den letzten fünf Jahren gesundheitliche Beschwerden, Krankheiten, 
 Unfallfolgen oder angeborene Leiden, wegen derer Sie in ärztlicher Behandlung waren?
+
+Erwartete Felder (können variieren):
+- period_start, period_end: Zeitraum der Behandlung
+- reason: Grund/Diagnose
+- therapist_name, therapist_address: Therapeut/Arzt
+- treatment_completed: Ob abgeschlossen
 
 Bewerte jede Behandlung basierend auf:
 - Art der Erkrankung/Beschwerde
@@ -251,14 +331,53 @@ Bewerte jede Behandlung basierend auf:
 
 
 @app.post("/assess_mental_health", response_model=HealthQuestionResponse)
-def assess_mental_health(req: HealthQuestionRequest):
+def assess_mental_health(req: FlexibleHealthRequest):
     """
     Endpoint 2: Psychiatric, psychological, or psychotherapeutic treatment
     
     Question: Have you ever been advised or treated by a psychiatrist, psychologist, 
     or psychotherapist?
     
-    Expected format per line: Period, Reason, Name and address of therapist, Treatment completed?
+    Expected format: List of treatment objects with flexible structure
+    
+    Example request:
+    {
+        "treatments": [
+            {
+                "period_start": "2019-03",
+                "period_end": "2020-09",
+                "reason": "Burnout nach Jobwechsel",
+                "therapist_name": "Dr. Weber",
+                "treatment_completed": true
+            },
+            {
+                "period_start": "2022-01",
+                "reason": "Angststörung",
+                "therapist_name": "Prof. Klein",
+                "treatment_completed": false
+            }
+        ]
+    }
+    
+    Example response:
+    {
+        "overall_risk_score": 7,
+        "treatment_scores": [
+            {
+                "line_number": 1,
+                "treatment_text": "{\"period_start\": \"2019-03\", \"period_end\": \"2020-09\", \"reason\": \"Burnout nach Jobwechsel\", \"therapist_name\": \"Dr. Weber\", \"treatment_completed\": true}",
+                "risk_score": 5,
+                "explanation": "Burnout durch konkreten Auslöser, Behandlung abgeschlossen - mittleres Risiko mit Rezidivgefahr"
+            },
+            {
+                "line_number": 2,
+                "treatment_text": "{\"period_start\": \"2022-01\", \"reason\": \"Angststörung\", \"therapist_name\": \"Prof. Klein\", \"treatment_completed\": false}",
+                "risk_score": 7,
+                "explanation": "Laufende Behandlung einer Angststörung - hohes Risiko für Berufsunfähigkeit und Rückfall"
+            }
+        ],
+        "summary": "Die laufende psychiatrische Behandlung wegen Angststörung stellt ein erhöhtes Risiko dar. In Kombination mit der Burnout-Vorgeschichte besteht erhöhte Rezidivgefahr."
+    }
     """
     
     context = """
@@ -266,6 +385,12 @@ Frage: Waren Sie jemals in psychiatrischer, psychologischer oder psychotherapeut
 Beratung oder Behandlung?
 
 WICHTIG: Psychische Erkrankungen haben oft ein HÖHERES Risiko für Berufsunfähigkeit!
+
+Erwartete Felder (können variieren):
+- period_start, period_end: Zeitraum der Behandlung
+- reason: Art der psychischen Erkrankung
+- therapist_name, therapist_address: Therapeut/Psychiater
+- treatment_completed: Ob abgeschlossen
 
 Bewerte jede Behandlung basierend auf:
 - Art der psychischen Erkrankung (Depression, Burnout, Angststörung, etc.)
@@ -280,19 +405,79 @@ Bewerte jede Behandlung basierend auf:
 
 
 @app.post("/assess_medication", response_model=HealthQuestionResponse)
-def assess_medication(req: HealthQuestionRequest):
+def assess_medication(req: FlexibleHealthRequest):
     """
     Endpoint 3: Regular medication use in past 5 years
     
     Question: Have you taken or do you take medication regularly in the past five years 
     (excluding contraception)?
     
-    Expected format per line: Period, Reason, Name of medication, Dosis, Treatment completed?
+    Expected format: List of medication objects with flexible structure
+    
+    Example request:
+    {
+        "treatments": [
+            {
+                "period_start": "2020-03",
+                "reason": "Bluthochdruck",
+                "medication_name": "Ramipril",
+                "dosage": "5mg täglich",
+                "treatment_completed": false
+            },
+            {
+                "period_start": "2021-06",
+                "period_end": "2022-02",
+                "reason": "Rückenschmerzen",
+                "medication_name": "Ibuprofen",
+                "dosage": "400mg bei Bedarf",
+                "treatment_completed": true
+            },
+            {
+                "period_start": "2019-09",
+                "reason": "Depression",
+                "medication_name": "Sertralin",
+                "dosage": "50mg täglich"
+            }
+        ]
+    }
+    
+    Example response:
+    {
+        "overall_risk_score": 7,
+        "treatment_scores": [
+            {
+                "line_number": 1,
+                "treatment_text": "{\"period_start\": \"2020-03\", \"reason\": \"Bluthochdruck\", \"medication_name\": \"Ramipril\", \"dosage\": \"5mg täglich\", \"treatment_completed\": false}",
+                "risk_score": 6,
+                "explanation": "Dauerhafte Blutdruckmedikation deutet auf chronische Herz-Kreislauf-Erkrankung - mittleres bis hohes Risiko"
+            },
+            {
+                "line_number": 2,
+                "treatment_text": "{\"period_start\": \"2021-06\", \"period_end\": \"2022-02\", \"reason\": \"Rückenschmerzen\", \"medication_name\": \"Ibuprofen\", \"dosage\": \"400mg bei Bedarf\", \"treatment_completed\": true}",
+                "risk_score": 3,
+                "explanation": "Zeitlich begrenzte Schmerzmedikation, abgeschlossen - niedriges Risiko"
+            },
+            {
+                "line_number": 3,
+                "treatment_text": "{\"period_start\": \"2019-09\", \"reason\": \"Depression\", \"medication_name\": \"Sertralin\", \"dosage\": \"50mg täglich\"}",
+                "risk_score": 7,
+                "explanation": "Langfristige Antidepressiva-Einnahme deutet auf chronische Depression - hohes Risiko für Berufsunfähigkeit"
+            }
+        ],
+        "summary": "Mehrere chronische Medikationen laufen noch. Besonders die Antidepressiva-Dauermedikation erhöht das Risiko deutlich."
+    }
     """
     
     context = """
 Frage: Haben Sie in den letzten fünf Jahren regelmäßig Medikamente eingenommen 
 (außer Verhütungsmittel)?
+
+Erwartete Felder (können variieren):
+- period_start, period_end: Zeitraum der Medikation
+- reason: Grund für die Medikation
+- medication_name: Name des Medikaments
+- dosage: Dosierung
+- treatment_completed: Ob die Einnahme beendet ist
 
 Bewerte jede Medikation basierend auf:
 - Art des Medikaments (z.B. Blutdrucksenker, Antidepressiva, Schmerzmittel)
@@ -307,7 +492,7 @@ Bewerte jede Medikation basierend auf:
 
 
 @app.post("/assess_work_disability", response_model=HealthQuestionResponse)
-def assess_work_disability(req: HealthQuestionRequest):
+def assess_work_disability(req: FlexibleHealthRequest):
     """
     Endpoint 4: Work disability or inability to work in past 5 years
     
@@ -315,7 +500,56 @@ def assess_work_disability(req: HealthQuestionRequest):
     fully or partially unable to work for more than four consecutive weeks in the past 
     five years due to health reasons?
     
-    Expected format per line: Period, Reason, Treatment completed?
+    Expected format: List of work disability objects with flexible structure
+    
+    Example request:
+    {
+        "treatments": [
+            {
+                "period_start": "2022-03",
+                "period_end": "2022-05",
+                "reason": "Bandscheibenvorfall mit OP",
+                "recovery_status": "Vollständig wiederhergestellt"
+            },
+            {
+                "period_start": "2023-01",
+                "period_end": "2023-03",
+                "reason": "Burnout",
+                "recovery_status": "Teilweise arbeitsfähig"
+            },
+            {
+                "period_start": "2021-11",
+                "period_end": "2021-12",
+                "reason": "Komplizierter Armbruch"
+            }
+        ]
+    }
+    
+    Example response:
+    {
+        "overall_risk_score": 8,
+        "treatment_scores": [
+            {
+                "line_number": 1,
+                "treatment_text": "{\"period_start\": \"2022-03\", \"period_end\": \"2022-05\", \"reason\": \"Bandscheibenvorfall mit OP\", \"recovery_status\": \"Vollständig wiederhergestellt\"}",
+                "risk_score": 6,
+                "explanation": "OP-bedürftiger Bandscheibenvorfall mit 8 Wochen Arbeitsunfähigkeit - mittleres bis hohes Rezidivrisiko"
+            },
+            {
+                "line_number": 2,
+                "treatment_text": "{\"period_start\": \"2023-01\", \"period_end\": \"2023-03\", \"reason\": \"Burnout\", \"recovery_status\": \"Teilweise arbeitsfähig\"}",
+                "risk_score": 8,
+                "explanation": "Längere Arbeitsunfähigkeit wegen Burnout, nur teilweise wiederhergestellt - hohes Risiko für erneute AU"
+            },
+            {
+                "line_number": 3,
+                "treatment_text": "{\"period_start\": \"2021-11\", \"period_end\": \"2021-12\", \"reason\": \"Komplizierter Armbruch\"}",
+                "risk_score": 4,
+                "explanation": "Unfallbedingte AU, vollständig geheilt - niedriges bis mittleres Risiko"
+            }
+        ],
+        "summary": "Mehrere längere Arbeitsunfähigkeitsphasen in den letzten Jahren. Besonders kritisch ist das Burnout mit nur teilweiser Wiederherstellung - sehr hohes Risiko für erneute Berufsunfähigkeit."
+    }
     """
     
     context = """
@@ -324,6 +558,12 @@ letzten fünf Jahren länger als vier Wochen durchgehend ganz oder teilweise
 arbeitsunfähig aus gesundheitlichen Gründen?
 
 SEHR WICHTIG: Arbeitsunfähigkeit ist ein STARKER Indikator für hohes Risiko!
+
+Erwartete Felder (können variieren):
+- period_start, period_end: Zeitraum der Arbeitsunfähigkeit
+- reason: Grund für die Arbeitsunfähigkeit
+- recovery_status: Aktueller Genesungsstatus
+- disability_type: Vollständig oder teilweise arbeitsunfähig
 
 Bewerte jede Phase der Arbeitsunfähigkeit basierend auf:
 - Dauer der Arbeitsunfähigkeit (4 Wochen vs. Monate)
@@ -335,6 +575,10 @@ Bewerte jede Phase der Arbeitsunfähigkeit basierend auf:
 """
     
     return _assess_health_treatments(req.treatments, context)
+
+
+# ------------ Debug Endpoint (DELETE AFTER USE) ------------
+
 
 
 if __name__ == "__main__":
