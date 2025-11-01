@@ -22,11 +22,14 @@ import confetti from "canvas-confetti";
 import { useCallback, useState, useEffect } from "react";
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { CatchGame } from "@/components/catch-game";
 
 export function LifeInsuranceLanding() {
   const t = useTranslations();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [showGame, setShowGame] = useState(false);
+  const [logoClickCount, setLogoClickCount] = useState(0);
 
   const triggerConfetti = useCallback(() => {
     const paxTextShape = confetti.shapeFromPath({
@@ -97,6 +100,22 @@ export function LifeInsuranceLanding() {
     // Navigation will happen automatically via Link
   }, [triggerConfetti]);
 
+  const handleLogoClick = useCallback(() => {
+    const newCount = logoClickCount + 1;
+    setLogoClickCount(newCount);
+
+    if (newCount === 3) {
+      setShowGame(true);
+      setLogoClickCount(0); // Reset counter
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.2 },
+        colors: ["#8ccd0f", "#1a5ab8", "#7cb50d"],
+      });
+    }
+  }, [logoClickCount]);
+
   // Subtiles Hintergrund-Konfetti
   useEffect(() => {
     const paxTextShape = confetti.shapeFromPath({
@@ -140,6 +159,9 @@ export function LifeInsuranceLanding() {
 
   return (
     <div className="min-h-screen bg-white scroll-smooth">
+      {/* Catch Game */}
+      {showGame && <CatchGame onClose={() => setShowGame(false)} />}
+
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-white min-h-[90vh] flex items-center">
         {/* Decorative background elements */}
@@ -153,13 +175,19 @@ export function LifeInsuranceLanding() {
           {/* Navigation */}
           <nav className="flex items-center justify-between py-4">
             <div className="flex items-center gap-3 sm:gap-6">
-              <Image
-                src="/logo.png"
-                alt="Underwaise - Moderne Lebensversicherung"
-                width={200}
-                height={67}
-                className="h-12 sm:h-16 w-auto"
-              />
+              <button
+                onClick={handleLogoClick}
+                className="cursor-pointer hover:scale-105 transition-transform"
+                title="Click me 3 times for a surprise!"
+              >
+                <Image
+                  src="/logo.png"
+                  alt="Underwaise - Moderne Lebensversicherung"
+                  width={200}
+                  height={67}
+                  className="h-12 sm:h-16 w-auto"
+                />
+              </button>
               <Image
                 src="/baselhack.svg"
                 alt="baselhack Hackathon"
