@@ -16,6 +16,7 @@
  */
 package cloud.underwaise;
 
+import cloud.underwaise.model.ApplicationForm;
 import cloud.underwaise.services.UnderwritingService;
 import org.cibseven.bpm.spring.boot.starter.annotation.EnableProcessApplication;
 import org.cibseven.bpm.spring.boot.starter.event.PostDeployEvent;
@@ -39,7 +40,8 @@ public class UnderwaiseApplication {
 
     @EventListener
     public void processPostDeploy(PostDeployEvent event) {
-
-//        underwritingService.start(new ApplicationForm("John", "Doe", LocalDate.of(2000, 1, 1), "john.doe@example.org", true, "Test", "Test"));
+        var applicationForm = new ApplicationForm();
+        applicationForm.setEmail("david@uebelacker.dev");
+        underwritingService.start(applicationForm);
     }
 }

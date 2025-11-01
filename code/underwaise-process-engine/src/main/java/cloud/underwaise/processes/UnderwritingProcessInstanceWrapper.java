@@ -1,0 +1,28 @@
+package cloud.underwaise.processes;
+
+import org.cibseven.bpm.engine.RuntimeService;
+import org.cibseven.bpm.engine.delegate.DelegateExecution;
+import org.cibseven.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.cibseven.bpm.engine.runtime.ProcessInstance;
+
+public class UnderwritingProcessInstanceWrapper {
+    public static final String PROCESS_DEFINITION_KEY = "underwriting";
+
+    public static final String APPLICATION_ID_VARIABLE = "applicationId";
+
+    private final RuntimeService runtimeService;
+    private final ProcessInstance processInstance;
+
+    public UnderwritingProcessInstanceWrapper(DelegateExecution delegateExecution) {
+        if (delegateExecution instanceof ExecutionEntity executionEntity) {
+            this.runtimeService = delegateExecution.getProcessEngine().getRuntimeService();
+            this.processInstance = executionEntity.getProcessInstance();
+        } else {
+            throw new IllegalArgumentException("DelegateExecution is not an instance of ExecutionEntity");
+        }
+    }
+
+    public Long getApplicationId() {
+        return (Long) runtimeService.getVariable(processInstance.getProcessInstanceId(), APPLICATION_ID_VARIABLE);
+    }
+}
