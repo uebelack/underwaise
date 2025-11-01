@@ -181,3 +181,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.grecaptcha-badge {
+  top: 10px;
+  z-index: 1000;
+}
