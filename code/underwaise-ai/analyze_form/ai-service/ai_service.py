@@ -1,8 +1,11 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
+from contextlib import asynccontextmanager
 import json
+import socket
 
 load_dotenv()
 
@@ -13,7 +16,36 @@ class Joke(BaseModel):
     joke: str
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup and shutdown events"""
+    # Startup
+    hostname = socket.gethostname()
+    try:
+        local_ip = socket.gethostbyname(hostname)
+    except:
+        local_ip = "unknown"
+    print(f"\n{'='*50}")
+    print(f"Server started successfully!")
+    print(f"  - Local: http://127.0.0.1:8000")
+    print(f"  - Network: http://192.168.22.72:8000")
+    print(f"  - Docs: http://192.168.22.72:8000/docs")
+    print(f"{'='*50}\n")
+    yield
+    # Shutdown
+    print("Shutting down...")
+
+
+app = FastAPI(lifespan=lifespan)
+
+# Add CORS middleware to allow requests from other devices
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for local network testing
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -182,5 +214,10 @@ Beispiele:
 
 if __name__ == "__main__":
     import uvicorn
-    # Expose to local network: accessible via your IP 192.168.22.72
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    print("Starting server on all network interfaces (0.0.0.0:8000)...")
+    uvicorn.run(
+        app,  # Pass the app object directly
+        host="0.0.0.0", 
+        port=8000,
+        log_level="info"
+    )
