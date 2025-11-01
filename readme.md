@@ -29,8 +29,8 @@ Meet the magnificent humans who sacrificed their weekend sleep schedules:
 - **Valentino** 🎩✨ - The Magician
 - **Kathrin** 🏥🍬 - Insurance Queen & Sweet Supplier
 - **Sebastian** 🤖🧠 - ML AI Expert
-- **Morris** 🤖❤️ - The AI LL Export
-- **Litty** 📋💼 - Insurance Tech Exprt
+- **Morris** 🤖❤️ - The AI LL Expert
+- **Litty** 📋💼 - Insurance Tech Expert
 - **David** ☕️ - Old School Java Programmer
 
 *Eight developers entered. One solution emerged. Zero regrets (maybe a few on Monday morning).*
