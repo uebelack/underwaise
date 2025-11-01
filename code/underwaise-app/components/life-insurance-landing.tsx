@@ -16,8 +16,63 @@ import {
   Zap,
   Star,
 } from "lucide-react";
+import confetti from "canvas-confetti";
 
 export function LifeInsuranceLanding() {
+  const triggerConfetti = () => {
+    const paxTextShape = confetti.shapeFromPath({
+      path: 'M313.288 144.806l44.794-58.06-44.365-57.495h43.368l25.82 34.954 26.11-34.954h38.802L403.309 86.46l45.79 58.347h-44.936l-25.391-33.952-25.968 33.952h-39.516zm-43.082-35.092V92.31c-4.992.71-9.416 1.425-22.111 3.566-13.41 2.283-17.835 7.418-17.835 13.84 0 7.131 3.995 12.266 14.269 12.266 7.704 0 18.402-5.278 25.677-12.267m4.99 35.092l-2.712-11.842c-12.266 9.988-23.965 14.698-39.368 14.698-22.974 0-39.092-13.124-39.092-34.382 0-21.543 14.55-33.528 43.94-38.09 16.69-2.57 25.11-3.853 31.383-4.563V66.77c0-10.412-5.277-15.122-17.114-15.122-13.13 0-17.835 5.282-18.407 14.126h-34.81c2.569-29.529 24.966-39.373 55.782-39.373 37.518 0 50.786 16.118 50.786 47.787v39.092c0 12.839.286 18.545 3.137 31.526h-33.524zM125.69 73.478c17.978 0 24.251-7.418 24.251-19.975 0-12.553-6.273-19.97-24.251-19.97h-18.83v39.945h18.83zm-56.207 71.328V5h59.344c41.233 0 59.348 20.256 59.348 48.503 0 28.251-18.115 48.507-59.348 48.507h-21.968v42.796H69.482z',
+    });
+
+    const duration = 4 * 1000; 
+    const animationEnd = Date.now() + duration;
+    const defaults = { 
+      startVelocity: 15, 
+      spread: 360, 
+      ticks: 120, 
+      zIndex: 0,
+      scalar: 5.5, 
+      gravity: 0.5, 
+      drift: 0.2, 
+    };
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+    
+    const interval: NodeJS.Timeout = setInterval(function () {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 5; // Mehr PAX-Logos
+
+      // PAX-Logo von allen Seiten
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+        colors: ["#8ccd0f", "#1a5ab8", "#7cb50d"],
+        shapes: [paxTextShape],
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.4, 0.6), y: Math.random() - 0.2 },
+        colors: ["#8ccd0f", "#1a5ab8", "#7cb50d"],
+        shapes: [paxTextShape],
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+        colors: ["#8ccd0f", "#1a5ab8", "#7cb50d"],
+        shapes: [paxTextShape],
+      });
+    }, 300);
+  };
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -32,12 +87,19 @@ export function LifeInsuranceLanding() {
         <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-8">
           {/* Navigation */}
           <nav className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-6">
               <Image
                 src="/logo.png"
                 alt="Underwaise Logo"
                 width={200}
                 height={67}
+              />
+              <Image
+                src="/baselhack.svg"
+                alt="baselhack Logo"
+                width={120}
+                height={67}
+                className="brightness-0"
               />
             </div>
             <div className="hidden md:flex items-center gap-8">
@@ -83,7 +145,12 @@ export function LifeInsuranceLanding() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <Button size="lg" asChild className="bg-[#7cb50d] hover:bg-[#6ba00b] text-white shadow-lg shadow-green-500/30">
+                <Button 
+                  size="lg" 
+                  asChild 
+                  className="bg-[#7cb50d] hover:bg-[#6ba00b] text-white shadow-lg shadow-green-500/30"
+                  onClick={triggerConfetti}
+                >
                   <Link
                     href="/spar-lebensversicherung"
                     className="group inline-flex items-center"
@@ -496,7 +563,12 @@ export function LifeInsuranceLanding() {
                   <span className="text-white">Schnelle Auszahlung</span>
                 </li>
               </ul>
-              <Button className="w-full bg-[#7cb50d] hover:bg-[#6ba00b] text-white" size="lg" asChild>
+              <Button 
+                className="w-full bg-[#7cb50d] hover:bg-[#6ba00b] text-white" 
+                size="lg" 
+                asChild
+                onClick={triggerConfetti}
+              >
                 <Link href="/spar-lebensversicherung">
                   Jetzt starten
                 </Link>
@@ -569,20 +641,16 @@ export function LifeInsuranceLanding() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Button size="lg" asChild className="bg-[#7cb50d] hover:bg-[#6ba00b] text-white shadow-xl shadow-green-500/20">
+              <Button 
+                size="lg" 
+                asChild 
+                className="bg-[#7cb50d] hover:bg-[#6ba00b] text-white shadow-xl shadow-green-500/20"
+                onClick={triggerConfetti}
+              >
                 <Link href="/spar-lebensversicherung" className="group">
                   Antrag starten
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
-              </Button>
-
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-white hover:bg-white hover:text-[#1a5ab8] text-white"
-                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Mehr erfahren
               </Button>
             </div>
 
@@ -621,13 +689,22 @@ export function LifeInsuranceLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div className="col-span-2">
-              <Image
-                src="/logo.png"
-                alt="Underwaise Logo"
-                width={160}
-                height={53}
-                className="mb-4 brightness-0 invert"
-              />
+              <div className="flex items-center gap-4 mb-4">
+                <Image
+                  src="/logo.png"
+                  alt="Underwaise Logo"
+                  width={160}
+                  height={53}
+                  className="brightness-0 invert"
+                />
+                <Image
+                  src="/baselhack.svg"
+                  alt="baselhack Logo"
+                  width={100}
+                  height={56}
+                  className="brightness-0 invert"
+                />
+              </div>
               <p className="text-gray-400 mb-4">
                 Moderne Lebensversicherung für die Schweiz. 
                 Einfach, transparent und sicher.
