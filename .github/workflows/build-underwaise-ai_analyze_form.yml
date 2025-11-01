@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - main
+      - develop
     paths:
       - "code/underwaise-ai/analyze_form/**"
       - ".github/workflows/build-underwaise-ai_analyze_form.yml"
   pull_request:
     branches:
       - main
+      - develop
     paths:
       - "code/underwaise-ai/analyze_form/**"
   workflow_dispatch:
