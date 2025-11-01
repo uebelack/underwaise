@@ -15,6 +15,17 @@ resource "azurerm_container_app" "process_engine" {
     identity = azurerm_user_assigned_identity.container_apps.id
   }
 
+  registry {
+    server               = "ghcr.io"
+    username             = var.ghcr_username
+    password_secret_name = "ghcr-password"
+  }
+
+  secret {
+    name  = "ghcr-password"
+    value = var.ghcr_password
+  }
+
   secret {
     name  = "sql-username"
     value = var.sql_admin_username

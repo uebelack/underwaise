@@ -17,8 +17,7 @@ public class MailService {
         var message = Message.builder().from("Underwaise <no-reply@%s>".formatted(underwaiseProperties.getMailgunDomain()))
                 .to(application.getApplicationForm().getEmail())
                 .subject("Your Application for the Life Spar Lebensversicherung")
-                .text("Hallo %s,\n\nthank you for your application! We will get back to you soon.".formatted()
-                        application.getApplicationForm().getFirstName()
+                .text("Hallo %s %s,\n\nthank you for your application! We will get back to you soon.".formatted(application.getApplicationForm().getFirstName(), application.getApplicationForm().getLastName())
                 ).build();
 
         mailgunMessagesApi.sendMessage(underwaiseProperties.getMailgunDomain(), message);

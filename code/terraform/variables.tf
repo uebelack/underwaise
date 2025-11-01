@@ -73,3 +73,15 @@ variable "home_ip" {
   description = "Home IP address"
   type        = string
 }
+
+# GitHub Container Registry Variables
+variable "ghcr_username" {
+  description = "GitHub Container Registry username"
+  type        = string
+}
+
+variable "ghcr_password" {
+  description = "GitHub Container Registry password (Personal Access Token)"
+  type        = string
+  sensitive   = true
+}

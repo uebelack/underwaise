@@ -12,6 +12,11 @@ sql_admin_password          = "password"
 # Container Images
 process_engine_image_url = "ghcr.io/underwaise/underwaise/underwaise-process-engine:develop"
 
+# GitHub Container Registry
+ghcr_username = "user"
+ghcr_password = "ghp_123"
+
+
 # Process Engine Scaling
 process_engine_min_replicas = 0
 process_engine_max_replicas = 3
