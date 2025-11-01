@@ -1,0 +1,149 @@
+{
+  "nav": {
+    "features": "Features",
+    "benefits": "Benefits",
+    "pricing": "Pricing",
+    "getStarted": "Get Started"
+  },
+  "hero": {
+    "badge": "Versicherung neu gedacht",
+    "title": "Deine Zukunft.",
+    "titleHighlight": "Deine Sicherheit.",
+    "description": "Moderne Lebensversicherung mit transparenten Konditionen und blitzschneller Beantragung. In nur 5 Minuten zum Versicherungsschutz.",
+    "cta": "Jetzt starten",
+    "loading": "Wird geladen...",
+    "duration": "Antragsdauer",
+    "hiddenCosts": "Versteckte Kosten",
+    "support": "Support",
+    "coverageUpTo": "Versicherungssumme bis",
+    "monthlyFrom": "Monatliche Prämie ab",
+    "customers": "Kunden",
+    "trustUs": "vertrauen uns bereits",
+    "altText": "Underwaise Lebensversicherung App auf iPhone"
+  },
+  "stats": {
+    "duration": "5 Min",
+    "durationLabel": "Antragsdauer",
+    "hiddenCosts": "0 CHF",
+    "hiddenCostsLabel": "Versteckte Kosten",
+    "support": "24/7",
+    "supportLabel": "Support",
+    "supportAvailable": "Support verfügbar"
+  },
+  "features": {
+    "title": "Alles was du brauchst,",
+    "titleHighlight": "in einer Lösung",
+    "description": "Moderne Lebensversicherung mit allen wichtigen Features für deine finanzielle Sicherheit und die deiner Familie.",
+    "deathBenefit": {
+      "title": "Todesfallschutz",
+      "description": "Steuerfreie Auszahlung an deine Begünstigten zur Deckung von Bestattungskosten, Schulden, Hypotheken und laufenden Lebenshaltungskosten.",
+      "benefit1": "Sofortige Einmalzahlung",
+      "benefit2": "Deckung Bestattungskosten",
+      "benefit3": "Hypotheken & Schuldenschutz"
+    },
+    "disabilityProtection": {
+      "title": "Invaliditätsschutz",
+      "description": "Einkommensersatz bei Erwerbsunfähigkeit. Deine Familie behält finanzielle Stabilität während der Erholungsphase.",
+      "benefit1": "Monatlicher Einkommensersatz",
+      "benefit2": "Unterstützung Arztkosten",
+      "benefit3": "Rehabilitations-Hilfe"
+    },
+    "financialSecurity": {
+      "title": "Finanzielle Sicherheit",
+      "description": "Deine Familie behält ihren Lebensstandard, bezahlt Bildung und bewältigt tägliche Ausgaben ohne finanzielle Belastung.",
+      "benefit1": "Bildungsfonds Schutz",
+      "benefit2": "Lebenshaltungskosten",
+      "benefit3": "Zukünftige Stabilität"
+    }
+  },
+  "benefits": {
+    "badge": "Vorteile",
+    "title": "Warum",
+    "titleHighlight": "Underwaise",
+    "question": "?",
+    "description": "Moderne Versicherung mit Tradition. Wir kombinieren die Sicherheit eines etablierten Partners mit der Geschwindigkeit und Transparenz der digitalen Welt.",
+    "list": {
+      "onlineApplication": "5-Minuten Online-Antrag",
+      "onlineApplicationDetail": "Einfach, schnell, ohne Papierkram",
+      "coverage": "Deckung bis CHF 400,000+",
+      "coverageDetail": "Flexible Beträge für deine Bedürfnisse",
+      "transparentPricing": "100% Transparente Preise",
+      "transparentPricingDetail": "Keine versteckten Gebühren oder Überraschungen",
+      "comprehensiveCoverage": "Umfassender Schutz",
+      "comprehensiveCoverageDetail": "Todes- und Invaliditätsschutz inklusive",
+      "digitalSupport": "24/7 Digital Support",
+      "digitalSupportDetail": "Immer für dich da, wenn du uns brauchst",
+      "fastPayout": "Schnelle Auszahlung",
+      "fastPayoutDetail": "Im Ernstfall schnell und unkompliziert"
+    },
+    "coverageOverview": {
+      "title": "Deine Deckung auf einen Blick",
+      "deathBenefit": {
+        "label": "Todesfallleistung",
+        "title": "Einmalzahlung",
+        "description": "Steuerfreie Auszahlung für Hypothek, Schulden und Lebenshaltungskosten deiner Familie"
+      },
+      "disabilityProtection": {
+        "label": "Invaliditätsschutz",
+        "title": "Einkommensersatz",
+        "description": "Monatliche Zahlungen bei Erwerbsunfähigkeit für Arztkosten und tägliche Ausgaben"
+      },
+      "peaceOfMind": {
+        "label": "Seelenfrieden",
+        "title": "Vollständiger Schutz",
+        "description": "Keine finanzielle Belastung in schwierigen Zeiten—deine Familie bleibt sicher"
+      }
+    }
+  },
+  "pricing": {
+    "badge": "Pricing",
+    "title": "Faire Preise.",
+    "titleHighlight": "Keine Überraschungen.",
+    "description": "Transparente Preisgestaltung ohne versteckte Kosten. Erhalte sofort ein persönliches Angebot.",
+    "perMonth": "pro Monat",
+    "popular": "Beliebt",
+    "basic": {
+      "name": "Basis",
+      "price": "ab CHF 29",
+      "coverage": "Bis CHF 150,000 Deckung",
+      "deathBenefit": "Todesfallschutz",
+      "support": "Online Support"
+    },
+    "premium": {
+      "name": "Premium",
+      "price": "ab CHF 49",
+      "coverage": "Bis CHF 300,000 Deckung",
+      "protection": "Todes- & Invaliditätsschutz",
+      "support": "Prioritäts-Support",
+      "fastPayout": "Schnelle Auszahlung"
+    },
+    "ultimate": {
+      "name": "Ultimate",
+      "price": "ab CHF 89",
+      "coverage": "Bis CHF 400,000+ Deckung",
+      "protection": "Vollständiger Schutz",
+      "advisor": "Persönlicher Berater",
+      "support": "24/7 Premium-Support"
+    }
+  },
+  "cta": {
+    "badge": "Bereit loszulegen?",
+    "title": "Schütze was dir wichtig ist.",
+    "titleHighlight": "Starte heute.",
+    "description": "Schließe dich tausenden Schweizer Familien an, die uns vertrauen. Einfache Beantragung, transparente Preise und jahrzehntelange Erfahrung.",
+    "startApplication": "Antrag starten"
+  },
+  "footer": {
+    "description": "Moderne Lebensversicherung für die Schweiz. Einfach, transparent und sicher.",
+    "product": "Produkt",
+    "company": "Unternehmen",
+    "aboutUs": "Über uns",
+    "contact": "Kontakt",
+    "privacy": "Datenschutz",
+    "copyright": "© 2025 Underwaise. Alle Rechte vorbehalten."
+  },
+  "header": {
+    "title": "Spar Lebensversicherung",
+    "advice": "Advice"
+  }
+}
