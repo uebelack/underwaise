@@ -2,7 +2,6 @@ package cloud.underwaise.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,11 +28,9 @@ public class ApplicationForm {
     @Column(name = "smoker", nullable = false)
     private boolean smoker;
 
-    @Lob
     @Column(name = "hobbies")
     private String hobbies;
 
-    @Lob
     @Column(name = "health_conditions")
     private String healthConditions;
 }

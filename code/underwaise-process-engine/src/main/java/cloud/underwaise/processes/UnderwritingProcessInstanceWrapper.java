@@ -10,6 +10,8 @@ public class UnderwritingProcessInstanceWrapper {
 
     public static final String APPLICATION_ID_VARIABLE = "applicationId";
 
+    public static final String TRAINING_VARIABLE = "training";
+
     private final RuntimeService runtimeService;
     private final ProcessInstance processInstance;
 
@@ -24,5 +26,13 @@ public class UnderwritingProcessInstanceWrapper {
 
     public Long getApplicationId() {
         return (Long) runtimeService.getVariable(processInstance.getProcessInstanceId(), APPLICATION_ID_VARIABLE);
+    }
+
+    public Boolean getTraining() {
+        return (Boolean) runtimeService.getVariable(processInstance.getProcessInstanceId(), TRAINING_VARIABLE);
+    }
+
+    public void setTraining(Boolean training) {
+        runtimeService.setVariable(processInstance.getProcessInstanceId(), TRAINING_VARIABLE, training);
     }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import "./life-star-form.style.scss";
 import { ButtonGroup } from "../ui/button-group";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -37,11 +38,31 @@ const postApplication = async (data: z.infer<typeof formSchema>) => {
 
 type FormValues = z.infer<typeof formSchema>;
 
+const calculateFormCompletion = (values: FormValues): number => {
+  const fields = [
+    values.firstName,
+    values.lastName,
+    values.email,
+    values.birthDate,
+    values.smoker !== undefined, // For boolean field, check if it's defined
+    values.hobbies,
+    values.healthConditions,
+  ];
+
+  const filledFields = fields.filter((field) => {
+    if (typeof field === "boolean") return true; // Boolean fields are always considered filled
+    if (typeof field === "string") return field.trim().length > 0;
+    return false;
+  });
+
+  const percentage = Math.round((filledFields.length / fields.length) * 100);
+  return percentage;
+};
+
 export function LifeStarForm() {
   const router = useRouter();
-  const [submitStatus, setSubmitStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
+
+  const [completionPercentage, setCompletionPercentage] = useState<number>(14);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -57,25 +78,38 @@ export function LifeStarForm() {
     mode: "onTouched",
   });
 
-  const mutation = useMutation({
+  const watchedValues = form.watch();
+
+  useEffect(() => {
+    const percentage = calculateFormCompletion(watchedValues);
+    setCompletionPercentage(percentage);
+  }, [watchedValues]);
+
+  const { mutate: submitApplication, isPending } = useMutation({
     mutationFn: postApplication,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log(data);
       router.push("/spar-lebensversicherung/thank-you");
     },
     onError: () => {
-      console.log("ERROR");
-      setSubmitStatus("error");
+      toast.error("There was an error submitting your application.");
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    mutation.mutate(values);
+    submitApplication(values);
   }
 
   return (
     <div className="form-container">
-      <h2>TBD</h2>
+      <div className="form-progress">
+        <div
+          className="progress-indicator"
+          style={{ width: `${completionPercentage}%` }}
+        />
+      </div>
+
+      <h2>Apply now for your life Spar Lebensversicherung</h2>
       <p className="subtitle">Please fill out the form with your information</p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -242,16 +276,16 @@ export function LifeStarForm() {
                 className="secondary-action"
                 asChild
               >
-                <Link href="/">Back</Link>
+                <Link href="/">Cancel</Link>
               </Button>
               <Button
                 size="lg"
                 variant="default"
                 type="submit"
                 className="primary-action"
-                disabled={mutation.isPending || !form.formState.isValid}
+                disabled={isPending || !form.formState.isValid}
               >
-                {mutation.isPending ? (
+                {isPending ? (
                   <span>Submitting Application...</span>
                 ) : (
                   <span>Submit Application</span>
