@@ -3,14 +3,14 @@
     "features": "Features",
     "benefits": "Benefits",
     "pricing": "Pricing",
-    "getStarted": "Get Started"
+    "getStarted": "Get Insured Now"
   },
   "hero": {
     "badge": "Insurance reimagined",
     "title": "Your Future.",
     "titleHighlight": "Your Security.",
     "description": "Modern life insurance with transparent terms and lightning-fast application. Get insurance coverage in just 5 minutes.",
-    "cta": "Get Started",
+    "cta": "Get Insured Now",
     "loading": "Loading...",
     "duration": "Application time",
     "hiddenCosts": "Hidden costs",

@@ -3,14 +3,14 @@
     "features": "Features",
     "benefits": "Benefits",
     "pricing": "Pricing",
-    "getStarted": "Get Started"
+    "getStarted": "Jetzt versichern"
   },
   "hero": {
     "badge": "Versicherung neu gedacht",
     "title": "Deine Zukunft.",
     "titleHighlight": "Deine Sicherheit.",
     "description": "Moderne Lebensversicherung mit transparenten Konditionen und blitzschneller Beantragung. In nur 5 Minuten zum Versicherungsschutz.",
-    "cta": "Jetzt starten",
+    "cta": "Jetzt versichern",
     "loading": "Wird geladen...",
     "duration": "Antragsdauer",
     "hiddenCosts": "Versteckte Kosten",
