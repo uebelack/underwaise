@@ -10,7 +10,7 @@ import json
 import os
 from langchain_openai import AzureChatOpenAI
 
-API_VERSION = "2025-04-01-preview"
+API_VERSION = "2025-11-01-preview"
 
 
 def get_gpt_mini_llm():
