@@ -3,9 +3,13 @@ package cloud.underwaise.services;
 import cloud.underwaise.UnderwaiseProperties;
 import cloud.underwaise.ai.analyzeform.api.DefaultApi;
 import cloud.underwaise.ai.analyzeform.model.UnderwriteRequest;
+import cloud.underwaise.mapper.HealthConditionListToTreatmentsMapper;
+import cloud.underwaise.model.HealthConditionForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,5 +30,17 @@ public class AnalyzeFormAiService {
         log.debug("risk result: {} {}", result.getRiskScore(), result.getExplanation());
 
         return result.getRiskScore();
+    }
+
+    public Integer accessRiskForPhysicalHealthCondition(List<HealthConditionForm> healthConditionForm) {
+        log.debug("Accessing risk for physical health condition: {}", healthConditionForm);
+        var api = new DefaultApi();
+        api.getApiClient().setBasePath(underwaiseProperties.getAnalyzeFormAiUrl());
+        var result = api.assessPhysicalHealthAssessPhysicalHealthPost(
+                HealthConditionListToTreatmentsMapper.map(healthConditionForm));
+
+//        log.debug("risk result: {} {}", result.getRiskScore(), result.getExplanation());
+//
+        return result.getOverallRiskScore(); //todo Or calculate the overall risk on backend side!
     }
 }

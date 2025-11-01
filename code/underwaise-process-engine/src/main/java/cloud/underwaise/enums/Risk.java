@@ -2,6 +2,8 @@ package cloud.underwaise.enums;
 
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 @Getter
 public enum Risk {
     NONE("none"),
@@ -27,5 +29,9 @@ public enum Risk {
             return HIGH;
         }
         return SEVERE;
+    }
+
+    public static Risk fromValue(BigDecimal hobbyScore) {
+        return fromValue(hobbyScore.intValue());
     }
 }

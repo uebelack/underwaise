@@ -12,6 +12,10 @@ import org.cibseven.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Map;
 
 import static cloud.underwaise.processes.UnderwritingProcessInstanceWrapper.APPLICATION_ID_VARIABLE;
@@ -50,7 +54,7 @@ public class UnderwritingService {
 
         var application = new Application();
         application.setApplicationForm(applicationForm);
-        application.setApplicationFeature(new ApplicationFeature());
+        application.setApplicationFeature(createApplicationFeature(applicationForm));
         Application savedApplication = applicationRepository.save(application);
 
         runtimeService.startProcessInstanceByKey(
@@ -61,4 +65,28 @@ public class UnderwritingService {
 
         return savedApplication;
     }
+
+    private ApplicationFeature createApplicationFeature(ApplicationForm applicationForm) {
+        var feature = new ApplicationFeature();
+        feature.setSmoker(applicationForm.getIsSmoker());
+        if (applicationForm.getBirthDate() != null) {
+            feature.setAge(calculateAge(applicationForm.getBirthDate()));
+        }
+        if (applicationForm.getHeight() > 0 && applicationForm.getWeight() > 0) {
+            feature.setBmi(calculateBmi(applicationForm.getHeight(), applicationForm.getWeight()));
+        }
+        return feature;
+    }
+
+    private BigDecimal calculateBmi(int height, int weight) {
+        BigDecimal heightInMeters = BigDecimal.valueOf(height).divide(BigDecimal.valueOf(100));
+        BigDecimal heightSquared = heightInMeters.multiply(heightInMeters);
+        return BigDecimal.valueOf(weight).divide(heightSquared, 2, RoundingMode.HALF_UP);
+    }
+
+    private int calculateAge(LocalDate date) {
+        LocalDate today = LocalDate.now();
+        return Period.between(date, today).getYears();
+    }
+
 }
