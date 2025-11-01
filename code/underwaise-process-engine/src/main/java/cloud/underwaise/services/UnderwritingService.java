@@ -1,5 +1,6 @@
 package cloud.underwaise.services;
 
+import cloud.underwaise.UnderwaiseProperties;
 import cloud.underwaise.model.Application;
 import cloud.underwaise.model.ApplicationForm;
 import cloud.underwaise.processes.UnderwritingProcessInstanceWrapper;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 
 import static cloud.underwaise.processes.UnderwritingProcessInstanceWrapper.APPLICATION_ID_VARIABLE;
+import static cloud.underwaise.processes.UnderwritingProcessInstanceWrapper.TRAINING_VARIABLE;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ import static cloud.underwaise.processes.UnderwritingProcessInstanceWrapper.APPL
 public class UnderwritingService {
     private final RuntimeService runtimeService;
     private final ApplicationRepository applicationRepository;
+    private final UnderwaiseProperties underwaiseProperties;
 
     @Transactional
     public Application start(ApplicationForm applicationForm) {
@@ -30,7 +33,8 @@ public class UnderwritingService {
 
         runtimeService.startProcessInstanceByKey(
                 UnderwritingProcessInstanceWrapper.PROCESS_DEFINITION_KEY,
-                Map.of(APPLICATION_ID_VARIABLE, savedApplication.getId())
+                Map.of(APPLICATION_ID_VARIABLE, savedApplication.getId(),
+                        TRAINING_VARIABLE, underwaiseProperties.isTrainingActive())
         );
 
         return savedApplication;

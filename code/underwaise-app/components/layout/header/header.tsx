@@ -9,7 +9,9 @@ export default function Header() {
   return (
     <header>
       <div className="content">
-        <Image src="/pax-logo.svg" alt="Pax Logo" width={50} height={36} />
+        <Link href="/">
+          <Image src="/pax-logo.svg" alt="Pax Logo" width={50} height={36} />
+        </Link>
         <div className="spacer" />
         <h1>Spar Lebensversicherung</h1>
         <Button

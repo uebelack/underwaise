@@ -27,6 +27,13 @@ def infer(model_file: str = Query(..., description="Path to the model file (.job
             random_state=42
         )
 
+        label_map = {
+            0: 'Acceptance',
+            1: 'Risk surcharge indicated',
+            2: 'Additional clarification indicated',
+            3: 'Rejection'
+        }
+
         # Example inference
         new_sample = X[0].reshape(1, -1)
         new_sample_scaled = loaded_scaler.transform(new_sample)

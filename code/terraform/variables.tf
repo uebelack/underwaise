@@ -60,13 +60,13 @@ variable "process_engine_memory" {
 variable "process_engine_min_replicas" {
   description = "Minimum number of replicas for process engine"
   type        = number
-  default     = 0
+  default     = 1
 }
 
 variable "process_engine_max_replicas" {
   description = "Maximum number of replicas for process engine"
   type        = number
-  default     = 3
+  default     = 4
 }
 
 variable "home_ip" {
@@ -84,4 +84,16 @@ variable "ghcr_password" {
   description = "GitHub Container Registry password (Personal Access Token)"
   type        = string
   sensitive   = true
+}
+
+variable "openai_gpt_mini_capacity" {
+  description = "Token capacity for the GPT deployment"
+  type        = number
+  default     = 100
+}
+
+variable "openai_gpt_chat_capacity" {
+  description = "Token capacity for the GPT deployment"
+  type        = number
+  default     = 100
 }

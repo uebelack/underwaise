@@ -19,12 +19,22 @@ SCALER_FILENAME = f"scaler_{MULTI_CLASS_STRATEGY}.joblib"
 
 df = pd.read_csv('../../../assets/testdaten_underwriting.csv', encoding='latin1',delimiter=';')
 
+label_map = {
+    'Acceptance': 0,
+    'Risk surcharge indicated': 1,
+    'Additional clarification indicated': 2,
+    'Rejection': 3
+}
+
 
 target_col = 'Target'
+non_relevant_features = ['First name','Last name']
+
+non_relevant_features.append(target_col)
 
 # Separate features and target
-y = df[target_col].values
-X = df.drop(columns=[target_col])
+y = df[target_col].map(label_map).values
+X = df.drop(columns=non_relevant_features)
 
 # Convert categorical variables to numeric (e.g., one-hot encoding)
 X = pd.get_dummies(X, drop_first=True)
@@ -32,23 +42,6 @@ X = pd.get_dummies(X, drop_first=True)
 # Convert to NumPy arrays for sklearn compatibility
 X = X.values
 
-# Verify shapes
-print("Feature matrix shape:", X.shape)
-print("Target vector shape:", y.shape)
-print(X)
-
-# -------------------------------
-# 2. Generate 4-Class Dataset
-# -------------------------------
-X, y = make_classification(
-    n_samples=1000,
-    n_features=20,
-    n_informative=10,
-    n_redundant=2,
-    n_classes=4,
-    n_clusters_per_class=1,
-    random_state=42
-)
 
 print(f"Features shape: {X.shape}")
 print(f"Target shape: {y.shape}")
