@@ -25,6 +25,8 @@ process_engine_memory       = "2Gi"
 
 home_ip = "12.12.12.12"
 
+mailgun_api_key = "123"
+
 tags = {
   Project     = "Underwaise"
   ManagedBy   = "Terraform"

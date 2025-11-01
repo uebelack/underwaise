@@ -42,6 +42,10 @@ resource "azurerm_container_app" "process_engine" {
     value = "jdbc:sqlserver://${azurerm_mssql_server.main.fully_qualified_domain_name}:1433;database=${azurerm_mssql_database.process_engine.name};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"
   }
 
+  secret {
+    name  = "mailgun-api-key"
+    value = var.mailgun_api_key
+  }
 
   template {
     min_replicas = var.process_engine_min_replicas
@@ -71,6 +75,11 @@ resource "azurerm_container_app" "process_engine" {
       env {
         name  = "SPRING_DATASOURCE_PASSWORD"
         secret_name = "sql-password"
+      }
+
+      env {
+        name  = "UNDERWAISE_MAILGUN_API_KEY"
+        secret_name = "mailgun-api-key"
       }
 
       env {
