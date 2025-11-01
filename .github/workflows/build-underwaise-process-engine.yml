@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - main
+      - develop
     paths:
       - "code/underwaise-process-engine/**"
       - ".github/workflows/build-underwaise-process-engine.yml"
   pull_request:
     branches:
       - main
+      - develop
     paths:
       - "code/underwaise-process-engine/**"
   workflow_dispatch:

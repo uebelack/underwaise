@@ -15,7 +15,7 @@ public class MailService {
 
     public void sendApplicationMail(Application application) {
         var message = Message.builder().from("Underwaise <no-reply@%s>".formatted(underwaiseProperties.getMailgunDomain()))
-                .to(application.getApplicationForm().email())
+                .to(application.getApplicationForm().getEmail())
                 .subject("Test")
                 .text("This is a test email.")
                 .build();
