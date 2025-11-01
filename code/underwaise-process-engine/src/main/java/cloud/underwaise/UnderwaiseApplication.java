@@ -64,6 +64,9 @@ public class UnderwaiseApplication {
             applicationForm.setIncapacityForm(new ArrayList<>());
             applicationForm.setSpecialSportActivities("Fallschirmspringen und Fahren mit dem Rennvelo");
 
+            applicationForm.setHeight(180);
+            applicationForm.setWeight(120);
+            
             underwritingService.start(applicationForm);
         }
     }

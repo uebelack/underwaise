@@ -69,8 +69,12 @@ public class UnderwritingService {
     private ApplicationFeature createApplicationFeature(ApplicationForm applicationForm) {
         var feature = new ApplicationFeature();
         feature.setSmoker(applicationForm.getIsSmoker());
-        feature.setAge(calculateAge(applicationForm.getBirthDate()));
-        feature.setBmi(calculateBmi(applicationForm.getHeight(), applicationForm.getWeight()));
+        if (applicationForm.getBirthDate() != null) {
+            feature.setAge(calculateAge(applicationForm.getBirthDate()));
+        }
+        if (applicationForm.getHeight() > 0 && applicationForm.getWeight() > 0) {
+            feature.setBmi(calculateBmi(applicationForm.getHeight(), applicationForm.getWeight()));
+        }
         return feature;
     }
 
