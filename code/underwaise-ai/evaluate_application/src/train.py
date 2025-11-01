@@ -16,8 +16,8 @@ import os
 MULTI_CLASS_STRATEGY = "ovr"  # options: "ovr" or "ovo"
 
 # Filenames for saving the model and scaler
-MODEL_FILENAME = f"svm_model.joblib"
-SCALER_FILENAME = f"scaler.joblib"
+MODEL_FILENAME = f"../svm_model.joblib"
+SCALER_FILENAME = f"../scaler.joblib"
 
 
 conn = pyodbc.connect(os.getenv("SQL_CONN_STRING"))
