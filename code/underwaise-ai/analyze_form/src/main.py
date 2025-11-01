@@ -40,7 +40,7 @@ app.add_middleware(
 # ------------ Hobbies Risk Assessment ------------
 
 class UnderwriteRequest(BaseModel):
-    text: str = Field(..., description="Freitext zu Hobbys, Aktivitäten, Verhalten")
+    specialSportActivities: str = Field(..., description="Freitext zu Hobbys, Aktivitäten, Verhalten")
 
 
 class UnderwriteResponse(BaseModel):
@@ -50,19 +50,7 @@ class UnderwriteResponse(BaseModel):
 
 @app.post("/get_risk_from_hobbies", response_model=UnderwriteResponse)
 def get_risk_from_hobbies(req: UnderwriteRequest):
-    """Assess risk from hobbies/activities with a single score.
-    
-    Example request:
-    {
-        "text": "Ich gehe regelmäßig Fallschirmspringen und Klettern. Außerdem spiele ich gerne Fußball am Wochenende."
-    }
-    
-    Example response:
-    {
-        "risk_score": 7,
-        "explanation": "Fallschirmspringen ist eine Hochrisiko-Sportart mit erhöhtem Verletzungs- und Todesrisiko. Klettern trägt ebenfalls zu einem erhöhten Risiko bei."
-    }
-    """
+    """Assess risk from hobbies/activities with a single score."""
 
     prompt = f"""
 Du bist ein Underwriting-Assistant. Analysiere die Hobbys/Aktivitäten und gib EINEN Risikowert zurück.
@@ -94,7 +82,7 @@ Du bist ein Underwriting-Assistant. Analysiere die Hobbys/Aktivitäten und gib E
 - Erklärung soll konkret auf den Text eingehen
 
 **Text:**
-\"\"\"{req.text}\"\"\"
+\"\"\"{req.specialSportActivities}\"\"\"
 """
 
     return _assess_risk(prompt)
@@ -103,8 +91,13 @@ Du bist ein Underwriting-Assistant. Analysiere die Hobbys/Aktivitäten und gib E
 # ------------ Health Questions Risk Assessment ------------
 
 class FlexibleHealthRequest(BaseModel):
-    """Accepts any list of treatment objects with flexible structure"""
-    treatments: List[dict] = Field(..., description="List of treatment objects with any structure")
+    """Accepts any dictionary structure - no field validation"""
+    model_config = {"extra": "allow"}
+    
+    def __init__(self, **data):
+        # Pass through any data without validation
+        super().__init__()
+        self.__dict__.update(data)
 
 
 # Remove all the specific treatment models, keep only response models
@@ -151,8 +144,18 @@ def _assess_risk(prompt: str) -> UnderwriteResponse:
 
 
 # Reusable function for health question assessment
-def _assess_health_treatments(treatments: List[dict], question_context: str) -> HealthQuestionResponse:
+def _assess_health_treatments(request_data: dict, question_context: str) -> HealthQuestionResponse:
     """Reusable function to assess multiple treatment lines."""
+    
+    # Extract treatments from whatever field name is provided
+    treatments = None
+    for key, value in request_data.items():
+        if isinstance(value, list) and len(value) > 0:
+            treatments = value
+            break
+    
+    if not treatments:
+        raise HTTPException(status_code=400, detail="No treatment list found in request")
     
     # Convert treatment objects to readable strings for the LLM
     treatment_strings = []
@@ -246,68 +249,12 @@ Interpretiere die JSON-Daten flexibel - nicht alle Felder sind immer vorhanden.
 
 
 @app.post("/assess_physical_health", response_model=HealthQuestionResponse)
-def assess_physical_health(req: FlexibleHealthRequest):
+async def assess_physical_health(request_data: dict):
     """
     Endpoint 1: Physical health complaints, illnesses, accidents in past 5 years
     
     Question: Have you had any health complaints, illnesses, consequences of accidents, 
     or congenital conditions in the past five years for which you sought treatment?
-    
-    Expected format: List of treatment objects with flexible structure
-    
-    Example request:
-    {
-        "treatments": [
-            {
-                "period_start": "2022-01",
-                "period_end": "2023-06",
-                "reason": "Rückenschmerzen",
-                "therapist_name": "Dr. Schmidt",
-                "therapist_address": "Orthopädie München",
-                "treatment_completed": true
-            },
-            {
-                "period_start": "2021-02",
-                "period_end": "2021-03",
-                "reason": "Grippeerkrankung",
-                "therapist_name": "Dr. Müller",
-                "therapist_address": "Hausarzt Berlin",
-                "treatment_completed": true
-            },
-            {
-                "period_start": "2020-06",
-                "reason": "Bluthochdruck",
-                "therapist_name": "Dr. Wagner",
-                "treatment_completed": false
-            }
-        ]
-    }
-    
-    Example response:
-    {
-        "overall_risk_score": 6,
-        "treatment_scores": [
-            {
-                "line_number": 1,
-                "treatment_text": "{\"period_start\": \"2022-01\", \"period_end\": \"2023-06\", \"reason\": \"Rückenschmerzen\", \"therapist_name\": \"Dr. Schmidt\", \"therapist_address\": \"Orthopädie München\", \"treatment_completed\": true}",
-                "risk_score": 4,
-                "explanation": "Rückenschmerzen sind häufig, die Behandlung ist abgeschlossen - moderates Risiko"
-            },
-            {
-                "line_number": 2,
-                "treatment_text": "{\"period_start\": \"2021-02\", \"period_end\": \"2021-03\", \"reason\": \"Grippeerkrankung\", \"therapist_name\": \"Dr. Müller\", \"therapist_address\": \"Hausarzt Berlin\", \"treatment_completed\": true}",
-                "risk_score": 1,
-                "explanation": "Normale Grippeerkrankung, vollständig ausgeheilt - sehr niedriges Risiko"
-            },
-            {
-                "line_number": 3,
-                "treatment_text": "{\"period_start\": \"2020-06\", \"reason\": \"Bluthochdruck\", \"therapist_name\": \"Dr. Wagner\", \"treatment_completed\": false}",
-                "risk_score": 6,
-                "explanation": "Chronischer Bluthochdruck, noch in Behandlung - mittleres bis hohes Risiko"
-            }
-        ],
-        "summary": "Überwiegend behandelbare Erkrankungen. Der laufende Bluthochdruck erhöht das Gesamtrisiko auf ein mittleres Niveau."
-    }
     """
     
     context = """
@@ -315,69 +262,30 @@ Frage: Hatten Sie in den letzten fünf Jahren gesundheitliche Beschwerden, Krank
 Unfallfolgen oder angeborene Leiden, wegen derer Sie in ärztlicher Behandlung waren?
 
 Erwartete Felder (können variieren):
-- period_start, period_end: Zeitraum der Behandlung
-- reason: Grund/Diagnose
-- therapist_name, therapist_address: Therapeut/Arzt
-- treatment_completed: Ob abgeschlossen
+- startDate: Startdatum der Behandlung (YYYY-MM-DD)
+- endDate: Enddatum der Behandlung (YYYY-MM-DD oder null wenn laufend)
+- reason: Grund/Diagnose der Behandlung
+- isTreatmentCompleted: Boolean - ob Behandlung abgeschlossen ist
+- treatmentFacilityAddress: Adresse der Behandlungseinrichtung (optional)
 
 Bewerte jede Behandlung basierend auf:
 - Art der Erkrankung/Beschwerde
 - Zeitraum (kürzlich vs. vor Jahren)
-- Ob die Behandlung abgeschlossen ist
+- Ob die Behandlung abgeschlossen ist (isTreatmentCompleted)
 - Schweregrad der Erkrankung
+- Chronisch vs. akut
 """
     
-    return _assess_health_treatments(req.treatments, context)
+    return _assess_health_treatments(request_data, context)
 
 
 @app.post("/assess_mental_health", response_model=HealthQuestionResponse)
-def assess_mental_health(req: FlexibleHealthRequest):
+async def assess_mental_health(request_data: dict):
     """
     Endpoint 2: Psychiatric, psychological, or psychotherapeutic treatment
     
     Question: Have you ever been advised or treated by a psychiatrist, psychologist, 
     or psychotherapist?
-    
-    Expected format: List of treatment objects with flexible structure
-    
-    Example request:
-    {
-        "treatments": [
-            {
-                "period_start": "2019-03",
-                "period_end": "2020-09",
-                "reason": "Burnout nach Jobwechsel",
-                "therapist_name": "Dr. Weber",
-                "treatment_completed": true
-            },
-            {
-                "period_start": "2022-01",
-                "reason": "Angststörung",
-                "therapist_name": "Prof. Klein",
-                "treatment_completed": false
-            }
-        ]
-    }
-    
-    Example response:
-    {
-        "overall_risk_score": 7,
-        "treatment_scores": [
-            {
-                "line_number": 1,
-                "treatment_text": "{\"period_start\": \"2019-03\", \"period_end\": \"2020-09\", \"reason\": \"Burnout nach Jobwechsel\", \"therapist_name\": \"Dr. Weber\", \"treatment_completed\": true}",
-                "risk_score": 5,
-                "explanation": "Burnout durch konkreten Auslöser, Behandlung abgeschlossen - mittleres Risiko mit Rezidivgefahr"
-            },
-            {
-                "line_number": 2,
-                "treatment_text": "{\"period_start\": \"2022-01\", \"reason\": \"Angststörung\", \"therapist_name\": \"Prof. Klein\", \"treatment_completed\": false}",
-                "risk_score": 7,
-                "explanation": "Laufende Behandlung einer Angststörung - hohes Risiko für Berufsunfähigkeit und Rückfall"
-            }
-        ],
-        "summary": "Die laufende psychiatrische Behandlung wegen Angststörung stellt ein erhöhtes Risiko dar. In Kombination mit der Burnout-Vorgeschichte besteht erhöhte Rezidivgefahr."
-    }
     """
     
     context = """
@@ -387,85 +295,31 @@ Beratung oder Behandlung?
 WICHTIG: Psychische Erkrankungen haben oft ein HÖHERES Risiko für Berufsunfähigkeit!
 
 Erwartete Felder (können variieren):
-- period_start, period_end: Zeitraum der Behandlung
-- reason: Art der psychischen Erkrankung
-- therapist_name, therapist_address: Therapeut/Psychiater
-- treatment_completed: Ob abgeschlossen
+- startDate: Startdatum der Behandlung (YYYY-MM-DD)
+- endDate: Enddatum der Behandlung (YYYY-MM-DD oder null wenn laufend)
+- reason: Art der psychischen Erkrankung/Behandlung
+- isTreatmentCompleted: Boolean - ob Behandlung abgeschlossen ist
+- treatmentFacilityAddress: Adresse der Behandlungseinrichtung (optional)
 
 Bewerte jede Behandlung basierend auf:
 - Art der psychischen Erkrankung (Depression, Burnout, Angststörung, etc.)
 - Schweregrad (leicht vs. schwer)
 - Zeitraum und Dauer
-- Ob die Behandlung abgeschlossen ist
+- Ob die Behandlung abgeschlossen ist (isTreatmentCompleted)
 - Rezidivrisiko (Rückfallgefahr)
 - Auswirkungen auf Arbeitsfähigkeit
 """
     
-    return _assess_health_treatments(req.treatments, context)
+    return _assess_health_treatments(request_data, context)
 
 
 @app.post("/assess_medication", response_model=HealthQuestionResponse)
-def assess_medication(req: FlexibleHealthRequest):
+async def assess_medication(request_data: dict):
     """
     Endpoint 3: Regular medication use in past 5 years
     
     Question: Have you taken or do you take medication regularly in the past five years 
     (excluding contraception)?
-    
-    Expected format: List of medication objects with flexible structure
-    
-    Example request:
-    {
-        "treatments": [
-            {
-                "period_start": "2020-03",
-                "reason": "Bluthochdruck",
-                "medication_name": "Ramipril",
-                "dosage": "5mg täglich",
-                "treatment_completed": false
-            },
-            {
-                "period_start": "2021-06",
-                "period_end": "2022-02",
-                "reason": "Rückenschmerzen",
-                "medication_name": "Ibuprofen",
-                "dosage": "400mg bei Bedarf",
-                "treatment_completed": true
-            },
-            {
-                "period_start": "2019-09",
-                "reason": "Depression",
-                "medication_name": "Sertralin",
-                "dosage": "50mg täglich"
-            }
-        ]
-    }
-    
-    Example response:
-    {
-        "overall_risk_score": 7,
-        "treatment_scores": [
-            {
-                "line_number": 1,
-                "treatment_text": "{\"period_start\": \"2020-03\", \"reason\": \"Bluthochdruck\", \"medication_name\": \"Ramipril\", \"dosage\": \"5mg täglich\", \"treatment_completed\": false}",
-                "risk_score": 6,
-                "explanation": "Dauerhafte Blutdruckmedikation deutet auf chronische Herz-Kreislauf-Erkrankung - mittleres bis hohes Risiko"
-            },
-            {
-                "line_number": 2,
-                "treatment_text": "{\"period_start\": \"2021-06\", \"period_end\": \"2022-02\", \"reason\": \"Rückenschmerzen\", \"medication_name\": \"Ibuprofen\", \"dosage\": \"400mg bei Bedarf\", \"treatment_completed\": true}",
-                "risk_score": 3,
-                "explanation": "Zeitlich begrenzte Schmerzmedikation, abgeschlossen - niedriges Risiko"
-            },
-            {
-                "line_number": 3,
-                "treatment_text": "{\"period_start\": \"2019-09\", \"reason\": \"Depression\", \"medication_name\": \"Sertralin\", \"dosage\": \"50mg täglich\"}",
-                "risk_score": 7,
-                "explanation": "Langfristige Antidepressiva-Einnahme deutet auf chronische Depression - hohes Risiko für Berufsunfähigkeit"
-            }
-        ],
-        "summary": "Mehrere chronische Medikationen laufen noch. Besonders die Antidepressiva-Dauermedikation erhöht das Risiko deutlich."
-    }
     """
     
     context = """
@@ -473,83 +327,33 @@ Frage: Haben Sie in den letzten fünf Jahren regelmäßig Medikamente eingenomme
 (außer Verhütungsmittel)?
 
 Erwartete Felder (können variieren):
-- period_start, period_end: Zeitraum der Medikation
+- startDate: Startdatum der Medikation (YYYY-MM-DD)
+- endDate: Enddatum der Medikation (YYYY-MM-DD oder null wenn laufend)
 - reason: Grund für die Medikation
-- medication_name: Name des Medikaments
-- dosage: Dosierung
-- treatment_completed: Ob die Einnahme beendet ist
+- medicationNameAndDosage: Name und Dosierung des Medikaments
+- medicationPeriodicity: Häufigkeit (z.B. DAILY, WEEKLY)
+- isTreatmentCompleted: Boolean - ob Medikation beendet ist
 
 Bewerte jede Medikation basierend auf:
-- Art des Medikaments (z.B. Blutdrucksenker, Antidepressiva, Schmerzmittel)
-- Grund für die Medikation (zugrunde liegende Erkrankung)
-- Dauer der Einnahme (kurz vs. dauerhaft)
-- Dosierung
-- Ob die Medikation noch läuft oder abgeschlossen ist
+- Art des Medikaments und zugrunde liegende Erkrankung
+- Grund für die Medikation (reason)
+- Dauer der Einnahme (startDate bis endDate)
+- Häufigkeit der Einnahme (medicationPeriodicity)
+- Ob die Medikation noch läuft (isTreatmentCompleted)
 - Schweregrad der zugrunde liegenden Erkrankung
 """
     
-    return _assess_health_treatments(req.treatments, context)
+    return _assess_health_treatments(request_data, context)
 
 
 @app.post("/assess_work_disability", response_model=HealthQuestionResponse)
-def assess_work_disability(req: FlexibleHealthRequest):
+async def assess_work_disability(request_data: dict):
     """
     Endpoint 4: Work disability or inability to work in past 5 years
     
     Question: Is your ability to work or earn currently restricted, or have you been 
     fully or partially unable to work for more than four consecutive weeks in the past 
     five years due to health reasons?
-    
-    Expected format: List of work disability objects with flexible structure
-    
-    Example request:
-    {
-        "treatments": [
-            {
-                "period_start": "2022-03",
-                "period_end": "2022-05",
-                "reason": "Bandscheibenvorfall mit OP",
-                "recovery_status": "Vollständig wiederhergestellt"
-            },
-            {
-                "period_start": "2023-01",
-                "period_end": "2023-03",
-                "reason": "Burnout",
-                "recovery_status": "Teilweise arbeitsfähig"
-            },
-            {
-                "period_start": "2021-11",
-                "period_end": "2021-12",
-                "reason": "Komplizierter Armbruch"
-            }
-        ]
-    }
-    
-    Example response:
-    {
-        "overall_risk_score": 8,
-        "treatment_scores": [
-            {
-                "line_number": 1,
-                "treatment_text": "{\"period_start\": \"2022-03\", \"period_end\": \"2022-05\", \"reason\": \"Bandscheibenvorfall mit OP\", \"recovery_status\": \"Vollständig wiederhergestellt\"}",
-                "risk_score": 6,
-                "explanation": "OP-bedürftiger Bandscheibenvorfall mit 8 Wochen Arbeitsunfähigkeit - mittleres bis hohes Rezidivrisiko"
-            },
-            {
-                "line_number": 2,
-                "treatment_text": "{\"period_start\": \"2023-01\", \"period_end\": \"2023-03\", \"reason\": \"Burnout\", \"recovery_status\": \"Teilweise arbeitsfähig\"}",
-                "risk_score": 8,
-                "explanation": "Längere Arbeitsunfähigkeit wegen Burnout, nur teilweise wiederhergestellt - hohes Risiko für erneute AU"
-            },
-            {
-                "line_number": 3,
-                "treatment_text": "{\"period_start\": \"2021-11\", \"period_end\": \"2021-12\", \"reason\": \"Komplizierter Armbruch\"}",
-                "risk_score": 4,
-                "explanation": "Unfallbedingte AU, vollständig geheilt - niedriges bis mittleres Risiko"
-            }
-        ],
-        "summary": "Mehrere längere Arbeitsunfähigkeitsphasen in den letzten Jahren. Besonders kritisch ist das Burnout mit nur teilweiser Wiederherstellung - sehr hohes Risiko für erneute Berufsunfähigkeit."
-    }
     """
     
     context = """
@@ -560,21 +364,21 @@ arbeitsunfähig aus gesundheitlichen Gründen?
 SEHR WICHTIG: Arbeitsunfähigkeit ist ein STARKER Indikator für hohes Risiko!
 
 Erwartete Felder (können variieren):
-- period_start, period_end: Zeitraum der Arbeitsunfähigkeit
+- startDate: Startdatum der Arbeitsunfähigkeit (YYYY-MM-DD)
+- endDate: Enddatum der Arbeitsunfähigkeit (YYYY-MM-DD oder null wenn aktuell noch AU)
 - reason: Grund für die Arbeitsunfähigkeit
-- recovery_status: Aktueller Genesungsstatus
-- disability_type: Vollständig oder teilweise arbeitsunfähig
+- isTreatmentCompleted: Boolean - ob wieder arbeitsfähig
 
 Bewerte jede Phase der Arbeitsunfähigkeit basierend auf:
-- Dauer der Arbeitsunfähigkeit (4 Wochen vs. Monate)
-- Grund (Art der Erkrankung)
-- Vollständige vs. teilweise Arbeitsunfähigkeit
-- Ist die Person wieder voll arbeitsfähig?
+- Dauer der Arbeitsunfähigkeit (Differenz zwischen startDate und endDate)
+- Grund (Art der Erkrankung im reason Feld)
+- Ob Person wieder arbeitsfähig ist (isTreatmentCompleted)
 - Rezidivrisiko
 - Chronische vs. akute Ursache
+- Besonders kritisch: psychische Erkrankungen, lange Ausfallzeiten (>3 Monate)
 """
     
-    return _assess_health_treatments(req.treatments, context)
+    return _assess_health_treatments(request_data, context)
 
 
 # ------------ Debug Endpoint (DELETE AFTER USE) ------------
