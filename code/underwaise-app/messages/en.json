@@ -1,0 +1,149 @@
+{
+  "nav": {
+    "features": "Features",
+    "benefits": "Benefits",
+    "pricing": "Pricing",
+    "getStarted": "Get Started"
+  },
+  "hero": {
+    "badge": "Insurance reimagined",
+    "title": "Your Future.",
+    "titleHighlight": "Your Security.",
+    "description": "Modern life insurance with transparent terms and lightning-fast application. Get insurance coverage in just 5 minutes.",
+    "cta": "Get Started",
+    "loading": "Loading...",
+    "duration": "Application time",
+    "hiddenCosts": "Hidden costs",
+    "support": "Support",
+    "coverageUpTo": "Coverage up to",
+    "monthlyFrom": "Monthly premium from",
+    "customers": "Customers",
+    "trustUs": "already trust us",
+    "altText": "Underwaise Life Insurance App on iPhone"
+  },
+  "stats": {
+    "duration": "5 Min",
+    "durationLabel": "Application time",
+    "hiddenCosts": "0 CHF",
+    "hiddenCostsLabel": "Hidden costs",
+    "support": "24/7",
+    "supportLabel": "Support",
+    "supportAvailable": "Support available"
+  },
+  "features": {
+    "title": "Everything you need,",
+    "titleHighlight": "in one solution",
+    "description": "Modern life insurance with all essential features for your financial security and that of your family.",
+    "deathBenefit": {
+      "title": "Death Benefit Protection",
+      "description": "Tax-free payment to your beneficiaries to cover funeral costs, debts, mortgages, and ongoing living expenses.",
+      "benefit1": "Immediate lump-sum payment",
+      "benefit2": "Funeral cost coverage",
+      "benefit3": "Mortgage & debt protection"
+    },
+    "disabilityProtection": {
+      "title": "Disability Protection",
+      "description": "Income replacement in case of disability. Your family maintains financial stability during the recovery period.",
+      "benefit1": "Monthly income replacement",
+      "benefit2": "Medical expense support",
+      "benefit3": "Rehabilitation assistance"
+    },
+    "financialSecurity": {
+      "title": "Financial Security",
+      "description": "Your family maintains their standard of living, pays for education, and manages daily expenses without financial burden.",
+      "benefit1": "Education fund protection",
+      "benefit2": "Living expenses",
+      "benefit3": "Future stability"
+    }
+  },
+  "benefits": {
+    "badge": "Benefits",
+    "title": "Why",
+    "titleHighlight": "Underwaise",
+    "question": "?",
+    "description": "Modern insurance with tradition. We combine the security of an established partner with the speed and transparency of the digital world.",
+    "list": {
+      "onlineApplication": "5-Minute Online Application",
+      "onlineApplicationDetail": "Simple, fast, paperless",
+      "coverage": "Coverage up to CHF 400,000+",
+      "coverageDetail": "Flexible amounts for your needs",
+      "transparentPricing": "100% Transparent Pricing",
+      "transparentPricingDetail": "No hidden fees or surprises",
+      "comprehensiveCoverage": "Comprehensive Coverage",
+      "comprehensiveCoverageDetail": "Death and disability protection included",
+      "digitalSupport": "24/7 Digital Support",
+      "digitalSupportDetail": "Always there when you need us",
+      "fastPayout": "Fast Payout",
+      "fastPayoutDetail": "Quick and uncomplicated in emergencies"
+    },
+    "coverageOverview": {
+      "title": "Your coverage at a glance",
+      "deathBenefit": {
+        "label": "Death Benefit",
+        "title": "Lump-sum payment",
+        "description": "Tax-free payment for mortgage, debts, and living expenses for your family"
+      },
+      "disabilityProtection": {
+        "label": "Disability Protection",
+        "title": "Income replacement",
+        "description": "Monthly payments in case of disability for medical costs and daily expenses"
+      },
+      "peaceOfMind": {
+        "label": "Peace of Mind",
+        "title": "Complete Protection",
+        "description": "No financial burden in difficult times—your family stays secure"
+      }
+    }
+  },
+  "pricing": {
+    "badge": "Pricing",
+    "title": "Fair Prices.",
+    "titleHighlight": "No Surprises.",
+    "description": "Transparent pricing without hidden costs. Get a personalized quote instantly.",
+    "perMonth": "per month",
+    "popular": "Popular",
+    "basic": {
+      "name": "Basic",
+      "price": "from CHF 29",
+      "coverage": "Up to CHF 150,000 coverage",
+      "deathBenefit": "Death benefit protection",
+      "support": "Online support"
+    },
+    "premium": {
+      "name": "Premium",
+      "price": "from CHF 49",
+      "coverage": "Up to CHF 300,000 coverage",
+      "protection": "Death & disability protection",
+      "support": "Priority support",
+      "fastPayout": "Fast payout"
+    },
+    "ultimate": {
+      "name": "Ultimate",
+      "price": "from CHF 89",
+      "coverage": "Up to CHF 400,000+ coverage",
+      "protection": "Complete protection",
+      "advisor": "Personal advisor",
+      "support": "24/7 premium support"
+    }
+  },
+  "cta": {
+    "badge": "Ready to get started?",
+    "title": "Protect what matters.",
+    "titleHighlight": "Start today.",
+    "description": "Join thousands of Swiss families who trust us. Simple application, transparent pricing, and decades of experience.",
+    "startApplication": "Start application"
+  },
+  "footer": {
+    "description": "Modern life insurance for Switzerland. Simple, transparent, and secure.",
+    "product": "Product",
+    "company": "Company",
+    "aboutUs": "About us",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "copyright": "© 2025 Underwaise. All rights reserved."
+  },
+  "header": {
+    "title": "Savings Life Insurance",
+    "advice": "Advice"
+  }
+}
