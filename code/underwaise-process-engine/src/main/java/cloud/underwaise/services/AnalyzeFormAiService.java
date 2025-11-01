@@ -2,6 +2,7 @@ package cloud.underwaise.services;
 
 import cloud.underwaise.UnderwaiseProperties;
 import cloud.underwaise.ai.analyzeform.api.DefaultApi;
+import cloud.underwaise.ai.analyzeform.model.TreatmentRiskScore;
 import cloud.underwaise.ai.analyzeform.model.UnderwriteRequest;
 import cloud.underwaise.mapper.HealthConditionListToTreatmentsMapper;
 import cloud.underwaise.model.HealthConditionForm;
@@ -39,8 +40,6 @@ public class AnalyzeFormAiService {
         var result = api.assessPhysicalHealthAssessPhysicalHealthPost(
                 HealthConditionListToTreatmentsMapper.map(healthConditionForm));
 
-//        log.debug("risk result: {} {}", result.getRiskScore(), result.getExplanation());
-//
-        return result.getOverallRiskScore(); //todo Or calculate the overall risk on backend side!
+        return result.getTreatmentScores().stream().mapToInt(TreatmentRiskScore::getRiskScore).max().orElse(0);
     }
 }
