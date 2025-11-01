@@ -3,6 +3,7 @@ package cloud.underwaise.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -22,6 +23,7 @@ public abstract class BaseHealthForm {
 
     @ManyToOne
     @JoinColumn(name = "fk_application_form", nullable = false)
+    @JsonIgnore
     private ApplicationForm applicationForm;
 
     @Column(name = "start_date")

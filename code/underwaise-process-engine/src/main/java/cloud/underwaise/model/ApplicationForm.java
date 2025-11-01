@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -54,14 +54,14 @@ public class ApplicationForm {
 
     // Section for questions with complex answers v1.5 ;P
     @OneToMany(mappedBy = "applicationForm", cascade = CascadeType.ALL, orphanRemoval = true)
-    ArrayList<HealthConditionForm> physicalHealthConditions;
+    List<HealthConditionForm> physicalHealthConditions;
 
     @OneToMany(mappedBy = "applicationForm", cascade = CascadeType.ALL, orphanRemoval = true)
-    ArrayList<HealthConditionForm> mentalHealthConditions;
+    List<HealthConditionForm> mentalHealthConditions;
 
     @OneToMany(mappedBy = "applicationForm", cascade = CascadeType.ALL, orphanRemoval = true)
-    ArrayList<MedicationForm> medicationForm;
+    List<MedicationForm> medicationForm;
 
     @OneToMany(mappedBy = "applicationForm", cascade = CascadeType.ALL, orphanRemoval = true)
-    ArrayList<IncapacityForm> incapacityForm;
+    List<IncapacityForm> incapacityForm;
 }
