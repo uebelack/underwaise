@@ -1,5 +1,7 @@
 "use client";
 
+import "./life-star-form.style.scss";
+
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +21,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { formSchema } from "@/schemas/form-schema";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import "./life-star-form.style.scss";
 import { ButtonGroup } from "../ui/button-group";
 import Link from "next/link";
 import { toast } from "sonner";
