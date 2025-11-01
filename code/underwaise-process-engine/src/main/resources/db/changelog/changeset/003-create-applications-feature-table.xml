@@ -34,7 +34,7 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="physical_health_score" type="DECIMAL(5, 2)" defaultValue="5.0">
+            <column name="physical_health_score" type="DECIMAL(5, 2)" defaultValueNumeric="5.0">
                 <constraints nullable="false"/>
             </column>
 

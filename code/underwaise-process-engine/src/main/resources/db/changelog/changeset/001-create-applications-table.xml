@@ -41,6 +41,9 @@
             <column name="fk_feature_id" type="UUID">
                 <constraints nullable="true"/>
             </column>
+             <column name="status" type="VARCHAR(50)" defaultValue="Initialized">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
 
         <!-- Add foreign key constraint -->
