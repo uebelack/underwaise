@@ -6,34 +6,60 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
     <changeSet id="001-create-applications-table" author="system">
-        <createTable tableName="applications">
-            <column name="id" type="BIGINT" autoIncrement="true">
+        <!-- Create application_form table -->
+        <createTable tableName="application_form">
+            <column name="form_uuid" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="first_name" type="VARCHAR(100)">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
             </column>
             <column name="last_name" type="VARCHAR(100)">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
             </column>
             <column name="birth_date" type="DATE">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
             </column>
             <column name="email" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="smoker" type="BOOLEAN">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
             </column>
-            <column name="hobbies" type="CLOB"/>
-            <column name="health_conditions" type="CLOB"/>
+            <column name="hobbies" type="VARCHAR(1000)"/>
+            <column name="health_conditions" type="VARCHAR(1000)"/>
         </createTable>
 
-        <createIndex tableName="applications" indexName="idx_applications_email">
+        <!-- Create application table -->
+        <createTable tableName="application">
+            <column name="application_uuid" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="fk_form_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fk_feature_id" type="UUID">
+                <constraints nullable="true"/>
+            </column>
+             <column name="status" type="VARCHAR(50)" defaultValue="Initialized">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <!-- Add foreign key constraint -->
+        <addForeignKeyConstraint
+                baseTableName="application"
+                baseColumnNames="fk_form_id"
+                referencedTableName="application_form"
+                referencedColumnNames="form_uuid"
+                constraintName="fk_application_form"/>
+
+        <!-- Create indexes -->
+        <createIndex tableName="application_form" indexName="idx_application_form_email">
             <column name="email"/>
         </createIndex>
 
-        <createIndex tableName="applications" indexName="idx_applications_name">
+        <createIndex tableName="application_form" indexName="idx_application_form_name">
             <column name="last_name"/>
             <column name="first_name"/>
         </createIndex>

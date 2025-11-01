@@ -14,9 +14,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PAX Life Insurance - Protect Your Family Since 1876",
+  title: "Underwaise - Moderne Lebensversicherung in 5 Minuten | Schweiz",
   description:
-    "Life insurance that protects your loved ones financially if something happens to you. Death and disability coverage from Switzerland's trusted member-owned cooperative.",
+    "Moderne Lebensversicherung mit transparenten Konditionen. Todes- und Invaliditätsschutz ab CHF 29/Monat. Jetzt in nur 5 Minuten online abschliessen.",
+  keywords: [
+    "Lebensversicherung Schweiz",
+    "Online Lebensversicherung",
+    "Todesfallschutz",
+    "Invaliditätsschutz",
+    "günstige Versicherung",
+  ],
+  openGraph: {
+    title: "Underwaise - Moderne Lebensversicherung für die Schweiz",
+    description:
+      "In nur 5 Minuten zur Lebensversicherung. Transparente Preise, umfassender Schutz, 24/7 Support.",
+    type: "website",
+    locale: "de_CH",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Underwaise - Lebensversicherung neu gedacht",
+    description:
+      "Moderne Lebensversicherung in 5 Minuten. Ab CHF 29/Monat. Jetzt starten!",
+  },
 };
 
 export default function RootLayout({

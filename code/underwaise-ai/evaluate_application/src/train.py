@@ -7,6 +7,8 @@ from sklearn.svm import SVC
 from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
 from sklearn.metrics import classification_report, accuracy_score
 import pandas as pd
+import pyodbc
+import os
 # -------------------------------
 # 1. Configuration
 # -------------------------------
@@ -17,7 +19,26 @@ MULTI_CLASS_STRATEGY = "ovr"  # options: "ovr" or "ovo"
 MODEL_FILENAME = f"svm_model_{MULTI_CLASS_STRATEGY}.joblib"
 SCALER_FILENAME = f"scaler_{MULTI_CLASS_STRATEGY}.joblib"
 
-df = pd.read_csv('../../../assets/testdaten_underwriting.csv', encoding='latin1',delimiter=';')
+
+conn = pyodbc.connect(os.getenv("SQL_CONN_STRING"))
+
+query = """
+    SELECT 
+        TABLE_SCHEMA, 
+        TABLE_NAME
+    FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_TYPE = 'BASE TABLE'
+    ORDER BY TABLE_SCHEMA, TABLE_NAME;
+    """
+
+    # Run the query
+df = pd.read_sql(query, conn)
+
+print("📋 Available Tables:")
+print(df)
+
+
+df = pd.read_csv('../../../../assets/testdaten_underwriting.csv', encoding='latin1',delimiter=';')
 
 label_map = {
     'Acceptance': 0,
