@@ -7,8 +7,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import json
+import os
+from langchain_openai import AzureChatOpenAI
 
-from llm import get_gpt_mini_llm
+API_VERSION = "2025-04-01-preview"
+
+
+def get_gpt_mini_llm():
+    return AzureChatOpenAI(
+        openai_api_version=API_VERSION,
+        model="gpt-mini",
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+    )
 
 
 app = FastAPI()
@@ -21,21 +32,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World", "status": "API is running"}
-
-
-@app.get("/joke")
-def get_joke():
-    """Get a joke from the LLM."""
-    joke = get_gpt_mini_llm().invoke(
-        "Tell me a joke, just return the joke, no other text"
-    )
-    return {"joke": joke.content}
-
 
 # ------------ Hobbies Risk Assessment ------------
 
