@@ -32,132 +32,113 @@ def get_joke() -> Joke:
     return Joke(joke=joke.content)
 
 
-# ------------ NEW: Underwriting MVP endpoint ------------
+# ------------ SIMPLIFIED: Underwriting MVP endpoint ------------
 
 class UnderwriteRequest(BaseModel):
     text: str = Field(..., description="Freitext zu Hobbys, Aktivitäten, Verhalten, ...")
 
 
-class ActivityRisk(BaseModel):
+class DetectedActivity(BaseModel):
     name: str
-    severity: str  # e.g. "low", "medium", "high", "critical"
-    confidence: float  # 0..1 confidence that the activity is present
+    frequency: str  # "rarely", "occasionally", "regularly", "frequently"
+
+
+class RiskVector(BaseModel):
+    """
+    Fixed 5-dimension risk vector (all values 0.0 to 1.0):
+    - mortality_risk: Risk of death from activities
+    - disability_risk: Risk of permanent disability
+    - illness_risk: Risk of chronic illness or health issues
+    - accident_risk: Risk of accidents/injuries
+    - lifestyle_risk: General lifestyle health risks (sedentary, stress, etc.)
+    """
+    mortality_risk: float
+    disability_risk: float
+    illness_risk: float
+    accident_risk: float
+    lifestyle_risk: float
 
 
 class UnderwriteResponse(BaseModel):
-    original_text: str
-    activities: List[str]
-    activity_risks: List[ActivityRisk]
-    risk_score: float  # 0..1 overall risk metric
-    vector: List[float]  # fixed-length numeric vector (embedding-like), 8 floats 0..1
-    common_extreme_sports: List[str]
-    raw_llm_output: Optional[Dict[str, Any]] = None  # optional: parsed raw JSON from LLM for debugging
+    total_risk_score: float  # Overall risk: 0.0 (low) to 1.0 (high)
+    activities: List[DetectedActivity]
+    risk_vector: RiskVector
 
 
-@app.post("/underwrite", response_model=UnderwriteResponse)
-def underwrite(req: UnderwriteRequest):
+@app.post("/get_risk_from_hobbies", response_model=UnderwriteResponse)
+def get_risk_from_hobbies(req: UnderwriteRequest):
     """
-    MVP: Nimm Freitext (Hobbys / Freizeit), lass das LLM strukturierte Parameter extrahieren
-    und einen kleinen 8-dim Risiko-Vektor erzeugen. LLM wird gebeten, *nur* JSON zurückzugeben.
+    Simplified underwriting: Extract activities and calculate a fixed 5-dimension risk vector.
     """
 
-    # Prompt (auf Deutsch, damit dein Team deutsche Texte schreiben kann)
     prompt = f"""
-Du bist ein Underwriting-Assistant. Gegeben ist ein Freitext zur Person (Hobbys, Freizeit, Aktivitäten).
-Antworte **nur** mit gültigem JSON (keine erläuternden Sätze). Das JSON-Objekt muss genau diese Felder enthalten:
+Du bist ein Underwriting-Assistant. Analysiere den folgenden Text und antworte NUR mit gültigem JSON.
 
-- original_text: der unveränderte Input-String.
-- activities: Liste von kurzen Activity-Namen (z.B. "Klettern", "Tauchen", "Joggen").
-- activity_risks: Liste von Objekten mit {{ "name": <activity>, "severity": <"low"|"medium"|"high"|"critical">, "confidence": <float 0..1> }}.
-- risk_score: eine Zahl zwischen 0.0 und 1.0, die das Gesamt-Risiko darstellt (0 = sehr gering, 1 = extrem hoch).
-- vector: eine Liste mit genau 8 Fließkommazahlen zwischen 0.0 und 1.0 (dies ist ein kompakter Risiko-Vektor).
-- common_extreme_sports: Liste der gängigsten Extremsportarten/Risiken, die im Text relevant sein könnten (z.B. ["Wingsuit","Tauchen","Klettern", ...]).
+Erforderliches JSON-Format:
+{{
+  "total_risk_score": <float 0.0-1.0>,
+  "activities": [
+    {{"name": "<activity>", "frequency": "<rarely|occasionally|regularly|frequently>"}}
+  ],
+  "risk_vector": {{
+    "mortality_risk": <float 0.0-1.0>,
+    "disability_risk": <float 0.0-1.0>,
+    "illness_risk": <float 0.0-1.0>,
+    "accident_risk": <float 0.0-1.0>,
+    "lifestyle_risk": <float 0.0-1.0>
+  }}
+}}
 
-Führe diese Regeln strikt aus:
-1. JSON muss gültig parsebar sein.
-2. Floats müssen Punkt als Dezimaltrennzeichen verwenden (z.B. 0.75).
-3. vector muss genau 8 Elemente enthalten.
-4. Verwende für severity nur: "low", "medium", "high", "critical".
+Regeln:
+- total_risk_score: Gesamtrisiko (0.0 = sehr niedrig, 1.0 = extrem hoch)
+- activities: Erkannte Aktivitäten mit Häufigkeit
+- risk_vector: 5 fixe Dimensionen für verschiedene Risikoarten
+- Nur gültiges JSON ohne zusätzlichen Text
+- Dezimaltrenner ist Punkt (.)
 
-Input-text (du sollst diesen 1:1 in original_text zurückgeben):
+Text:
 \"\"\"{req.text}\"\"\"
-    """
+"""
 
     llm = get_gpt_mini_llm()
+    
     try:
         llm_response = llm.invoke(prompt)
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"LLM invocation failed: {e}")
-
-    raw = llm_response.content.strip()
-
-    # Versuche JSON zu parsen — LLM soll ja reines JSON liefern
-    try:
-        parsed = json.loads(raw)
-    except json.JSONDecodeError:
-        # Fallback: falls LLM etwas zusätzliches ausgibt, versuche, das JSON-Objekt im Text zu finden
-        # sehr einfacher heuristischer Versuch: von first '{' bis last '}'.
-        try:
+        raw = llm_response.content.strip()
+        
+        # Extract JSON if LLM added extra text
+        if not raw.startswith("{"):
             start = raw.index("{")
             end = raw.rindex("}") + 1
-            candidate = raw[start:end]
-            parsed = json.loads(candidate)
-        except Exception:
-            # endgültiges Fallback: gebe ein aussagekräftiges Fehler-HTTP-Objekt zurück
-            raise HTTPException(
-                status_code=502,
-                detail="LLM returned unparseable JSON. Raw output: " + raw[:1000]
+            raw = raw[start:end]
+        
+        parsed = json.loads(raw)
+        
+        # Validate and clip values
+        total_risk = max(0.0, min(1.0, float(parsed["total_risk_score"])))
+        
+        activities = [
+            DetectedActivity(
+                name=a["name"],
+                frequency=a["frequency"] if a["frequency"] in ["rarely", "occasionally", "regularly", "frequently"] else "occasionally"
             )
-
-    # Validierungs- und Normalisierungschecks (grundlegend)
-    # Sicherstellen, dass required fields exist and types are sane; sonst Fehler
-    try:
-        original_text = parsed.get("original_text", req.text)
-        activities = parsed.get("activities", [])
-        activity_risks = parsed.get("activity_risks", [])
-        risk_score = float(parsed.get("risk_score", 0.0))
-        vector = parsed.get("vector", [])
-        common_extreme_sports = parsed.get("common_extreme_sports", [])
+            for a in parsed["activities"]
+        ]
+        
+        rv = parsed["risk_vector"]
+        risk_vector = RiskVector(
+            mortality_risk=max(0.0, min(1.0, float(rv["mortality_risk"]))),
+            disability_risk=max(0.0, min(1.0, float(rv["disability_risk"]))),
+            illness_risk=max(0.0, min(1.0, float(rv["illness_risk"]))),
+            accident_risk=max(0.0, min(1.0, float(rv["accident_risk"]))),
+            lifestyle_risk=max(0.0, min(1.0, float(rv["lifestyle_risk"])))
+        )
+        
+        return UnderwriteResponse(
+            total_risk_score=total_risk,
+            activities=activities,
+            risk_vector=risk_vector
+        )
+        
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Invalid JSON structure from LLM: {e}")
-
-    # Minimalvalidierung: vector length and numeric ranges
-    if not isinstance(vector, list) or len(vector) != 8:
-        raise HTTPException(status_code=502, detail=f"LLM must return 'vector' of length 8, got: {vector}")
-    try:
-        vector = [float(v) for v in vector]
-    except Exception:
-        raise HTTPException(status_code=502, detail="Vector elements must be floats")
-
-    # Clip values to 0..1 defensively
-    vector = [max(0.0, min(1.0, v)) for v in vector]
-    risk_score = max(0.0, min(1.0, float(risk_score)))
-
-    # Normalize / ensure activity_risks structure
-    normalized_activity_risks = []
-    for ar in activity_risks:
-        # try best-effort mapping
-        name = ar.get("name") if isinstance(ar, dict) else str(ar)
-        severity = ar.get("severity", "low") if isinstance(ar, dict) else "low"
-        confidence = float(ar.get("confidence", 0.0)) if isinstance(ar, dict) else 0.0
-        if severity not in ("low", "medium", "high", "critical"):
-            severity = "low"
-        confidence = max(0.0, min(1.0, confidence))
-        normalized_activity_risks.append({
-            "name": name,
-            "severity": severity,
-            "confidence": confidence
-        })
-
-    # Hey :) xD
-    # Build response model
-    response = UnderwriteResponse(
-        original_text=original_text,
-        activities=activities,
-        activity_risks=[ActivityRisk(**ar) for ar in normalized_activity_risks],
-        risk_score=risk_score,
-        vector=vector,
-        common_extreme_sports=common_extreme_sports,
-        raw_llm_output=parsed  # optional/debug
-    )
-    return response
+        raise HTTPException(status_code=502, detail=f"Failed to process LLM response: {str(e)}")
