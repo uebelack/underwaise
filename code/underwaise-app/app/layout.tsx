@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Lato, Geist_Mono } from "next/font/google"; // Replace Geist with Lato
+import { Open_Sans, Geist_Mono } from "next/font/google"; // Replace Lato with Open_Sans
 import "./globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import Providers from "./providers";
 import { Analytics } from "@vercel/analytics/next";
 
-const lato = Lato({
-  variable: "--font-lato",
+const openSans = Open_Sans({
+  variable: "--font-open-sans",
   subsets: ["latin"],
-  weight: ["100", "300", "400", "700", "900"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 const geistMono = Geist_Mono({
@@ -52,7 +52,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${lato.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${openSans.variable} ${geistMono.variable} antialiased`}
+      >
         <NextIntlClientProvider messages={messages}>
           <Analytics />
           <Providers>{children}</Providers>
