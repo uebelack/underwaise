@@ -16,7 +16,7 @@ public class Application {
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    @Column(name = "application_uuid", updatable = false, nullable = false, unique = true)
+    @Column(name = "application_uuid", updatable = false, nullable = false, unique = true, columnDefinition = "uniqueidentifier")
     private UUID applicationUuid;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

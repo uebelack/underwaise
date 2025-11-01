@@ -21,7 +21,7 @@ public class ApplicationForm {
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    @Column(name = "form_uuid", updatable = false, nullable = false, unique = true)
+    @Column(name = "form_uuid", updatable = false, nullable = false, unique = true, columnDefinition = "uniqueidentifier")
     private UUID formUuid;
 
     @Column(name = "first_name", nullable = false)
