@@ -20,7 +20,7 @@ public class AnalyzeFormAiService {
     private final UnderwaiseProperties underwaiseProperties;
 
     public Integer getRiskForSpecialSportActivities(String sportActivities) {
-        log.debug("Getting risk for sport activities: {}", sportActivities);
+        log.info("Sending request to AnalyseForm AI to assess dangerous sports information: {}", sportActivities);
         var api = new DefaultApi();
         api.getApiClient().setBasePath(underwaiseProperties.getAnalyzeFormAiUrl());
 
@@ -28,18 +28,29 @@ public class AnalyzeFormAiService {
         underwriteRequest.setText(sportActivities);
         var result = api.getRiskFromHobbiesGetRiskFromHobbiesPost(underwriteRequest);
 
-        log.debug("risk result: {} {}", result.getRiskScore(), result.getExplanation());
-
+        log.info("AI reasoning results: {} {}", result.getRiskScore(), result.getExplanation());
         return result.getRiskScore();
     }
 
-    public Integer accessRiskForPhysicalHealthCondition(List<HealthConditionForm> healthConditionForm) {
-        log.debug("Accessing risk for physical health condition: {}", healthConditionForm);
+    public Integer accessRiskForPhysicalHealthCondition(List<HealthConditionForm> physicalHealthConditions) {
+        log.debug("Sending request to AnalyzeForm AI to assess physical health report: {}", physicalHealthConditions);
         var api = new DefaultApi();
         api.getApiClient().setBasePath(underwaiseProperties.getAnalyzeFormAiUrl());
         var result = api.assessPhysicalHealthAssessPhysicalHealthPost(
-                HealthConditionListToTreatmentsMapper.map(healthConditionForm));
+                HealthConditionListToTreatmentsMapper.map(physicalHealthConditions));
 
+        log.info("AI overall estimate: [{}] [{}]", result.getOverallRiskScore(), result.getSummary());
+        return result.getTreatmentScores().stream().mapToInt(TreatmentRiskScore::getRiskScore).max().orElse(0);
+    }
+
+    public Integer accessRiskForMentalHealthCondition(List<HealthConditionForm> mentalHealthConditions) {
+        log.debug("Sending request to AnalyzeForm AI to assess mental health report: {}", mentalHealthConditions);
+        var api = new DefaultApi();
+        api.getApiClient().setBasePath(underwaiseProperties.getAnalyzeFormAiUrl());
+        var result = api.assessMentalHealthAssessMentalHealthPost(
+                HealthConditionListToTreatmentsMapper.map(mentalHealthConditions));
+
+        log.info("AI overall estimate: [{}] [{}]", result.getOverallRiskScore(), result.getSummary());
         return result.getTreatmentScores().stream().mapToInt(TreatmentRiskScore::getRiskScore).max().orElse(0);
     }
 }
