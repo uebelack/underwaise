@@ -22,4 +22,8 @@ public class Application {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_form_id", referencedColumnName = "form_uuid")
     private ApplicationForm applicationForm;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "fk_feature_id", referencedColumnName = "feature_uuid")
+    private ApplicationFeature applicationFeature;
 }
