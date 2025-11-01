@@ -8,5 +8,8 @@
     <include file="db/changelog/changeset/001-create-applications-table.xml"/>
     <include file="db/changelog/changeset/002-insert-test-data.xml"/>
     <include file="db/changelog/changeset/003-create-applications-feature-table.xml"/>
+    <include file="db/changelog/changeset/004-update-application-form-table.xml"/>
+    <include file="db/changelog/changeset/005-create-health-tables.xml"/>
+    <include file="db/changelog/changeset/006-insert-updated-test-data.xml"/>
 
 </databaseChangeLog>

@@ -26,6 +26,9 @@ public class UnderwritingService {
 
     @Transactional
     public Application start(ApplicationForm applicationForm) {
+        // Set the parent reference for all child entities before saving
+        assignFkToChildEntities(applicationForm);
+
         var application = new Application();
         application.setApplicationForm(applicationForm);
 
@@ -38,5 +41,23 @@ public class UnderwritingService {
         );
 
         return savedApplication;
+    }
+
+    private static void assignFkToChildEntities(ApplicationForm applicationForm) {
+        applicationForm.getPhysicalHealthConditions().forEach(condition -> {
+            condition.setApplicationForm(applicationForm);
+        });
+
+        applicationForm.getMentalHealthConditions().forEach(condition -> {
+            condition.setApplicationForm(applicationForm);
+        });
+
+        applicationForm.getMedicationForm().forEach(medication -> {
+            medication.setApplicationForm(applicationForm);
+        });
+
+        applicationForm.getIncapacityForm().forEach(incapacity -> {
+            incapacity.setApplicationForm(applicationForm);
+        });
     }
 }

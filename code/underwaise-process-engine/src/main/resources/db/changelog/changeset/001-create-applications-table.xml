@@ -36,12 +36,12 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="fk_form_id" type="UUID">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="fk_feature_id" type="UUID">
                 <constraints nullable="true"/>
             </column>
-             <column name="status" type="VARCHAR(50)" defaultValue="Initialized">
+            <column name="status" type="VARCHAR(50)" defaultValue="Initialized">
                 <constraints nullable="true"/>
             </column>
         </createTable>

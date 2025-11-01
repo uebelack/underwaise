@@ -16,29 +16,23 @@ import os
 MULTI_CLASS_STRATEGY = "ovr"  # options: "ovr" or "ovo"
 
 # Filenames for saving the model and scaler
-MODEL_FILENAME = f"svm_model_{MULTI_CLASS_STRATEGY}.joblib"
-SCALER_FILENAME = f"scaler_{MULTI_CLASS_STRATEGY}.joblib"
+MODEL_FILENAME = f"svm_model.joblib"
+SCALER_FILENAME = f"scaler.joblib"
 
 
 conn = pyodbc.connect(os.getenv("SQL_CONN_STRING"))
 
 query = """
-    SELECT 
-        TABLE_SCHEMA, 
-        TABLE_NAME
-    FROM INFORMATION_SCHEMA.TABLES
-    WHERE TABLE_TYPE = 'BASE TABLE'
-    ORDER BY TABLE_SCHEMA, TABLE_NAME;
+    SELECT a.*,b.status FROM dbo.application_feature as a JOIN dbo.application as b ON a.feature_uuid = b.fk_feature_id;
     """
 
     # Run the query
 df = pd.read_sql(query, conn)
+df.drop('feature_uuid', axis=1, inplace=True)
 
 print("📋 Available Tables:")
 print(df)
 
-
-df = pd.read_csv('../../../../assets/testdaten_underwriting.csv', encoding='latin1',delimiter=';')
 
 label_map = {
     'Acceptance': 0,
@@ -48,17 +42,17 @@ label_map = {
 }
 
 
-target_col = 'Target'
-non_relevant_features = ['First name','Last name']
+target_col = 'status'
 
-non_relevant_features.append(target_col)
 
 # Separate features and target
 y = df[target_col].map(label_map).values
-X = df.drop(columns=non_relevant_features)
+X = df.drop(columns=[target_col])
 
-# Convert categorical variables to numeric (e.g., one-hot encoding)
-X = pd.get_dummies(X, drop_first=True)
+
+bool_cols = X.select_dtypes(include='bool').columns
+X[bool_cols] = X[bool_cols].astype(int)
+
 
 # Convert to NumPy arrays for sklearn compatibility
 X = X.values
@@ -114,6 +108,7 @@ print("Training complete.")
 # 7. Evaluate Model
 # -------------------------------
 y_pred = model.predict(X_test_scaled)
+
 accuracy = accuracy_score(y_test, y_pred)
 
 print("\n--- Model Evaluation ---")

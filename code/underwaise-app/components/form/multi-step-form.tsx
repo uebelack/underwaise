@@ -14,7 +14,7 @@ import {
   Incapacity,
 } from "@/types";
 import "./life-star-form.style.scss";
-import { FormFieldWrapper } from "./FormFieldWrapper";
+import { FormFieldWrapper } from "./form-field-wrapper";
 import { BooleanField } from "./boolean-field";
 import { apiClient } from "@/lib/apiClient";
 import { useMutation } from "@tanstack/react-query";

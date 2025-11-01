@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="004-update-application-form-table" author="system">
+        <!-- Add new columns to application_form table with default values -->
+        <addColumn tableName="application_form">
+            <column name="height" type="INT" defaultValueNumeric="175">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weight" type="INT" defaultValueNumeric="70">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_smoker" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_drug_user" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="special_sport_activities" type="VARCHAR(1000)"/>
+        </addColumn>
+
+        <!-- Update existing data to map old smoker column to new is_smoker column -->
+        <sql>
+            UPDATE application_form SET is_smoker = smoker WHERE smoker IS NOT NULL;
+        </sql>
+
+        <!-- Drop old columns that are no longer used -->
+        <dropColumn tableName="application_form">
+            <column name="smoker"/>
+            <column name="hobbies"/>
+            <column name="health_conditions"/>
+        </dropColumn>
+    </changeSet>
+
+</databaseChangeLog>
