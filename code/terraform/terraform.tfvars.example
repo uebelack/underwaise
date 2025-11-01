@@ -23,6 +23,10 @@ process_engine_max_replicas = 3
 process_engine_cpu          = 1.0
 process_engine_memory       = "2Gi"
 
+# OpenAI Variables
+openai_api_key = "sk-proj-123"
+openai_api_endpoint = "https://api.openai.com/v1"
+
 home_ip = "12.12.12.12"
 
 mailgun_api_key = "123"
