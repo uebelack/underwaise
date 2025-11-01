@@ -164,6 +164,13 @@ export function LifeInsuranceLanding() {
                 height={67}
                 className="brightness-0 h-10 sm:h-12 w-auto"
               />
+              <Image
+                src="/nag.png"
+                alt="NAG"
+                width={100}
+                height={50}
+                className="h-8 sm:h-10 w-auto"
+              />
             </div>
 
             {/* Desktop Navigation */}
@@ -854,6 +861,13 @@ export function LifeInsuranceLanding() {
                   alt="baselhack Logo"
                   width={100}
                   height={56}
+                  className="brightness-0 invert"
+                />
+                <Image
+                  src="/nag.png"
+                  alt="NAG Logo"
+                  width={80}
+                  height={40}
                   className="brightness-0 invert"
                 />
               </div>
