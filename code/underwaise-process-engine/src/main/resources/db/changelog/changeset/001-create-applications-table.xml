@@ -44,6 +44,12 @@
             <column name="status" type="VARCHAR(50)" defaultValue="Initialized">
                 <constraints nullable="true"/>
             </column>
+            <column name="statusML" type="VARCHAR(50)" defaultValue="Initialized">
+                <constraints nullable="true"/>
+            </column>
+            <column name="reason" type="VARCHAR(1000)" defaultValue="Initialized">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
 
         <!-- Add foreign key constraint -->

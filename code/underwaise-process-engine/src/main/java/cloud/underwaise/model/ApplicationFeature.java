@@ -5,6 +5,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -52,4 +53,21 @@ public class ApplicationFeature {
 
     @Column(name = "restrictions_score", nullable = false, precision = 5, scale = 2)
     private BigDecimal restrictionsScore = new BigDecimal("5.0");
+
+
+    public List<BigDecimal> getFeatureVector() {
+        return List.of(
+                new BigDecimal(age),
+                heightInCm,
+                weightInKg,
+                bmi,
+                smoker ? BigDecimal.ONE : BigDecimal.ZERO,
+                drugs ? BigDecimal.ONE : BigDecimal.ZERO,
+                hobbyScore,
+                physicalHealthScore,
+                psychologicalHealthScore,
+                medicationHealthScore,
+                restrictionsScore
+        );
+    }
 }

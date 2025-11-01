@@ -26,4 +26,13 @@ public class Application {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_feature_id", referencedColumnName = "feature_uuid")
     private ApplicationFeature applicationFeature;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "statusML")
+    private String statusML;
+
+    @Column(name = "reason")
+    private String reason;
 }
