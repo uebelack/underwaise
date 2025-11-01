@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="005-create-health-tables" author="system">
+        <!-- Create health_condition_form table -->
+        <createTable tableName="health_condition_form">
+            <column name="uuid" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="fk_application_form" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="DATE"/>
+            <column name="end_date" type="DATE"/>
+            <column name="reason" type="VARCHAR(1000)"/>
+            <column name="is_treatment_completed" type="BOOLEAN"/>
+            <column name="treatment_facility_address" type="VARCHAR(500)"/>
+        </createTable>
+
+        <!-- Create medication_form table -->
+        <createTable tableName="medication_form">
+            <column name="uuid" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="fk_application_form" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="DATE"/>
+            <column name="end_date" type="DATE"/>
+            <column name="reason" type="VARCHAR(1000)"/>
+            <column name="is_treatment_completed" type="BOOLEAN"/>
+            <column name="medication_name_and_dosage" type="VARCHAR(500)"/>
+            <column name="medication_periodicity" type="VARCHAR(20)"/>
+        </createTable>
+
+        <!-- Create incapacity_form table -->
+        <createTable tableName="incapacity_form">
+            <column name="uuid" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="fk_application_form" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="DATE"/>
+            <column name="end_date" type="DATE"/>
+            <column name="reason" type="VARCHAR(1000)"/>
+            <column name="is_treatment_completed" type="BOOLEAN"/>
+        </createTable>
+
+        <!-- Add foreign key constraints -->
+        <addForeignKeyConstraint
+                baseTableName="health_condition_form"
+                baseColumnNames="fk_application_form"
+                referencedTableName="application_form"
+                referencedColumnNames="form_uuid"
+                constraintName="fk_health_condition_form_application_form"/>
+
+        <addForeignKeyConstraint
+                baseTableName="medication_form"
+                baseColumnNames="fk_application_form"
+                referencedTableName="application_form"
+                referencedColumnNames="form_uuid"
+                constraintName="fk_medication_form_application_form"/>
+
+        <addForeignKeyConstraint
+                baseTableName="incapacity_form"
+                baseColumnNames="fk_application_form"
+                referencedTableName="application_form"
+                referencedColumnNames="form_uuid"
+                constraintName="fk_incapacity_form_application_form"/>
+
+        <!-- Create indexes -->
+        <createIndex tableName="health_condition_form" indexName="idx_health_condition_form_application">
+            <column name="fk_application_form"/>
+        </createIndex>
+
+        <createIndex tableName="medication_form" indexName="idx_medication_form_application">
+            <column name="fk_application_form"/>
+        </createIndex>
+
+        <createIndex tableName="incapacity_form" indexName="idx_incapacity_form_application">
+            <column name="fk_application_form"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

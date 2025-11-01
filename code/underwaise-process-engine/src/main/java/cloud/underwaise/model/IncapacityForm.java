@@ -1,6 +1,11 @@
 package cloud.underwaise.model;
 
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
-public class IncapacityForm extends BaseHealthForm { }
+@Table(name = "incapacity_form")
+public class IncapacityForm extends BaseHealthForm {
+    // No additional fields needed for now
+}

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="006-insert-updated-test-data" author="system">
+        <!-- Update existing John Doe record with new structure fields -->
+        <update tableName="application_form">
+            <column name="height" value="175"/>
+            <column name="weight" value="75"/>
+            <column name="special_sport_activities" value="swimming, cycling"/>
+            <where>form_uuid = '550e8400-e29b-41d4-a716-446655440001'</where>
+        </update>
+
+        <!-- Insert second test person -->
+        <insert tableName="application_form">
+            <column name="form_uuid" value="550e8400-e29b-41d4-a716-446655440003"/>
+            <column name="first_name" value="Jane"/>
+            <column name="last_name" value="Smith"/>
+            <column name="birth_date" value="1985-08-22"/>
+            <column name="email" value="jane.smith@example.com"/>
+            <column name="height" value="168"/>
+            <column name="weight" value="62"/>
+            <column name="is_smoker" valueBoolean="true"/>
+            <column name="is_drug_user" valueBoolean="false"/>
+            <column name="special_sport_activities" value="rock climbing, skiing"/>
+        </insert>
+
+        <!-- Update existing application record with status -->
+        <update tableName="application">
+            <column name="status" value="Initialized"/>
+            <where>application_uuid = '550e8400-e29b-41d4-a716-446655440002'</where>
+        </update>
+
+        <!-- Insert corresponding application record for Jane -->
+        <insert tableName="application">
+            <column name="application_uuid" value="550e8400-e29b-41d4-a716-446655440004"/>
+            <column name="fk_form_id" value="550e8400-e29b-41d4-a716-446655440003"/>
+            <column name="status" value="Initialized"/>
+        </insert>
+
+        <!-- Insert health condition data for John Doe -->
+        <insert tableName="health_condition_form">
+            <column name="uuid" value="550e8400-e29b-41d4-a716-446655440010"/>
+            <column name="fk_application_form" value="550e8400-e29b-41d4-a716-446655440001"/>
+            <column name="start_date" value="2020-03-15"/>
+            <column name="end_date" value="2020-06-15"/>
+            <column name="reason" value="Broken leg from skiing accident"/>
+            <column name="is_treatment_completed" valueBoolean="true"/>
+            <column name="treatment_facility_address" value="General Hospital, 123 Main St, Basel"/>
+        </insert>
+
+        <!-- Insert medication data for Jane Smith -->
+        <insert tableName="medication_form">
+            <column name="uuid" value="550e8400-e29b-41d4-a716-446655440011"/>
+            <column name="fk_application_form" value="550e8400-e29b-41d4-a716-446655440003"/>
+            <column name="start_date" value="2023-01-01"/>
+            <column name="reason" value="High blood pressure management"/>
+            <column name="is_treatment_completed" valueBoolean="false"/>
+            <column name="medication_name_and_dosage" value="Lisinopril 10mg"/>
+            <column name="medication_periodicity" value="DAILY"/>
+        </insert>
+
+        <!-- Insert mental health condition for Jane Smith -->
+        <insert tableName="health_condition_form">
+            <column name="uuid" value="550e8400-e29b-41d4-a716-446655440012"/>
+            <column name="fk_application_form" value="550e8400-e29b-41d4-a716-446655440003"/>
+            <column name="start_date" value="2022-09-01"/>
+            <column name="end_date" value="2023-03-01"/>
+            <column name="reason" value="Anxiety therapy"/>
+            <column name="is_treatment_completed" valueBoolean="true"/>
+            <column name="treatment_facility_address" value="Mental Health Center, 456 Oak Ave, Basel"/>
+        </insert>
+
+        <!-- Insert incapacity data for John Doe -->
+        <insert tableName="incapacity_form">
+            <column name="uuid" value="550e8400-e29b-41d4-a716-446655440013"/>
+            <column name="fk_application_form" value="550e8400-e29b-41d4-a716-446655440001"/>
+            <column name="start_date" value="2020-03-15"/>
+            <column name="end_date" value="2020-05-01"/>
+            <column name="reason" value="Unable to work due to leg injury"/>
+            <column name="is_treatment_completed" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
