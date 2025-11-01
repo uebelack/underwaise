@@ -91,8 +91,13 @@ Du bist ein Underwriting-Assistant. Analysiere die Hobbys/Aktivitäten und gib E
 # ------------ Health Questions Risk Assessment ------------
 
 class FlexibleHealthRequest(BaseModel):
-    """Accepts any list of treatment objects with flexible structure"""
-    treatments: List[dict] = Field(..., description="List of treatment objects with any structure")
+    """Accepts any dictionary structure - no field validation"""
+    model_config = {"extra": "allow"}
+    
+    def __init__(self, **data):
+        # Pass through any data without validation
+        super().__init__()
+        self.__dict__.update(data)
 
 
 # Remove all the specific treatment models, keep only response models
@@ -139,8 +144,18 @@ def _assess_risk(prompt: str) -> UnderwriteResponse:
 
 
 # Reusable function for health question assessment
-def _assess_health_treatments(treatments: List[dict], question_context: str) -> HealthQuestionResponse:
+def _assess_health_treatments(request_data: dict, question_context: str) -> HealthQuestionResponse:
     """Reusable function to assess multiple treatment lines."""
+    
+    # Extract treatments from whatever field name is provided
+    treatments = None
+    for key, value in request_data.items():
+        if isinstance(value, list) and len(value) > 0:
+            treatments = value
+            break
+    
+    if not treatments:
+        raise HTTPException(status_code=400, detail="No treatment list found in request")
     
     # Convert treatment objects to readable strings for the LLM
     treatment_strings = []
@@ -234,7 +249,7 @@ Interpretiere die JSON-Daten flexibel - nicht alle Felder sind immer vorhanden.
 
 
 @app.post("/assess_physical_health", response_model=HealthQuestionResponse)
-def assess_physical_health(req: FlexibleHealthRequest):
+async def assess_physical_health(request_data: dict):
     """
     Endpoint 1: Physical health complaints, illnesses, accidents in past 5 years
     
@@ -261,11 +276,11 @@ Bewerte jede Behandlung basierend auf:
 - Chronisch vs. akut
 """
     
-    return _assess_health_treatments(req.treatments, context)
+    return _assess_health_treatments(request_data, context)
 
 
 @app.post("/assess_mental_health", response_model=HealthQuestionResponse)
-def assess_mental_health(req: FlexibleHealthRequest):
+async def assess_mental_health(request_data: dict):
     """
     Endpoint 2: Psychiatric, psychological, or psychotherapeutic treatment
     
@@ -295,11 +310,11 @@ Bewerte jede Behandlung basierend auf:
 - Auswirkungen auf Arbeitsfähigkeit
 """
     
-    return _assess_health_treatments(req.treatments, context)
+    return _assess_health_treatments(request_data, context)
 
 
 @app.post("/assess_medication", response_model=HealthQuestionResponse)
-def assess_medication(req: FlexibleHealthRequest):
+async def assess_medication(request_data: dict):
     """
     Endpoint 3: Regular medication use in past 5 years
     
@@ -328,11 +343,11 @@ Bewerte jede Medikation basierend auf:
 - Schweregrad der zugrunde liegenden Erkrankung
 """
     
-    return _assess_health_treatments(req.treatments, context)
+    return _assess_health_treatments(request_data, context)
 
 
 @app.post("/assess_work_disability", response_model=HealthQuestionResponse)
-def assess_work_disability(req: FlexibleHealthRequest):
+async def assess_work_disability(request_data: dict):
     """
     Endpoint 4: Work disability or inability to work in past 5 years
     
@@ -363,7 +378,7 @@ Bewerte jede Phase der Arbeitsunfähigkeit basierend auf:
 - Besonders kritisch: psychische Erkrankungen, lange Ausfallzeiten (>3 Monate)
 """
     
-    return _assess_health_treatments(req.treatments, context)
+    return _assess_health_treatments(request_data, context)
 
 
 # ------------ Debug Endpoint (DELETE AFTER USE) ------------
