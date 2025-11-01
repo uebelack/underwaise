@@ -38,7 +38,7 @@ print("📋 Available Tables:")
 print(df)
 
 
-df = pd.read_csv('../../../assets/testdaten_underwriting.csv', encoding='latin1',delimiter=';')
+df = pd.read_csv('../../../../assets/testdaten_underwriting.csv', encoding='latin1',delimiter=';')
 
 label_map = {
     'Acceptance': 0,
