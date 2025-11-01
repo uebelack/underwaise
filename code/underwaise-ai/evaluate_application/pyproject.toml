@@ -1,0 +1,14 @@
+[project]
+name = "evaluate_application"
+version = "0.1.0"
+description = "Evaluate application using SVM"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dotenv>=0.9.9",
+    "fastapi[standard]>=0.120.2",
+    "joblib>=1.5.2",
+    "numpy>=2.3.4",
+    "pandas>=2.3.3",
+    "scikit-learn>=1.7.2",
+]

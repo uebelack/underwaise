@@ -97,3 +97,9 @@ variable "openai_gpt_chat_capacity" {
   type        = number
   default     = 100
 }
+
+variable "mailgun_api_key" {
+  description = "Mailgun API key"
+  type        = string
+  sensitive   = true
+}

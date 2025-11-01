@@ -18,7 +18,7 @@
       <bpmn:outgoing>Flow_03gbdpe</bpmn:outgoing>
     </bpmn:sendTask>
     <bpmn:sequenceFlow id="Flow_0xku8et" sourceRef="ApplicationPreprocessing" targetRef="Activity_0fqu4ia" />
-    <bpmn:startEvent id="StartEvent_1">
+    <bpmn:startEvent id="StartEvent_1" camunda:asyncAfter="true">
       <bpmn:outgoing>Flow_0npj5rd</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:subProcess id="ApplicationPreprocessing" name="Application Preprocessing">
