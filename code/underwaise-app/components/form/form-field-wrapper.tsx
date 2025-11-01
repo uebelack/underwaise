@@ -63,7 +63,12 @@ export const FormFieldWrapper: FC<Props> = ({
   <FormField
     control={control}
     name={name}
-    rules={{ required, min, max }}
+    rules={{
+      required,
+      min,
+      max,
+      pattern: type === "email" ? /^\S+@\S+$/i : undefined,
+    }}
     render={({ field, fieldState }) => (
       <FormItem>
         {label && <FormLabel>{label}</FormLabel>}

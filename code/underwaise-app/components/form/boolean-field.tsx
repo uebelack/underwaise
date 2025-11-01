@@ -23,7 +23,7 @@ export const BooleanField: FC<Props> = ({
   const value = watch(name);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-12">
       <FormField
         control={control}
         name={name}
@@ -57,7 +57,7 @@ export const BooleanField: FC<Props> = ({
           </FormItem>
         )}
       />
-      {followUp && value && <div className="mt-4 space-y-2">{followUp}</div>}
+      {followUp && value && <div className="mt-4 space-y-6">{followUp}</div>}
     </div>
   );
 };
