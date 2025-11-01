@@ -3,24 +3,29 @@ package cloud.underwaise.services;
 import cloud.underwaise.UnderwaiseProperties;
 import cloud.underwaise.ai.analyzeform.api.DefaultApi;
 import cloud.underwaise.ai.analyzeform.model.UnderwriteRequest;
-import cloud.underwaise.ai.analyzeform.model.UnderwriteResponse;
+import cloud.underwaise.enums.Risk;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AnalyzeFormAiService {
 
     private final UnderwaiseProperties underwaiseProperties;
 
-    public UnderwriteResponse getRiskFromHobbiesGetRiskFromHobbiesPost() {
+    public Risk getRiskForSpecialSportActivities(String sportActivities) {
+        log.debug("Getting risk for sport activities: {}", sportActivities);
         var api = new DefaultApi();
         api.getApiClient().setBasePath(underwaiseProperties.getAnalyzeFormAiUrl());
-        return api.getRiskFromHobbiesGetRiskFromHobbiesPost(createUnderwriteRequest());
-    }
 
-    private UnderwriteRequest createUnderwriteRequest() {
-        var request = new UnderwriteRequest();
-        return request;
+        var underwriteRequest = new UnderwriteRequest();
+        underwriteRequest.setText(sportActivities);
+        var result = api.getRiskFromHobbiesGetRiskFromHobbiesPost(underwriteRequest);
+
+        log.debug("risk result: {} {}", result.getRiskScore(), result.getExplanation());
+
+        return Risk.fromValue(result.getRiskScore());
     }
 }
