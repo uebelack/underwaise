@@ -1,5 +1,6 @@
 package cloud.underwaise.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,9 +44,11 @@ public class ApplicationForm {
     @Column(name = "weight", nullable = false)
     private int weight;
 
+    @JsonProperty("isSmoker")
     @Column(name = "is_smoker", nullable = false)
     private boolean isSmoker;
 
+    @JsonProperty("isDrugUser")
     @Column(name = "is_drug_user", nullable = false)
     private boolean isDrugUser;
 
