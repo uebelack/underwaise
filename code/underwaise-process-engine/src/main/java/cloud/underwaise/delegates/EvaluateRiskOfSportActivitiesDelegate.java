@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class EvaluateRiskOfSportActivitiesDelegate implements JavaDelegate {
 
     private final AnalyzeFormAiService analyzeFormAiService;
-    private ApplicationRepository applicationRepository;
+    private final ApplicationRepository applicationRepository;
 
     @Override
     public void execute(DelegateExecution delegateExecution) {
