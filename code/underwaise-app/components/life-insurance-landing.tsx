@@ -19,11 +19,17 @@ import {
   X,
 } from "lucide-react";
 import confetti from "canvas-confetti";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
+import { useTranslations } from 'next-intl';
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { CatchGame } from "@/components/catch-game";
 
 export function LifeInsuranceLanding() {
+  const t = useTranslations();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [showGame, setShowGame] = useState(false);
+  const [logoClickCount, setLogoClickCount] = useState(0);
 
   const triggerConfetti = useCallback(() => {
     const paxTextShape = confetti.shapeFromPath({
@@ -94,8 +100,68 @@ export function LifeInsuranceLanding() {
     // Navigation will happen automatically via Link
   }, [triggerConfetti]);
 
+  const handleLogoClick = useCallback(() => {
+    const newCount = logoClickCount + 1;
+    setLogoClickCount(newCount);
+
+    if (newCount === 3) {
+      setShowGame(true);
+      setLogoClickCount(0); // Reset counter
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.2 },
+        colors: ["#8ccd0f", "#1a5ab8", "#7cb50d"],
+      });
+    }
+  }, [logoClickCount]);
+
+  // Subtiles Hintergrund-Konfetti
+  useEffect(() => {
+    const paxTextShape = confetti.shapeFromPath({
+      path: 'M313.288 144.806l44.794-58.06-44.365-57.495h43.368l25.82 34.954 26.11-34.954h38.802L403.309 86.46l45.79 58.347h-44.936l-25.391-33.952-25.968 33.952h-39.516zm-43.082-35.092V92.31c-4.992.71-9.416 1.425-22.111 3.566-13.41 2.283-17.835 7.418-17.835 13.84 0 7.131 3.995 12.266 14.269 12.266 7.704 0 18.402-5.278 25.677-12.267m4.99 35.092l-2.712-11.842c-12.266 9.988-23.965 14.698-39.368 14.698-22.974 0-39.092-13.124-39.092-34.382 0-21.543 14.55-33.528 43.94-38.09 16.69-2.57 25.11-3.853 31.383-4.563V66.77c0-10.412-5.277-15.122-17.114-15.122-13.13 0-17.835 5.282-18.407 14.126h-34.81c2.569-29.529 24.966-39.373 55.782-39.373 37.518 0 50.786 16.118 50.786 47.787v39.092c0 12.839.286 18.545 3.137 31.526h-33.524zM125.69 73.478c17.978 0 24.251-7.418 24.251-19.975 0-12.553-6.273-19.97-24.251-19.97h-18.83v39.945h18.83zm-56.207 71.328V5h59.344c41.233 0 59.348 20.256 59.348 48.503 0 28.251-18.115 48.507-59.348 48.507h-21.968v42.796H69.482z',
+    });
+
+    const defaults = {
+      startVelocity: 3, // Moderat
+      spread: 360,
+      ticks: 1200, // Sehr lange Lebensdauer für vollen Fall
+      zIndex: 0, // Im Hintergrund
+      scalar: 4.5,
+      gravity: 0.4, // Mehr Gravität für vollen Fall durch den Screen
+      drift: 0.1,
+    };
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval: NodeJS.Timeout = setInterval(function () {
+      const particleCount = 1; // Nur 1 Partikel pro Position
+
+      // Zufällige Farbe aus grün oder blau
+      const colors = Math.random() > 0.5
+        ? ["#8ccd0f", "#7cb50d"] // Grüne PAX-Farben
+        : ["#1a5ab8", "#1548a0"]; // Blaue PAX-Farben
+
+      // Zufällige PAX-Logos von oben
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.2, 0.8), y: 0 }, // Starten am oberen Rand
+        colors: colors,
+        shapes: [paxTextShape],
+      });
+    }, 2500); // Weniger häufig
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen bg-white scroll-smooth">
+      {/* Catch Game */}
+      {showGame && <CatchGame onClose={() => setShowGame(false)} />}
+
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-white min-h-[90vh] flex items-center">
         {/* Decorative background elements */}
@@ -109,19 +175,32 @@ export function LifeInsuranceLanding() {
           {/* Navigation */}
           <nav className="flex items-center justify-between py-4">
             <div className="flex items-center gap-3 sm:gap-6">
-              <Image
-                src="/logo.png"
-                alt="Underwaise - Moderne Lebensversicherung"
-                width={200}
-                height={67}
-                className="h-12 sm:h-16 w-auto"
-              />
+              <button
+                onClick={handleLogoClick}
+                className="cursor-pointer hover:scale-105 transition-transform"
+                title="Click me 3 times for a surprise!"
+              >
+                <Image
+                  src="/logo.png"
+                  alt="Underwaise - Moderne Lebensversicherung"
+                  width={200}
+                  height={67}
+                  className="h-12 sm:h-16 w-auto"
+                />
+              </button>
               <Image
                 src="/baselhack.svg"
                 alt="baselhack Hackathon"
                 width={120}
                 height={67}
                 className="brightness-0 h-10 sm:h-12 w-auto"
+              />
+              <Image
+                src="/nag.png"
+                alt="NAG"
+                width={100}
+                height={50}
+                className="h-8 sm:h-10 w-auto"
               />
             </div>
 
@@ -131,23 +210,24 @@ export function LifeInsuranceLanding() {
                 onClick={() => scrollToSection('features')}
                 className="text-sm font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors"
               >
-                Features
+                {t('nav.features')}
               </button>
               <button
                 onClick={() => scrollToSection('benefits')}
                 className="text-sm font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors"
               >
-                Benefits
+                {t('nav.benefits')}
               </button>
               <button
                 onClick={() => scrollToSection('pricing')}
                 className="text-sm font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors"
               >
-                Pricing
+                {t('nav.pricing')}
               </button>
+              <LanguageSwitcher variant="light" />
               <Button size="sm" asChild className="bg-[#7cb50d] hover:bg-[#6ba00b] text-white">
                 <Link href="/spar-lebensversicherung">
-                  Get Started
+                  {t('nav.getStarted')}
                 </Link>
               </Button>
             </div>
@@ -170,24 +250,27 @@ export function LifeInsuranceLanding() {
                   onClick={() => scrollToSection('features')}
                   className="text-left text-base font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors py-2"
                 >
-                  Features
+                  {t('nav.features')}
                 </button>
                 <button
                   onClick={() => scrollToSection('benefits')}
                   className="text-left text-base font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors py-2"
                 >
-                  Benefits
+                  {t('nav.benefits')}
                 </button>
                 <button
                   onClick={() => scrollToSection('pricing')}
                   className="text-left text-base font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors py-2"
                 >
-                  Pricing
+                  {t('nav.pricing')}
                 </button>
                 <div className="pt-2 border-t border-gray-200">
+                  <LanguageSwitcher variant="light" />
+                </div>
+                <div className="border-t border-gray-200 pt-2">
                   <Button size="lg" asChild className="w-full bg-[#7cb50d] hover:bg-[#6ba00b] text-white">
                     <Link href="/spar-lebensversicherung">
-                      Get Started
+                      {t('nav.getStarted')}
                     </Link>
                   </Button>
                 </div>
@@ -210,18 +293,17 @@ export function LifeInsuranceLanding() {
               <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#7cb50d]/20 backdrop-blur-sm rounded-full mb-4 sm:mb-6 border border-[#7cb50d]/40">
                 <Sparkles className="w-3 sm:w-4 h-3 sm:h-4 text-[#7cb50d]" />
                 <span className="text-xs sm:text-sm font-semibold text-[#7cb50d]">
-                  Versicherung neu gedacht
+                  {t('hero.badge')}
                 </span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-[1.1] tracking-tight">
-                Deine Zukunft.
-                <span className="text-[#7cb50d] block mt-1 sm:mt-2">Deine Sicherheit.</span>
+                {t('hero.title')}
+                <span className="text-[#7cb50d] block mt-1 sm:mt-2">{t('hero.titleHighlight')}</span>
               </h1>
 
               <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 md:mb-10 leading-relaxed">
-                Moderne Lebensversicherung mit transparenten Konditionen und
-                blitzschneller Beantragung. In nur 5 Minuten zum Versicherungsschutz.
+                {t('hero.description')}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-10 md:mb-12">
@@ -239,11 +321,11 @@ export function LifeInsuranceLanding() {
                     {isNavigating ? (
                       <>
                         <Zap className="mr-2 h-5 w-5 animate-pulse" />
-                        Wird geladen...
+                        {t('hero.loading')}
                       </>
                     ) : (
                       <>
-                        Jetzt starten
+                        {t('hero.cta')}
                         <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
@@ -255,16 +337,16 @@ export function LifeInsuranceLanding() {
               <div className="space-y-4 sm:space-y-6">
                 <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
                   <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 border border-white/20 shadow-sm">
-                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1">5 Min</div>
-                    <div className="text-[10px] sm:text-xs text-gray-300">Antragsdauer</div>
+                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1">{t('stats.duration')}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-300">{t('stats.durationLabel')}</div>
                   </div>
                   <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 border border-white/20 shadow-sm">
-                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1">0 CHF</div>
-                    <div className="text-[10px] sm:text-xs text-gray-300">Versteckte Kosten</div>
+                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1">{t('stats.hiddenCosts')}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-300">{t('stats.hiddenCostsLabel')}</div>
                   </div>
                   <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 border border-white/20 shadow-sm">
-                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1">24/7</div>
-                    <div className="text-[10px] sm:text-xs text-gray-300">Support</div>
+                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1">{t('stats.support')}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-300">{t('stats.supportLabel')}</div>
                   </div>
                 </div>
 
@@ -273,7 +355,7 @@ export function LifeInsuranceLanding() {
                   <div className="bg-gradient-to-r from-[#1a5ab8]/30 to-[#1a5ab8]/20 backdrop-blur-sm rounded-2xl p-4 border border-[#1a5ab8]/40 shadow-sm">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-sm text-gray-300 mb-1">Versicherungssumme bis</div>
+                        <div className="text-sm text-gray-300 mb-1">{t('hero.coverageUpTo')}</div>
                         <div className="text-2xl font-bold text-white">CHF 400,000</div>
                       </div>
                       <div className="w-12 h-12 bg-[#1a5ab8] rounded-xl flex items-center justify-center shadow-lg">
@@ -285,7 +367,7 @@ export function LifeInsuranceLanding() {
                   <div className="bg-gradient-to-r from-[#7cb50d]/30 to-[#7cb50d]/20 backdrop-blur-sm rounded-2xl p-4 border border-[#7cb50d]/40 shadow-sm">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-sm text-gray-300 mb-1">Monatliche Prämie ab</div>
+                        <div className="text-sm text-gray-300 mb-1">{t('hero.monthlyFrom')}</div>
                         <div className="text-2xl font-bold text-white">CHF 49</div>
                       </div>
                       <div className="w-12 h-12 bg-[#7cb50d] rounded-xl flex items-center justify-center shadow-lg">
@@ -297,13 +379,13 @@ export function LifeInsuranceLanding() {
                   <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
                     <div className="flex items-center gap-3">
                       <div className="flex -space-x-2">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-white shadow-sm" />
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 border-2 border-white shadow-sm" />
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-white shadow-sm" />
+                        <img src="/customer1.webp" alt="Customer 1" className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" />
+                        <img src="/customer2.webp" alt="Customer 2" className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" />
+                        <img src="/customer3.webp" alt="Customer 3" className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" />
                       </div>
                       <div>
-                        <div className="text-white font-bold">2,500+ Kunden</div>
-                        <div className="text-gray-300 text-sm">vertrauen uns bereits</div>
+                        <div className="text-white font-bold">2,500+ {t('hero.customers')}</div>
+                        <div className="text-gray-300 text-sm">{t('hero.trustUs')}</div>
                       </div>
                     </div>
                   </div>
@@ -320,8 +402,8 @@ export function LifeInsuranceLanding() {
               {/* iPhone Image */}
               <div className="relative z-10">
                 <Image
-                  src="/hero-iphone.png"
-                  alt="Underwaise Lebensversicherung App auf iPhone"
+                  src="/hero-iphone-2.png"
+                  alt={t('hero.altText')}
                   width={400}
                   height={800}
                   className="drop-shadow-2xl w-full max-w-[280px] sm:max-w-[320px] md:max-w-[400px] h-auto"
@@ -340,12 +422,11 @@ export function LifeInsuranceLanding() {
           <div className="text-center mb-8 sm:mb-12 md:mb-16">
 
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 tracking-tight">
-              Alles was du brauchst,
-              <span className="text-[#1a5ab8] block mt-1 sm:mt-2">in einer Lösung</span>
+              {t('features.title')}
+              <span className="text-[#1a5ab8] block mt-1 sm:mt-2">{t('features.titleHighlight')}</span>
             </h2>
             <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
-              Moderne Lebensversicherung mit allen wichtigen Features für deine
-              finanzielle Sicherheit und die deiner Familie.
+              {t('features.description')}
             </p>
           </div>
 
@@ -358,24 +439,23 @@ export function LifeInsuranceLanding() {
                   <Shield className="h-7 w-7 text-[#1a5ab8] group-hover:text-white transition-colors" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  Todesfallschutz
+                  {t('features.deathBenefit.title')}
                 </h3>
                 <p className="text-gray-600 leading-relaxed mb-6">
-                  Steuerfreie Auszahlung an deine Begünstigten zur Deckung von 
-                  Bestattungskosten, Schulden, Hypotheken und laufenden Lebenshaltungskosten.
+                  {t('features.deathBenefit.description')}
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2 text-sm text-gray-600">
                     <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                    <span>Sofortige Einmalzahlung</span>
+                    <span>{t('features.deathBenefit.benefit1')}</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-600">
                     <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                    <span>Deckung Bestattungskosten</span>
+                    <span>{t('features.deathBenefit.benefit2')}</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-600">
                     <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                    <span>Hypotheken & Schuldenschutz</span>
+                    <span>{t('features.deathBenefit.benefit3')}</span>
                   </li>
                 </ul>
               </div>
@@ -389,24 +469,23 @@ export function LifeInsuranceLanding() {
                   <Heart className="h-7 w-7 text-[#1a5ab8] group-hover:text-white transition-colors" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  Invaliditätsschutz
+                  {t('features.disabilityProtection.title')}
                 </h3>
                 <p className="text-gray-600 leading-relaxed mb-6">
-                  Einkommensersatz bei Erwerbsunfähigkeit. Deine Familie behält 
-                  finanzielle Stabilität während der Erholungsphase.
+                  {t('features.disabilityProtection.description')}
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2 text-sm text-gray-600">
                     <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                    <span>Monatlicher Einkommensersatz</span>
+                    <span>{t('features.disabilityProtection.benefit1')}</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-600">
                     <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                    <span>Unterstützung Arztkosten</span>
+                    <span>{t('features.disabilityProtection.benefit2')}</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-600">
                     <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                    <span>Rehabilitations-Hilfe</span>
+                    <span>{t('features.disabilityProtection.benefit3')}</span>
                   </li>
                 </ul>
               </div>
@@ -420,24 +499,23 @@ export function LifeInsuranceLanding() {
                   <TrendingUp className="h-7 w-7 text-[#1a5ab8] group-hover:text-white transition-colors" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  Finanzielle Sicherheit
+                  {t('features.financialSecurity.title')}
                 </h3>
                 <p className="text-gray-600 leading-relaxed mb-6">
-                  Deine Familie behält ihren Lebensstandard, bezahlt Bildung und 
-                  bewältigt tägliche Ausgaben ohne finanzielle Belastung.
+                  {t('features.financialSecurity.description')}
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2 text-sm text-gray-600">
                     <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                    <span>Bildungsfonds Schutz</span>
+                    <span>{t('features.financialSecurity.benefit1')}</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-600">
                     <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                    <span>Lebenshaltungskosten</span>
+                    <span>{t('features.financialSecurity.benefit2')}</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-600">
                     <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                    <span>Zukünftige Stabilität</span>
+                    <span>{t('features.financialSecurity.benefit3')}</span>
                   </li>
                 </ul>
               </div>
@@ -455,44 +533,42 @@ export function LifeInsuranceLanding() {
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#7cb50d]/10 rounded-full mb-6 border border-[#7cb50d]/20">
                 <Star className="w-4 h-4 text-[#7cb50d]" />
                 <span className="text-sm font-semibold text-[#7cb50d]">
-                  Vorteile
+                  {t('benefits.badge')}
                 </span>
               </div>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
-                Warum{" "}
-                <span className="text-[#1a5ab8]">Underwaise</span>?
+                {t('benefits.title')}{" "}
+                <span className="text-[#1a5ab8]">{t('benefits.titleHighlight')}</span>{t('benefits.question')}
               </h2>
               <p className="text-lg text-gray-600 mb-10">
-                Moderne Versicherung mit Tradition. Wir kombinieren die Sicherheit 
-                eines etablierten Partners mit der Geschwindigkeit und Transparenz 
-                der digitalen Welt.
+                {t('benefits.description')}
               </p>
 
               <div className="space-y-5">
                 {[
                   {
-                    text: "5-Minuten Online-Antrag",
-                    detail: "Einfach, schnell, ohne Papierkram",
+                    text: t('benefits.list.onlineApplication'),
+                    detail: t('benefits.list.onlineApplicationDetail'),
                   },
                   {
-                    text: "Deckung bis CHF 400,000+",
-                    detail: "Flexible Beträge für deine Bedürfnisse",
+                    text: t('benefits.list.coverage'),
+                    detail: t('benefits.list.coverageDetail'),
                   },
                   {
-                    text: "100% Transparente Preise",
-                    detail: "Keine versteckten Gebühren oder Überraschungen",
+                    text: t('benefits.list.transparentPricing'),
+                    detail: t('benefits.list.transparentPricingDetail'),
                   },
                   {
-                    text: "Umfassender Schutz",
-                    detail: "Todes- und Invaliditätsschutz inklusive",
+                    text: t('benefits.list.comprehensiveCoverage'),
+                    detail: t('benefits.list.comprehensiveCoverageDetail'),
                   },
                   {
-                    text: "24/7 Digital Support",
-                    detail: "Immer für dich da, wenn du uns brauchst",
+                    text: t('benefits.list.digitalSupport'),
+                    detail: t('benefits.list.digitalSupportDetail'),
                   },
                   {
-                    text: "Schnelle Auszahlung",
-                    detail: "Im Ernstfall schnell und unkompliziert",
+                    text: t('benefits.list.fastPayout'),
+                    detail: t('benefits.list.fastPayoutDetail'),
                   },
                 ].map((benefit, index) => (
                   <div key={index} className="flex items-start gap-4 group">
@@ -515,54 +591,51 @@ export function LifeInsuranceLanding() {
             <div className="order-1 lg:order-2 relative">
               <div className="relative bg-gradient-to-br from-gray-50 to-white rounded-3xl p-8 border border-gray-200 shadow-xl">
                 <h3 className="text-xl font-bold text-gray-900 mb-8">
-                  Deine Deckung auf einen Blick
+                  {t('benefits.coverageOverview.title')}
                 </h3>
                 <div className="space-y-5">
                   <div className="bg-white rounded-2xl p-6 shadow-sm border-l-4 border-[#1a5ab8] hover:shadow-lg transition-shadow">
                     <div className="flex items-start justify-between mb-3">
                       <div className="text-sm font-bold text-[#1a5ab8] uppercase tracking-wide">
-                        Todesfallleistung
+                        {t('benefits.coverageOverview.deathBenefit.label')}
                       </div>
                       <Shield className="h-5 w-5 text-[#1a5ab8]" />
                     </div>
                     <div className="text-gray-900 font-bold text-lg mb-2">
-                      Einmalzahlung
+                      {t('benefits.coverageOverview.deathBenefit.title')}
                     </div>
                     <div className="text-sm text-gray-600">
-                      Steuerfreie Auszahlung für Hypothek, Schulden und 
-                      Lebenshaltungskosten deiner Familie
+                      {t('benefits.coverageOverview.deathBenefit.description')}
                     </div>
                   </div>
 
                   <div className="bg-white rounded-2xl p-6 shadow-sm border-l-4 border-[#7cb50d] hover:shadow-lg transition-shadow">
                     <div className="flex items-start justify-between mb-3">
                       <div className="text-sm font-bold text-[#7cb50d] uppercase tracking-wide">
-                        Invaliditätsschutz
+                        {t('benefits.coverageOverview.disabilityProtection.label')}
                       </div>
                       <Heart className="h-5 w-5 text-[#7cb50d]" />
                     </div>
                     <div className="text-gray-900 font-bold text-lg mb-2">
-                      Einkommensersatz
+                      {t('benefits.coverageOverview.disabilityProtection.title')}
                     </div>
                     <div className="text-sm text-gray-600">
-                      Monatliche Zahlungen bei Erwerbsunfähigkeit für Arztkosten 
-                      und tägliche Ausgaben
+                      {t('benefits.coverageOverview.disabilityProtection.description')}
                     </div>
                   </div>
 
                   <div className="bg-white rounded-2xl p-6 shadow-sm border-l-4 border-gray-300 hover:shadow-lg transition-shadow">
                     <div className="flex items-start justify-between mb-3">
                       <div className="text-sm font-bold text-gray-600 uppercase tracking-wide">
-                        Seelenfrieden
+                        {t('benefits.coverageOverview.peaceOfMind.label')}
                       </div>
                       <TrendingUp className="h-5 w-5 text-gray-600" />
                     </div>
                     <div className="text-gray-900 font-bold text-lg mb-2">
-                      Vollständiger Schutz
+                      {t('benefits.coverageOverview.peaceOfMind.title')}
                     </div>
                     <div className="text-sm text-gray-600">
-                      Keine finanzielle Belastung in schwierigen Zeiten—deine 
-                      Familie bleibt sicher
+                      {t('benefits.coverageOverview.peaceOfMind.description')}
                     </div>
                   </div>
                 </div>
@@ -584,16 +657,15 @@ export function LifeInsuranceLanding() {
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#1a5ab8]/10 rounded-full mb-4 sm:mb-6 border border-[#1a5ab8]/20">
               <TrendingUp className="w-3 sm:w-4 h-3 sm:h-4 text-[#1a5ab8]" />
               <span className="text-xs sm:text-sm font-semibold text-[#1a5ab8]">
-                Pricing
+                {t('pricing.badge')}
               </span>
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 tracking-tight">
-              Faire Preise.
-              <span className="text-[#1a5ab8] block mt-1 sm:mt-2">Keine Überraschungen.</span>
+              {t('pricing.title')}
+              <span className="text-[#1a5ab8] block mt-1 sm:mt-2">{t('pricing.titleHighlight')}</span>
             </h2>
             <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
-              Transparente Preisgestaltung ohne versteckte Kosten. Erhalte sofort
-              ein persönliches Angebot.
+              {t('pricing.description')}
             </p>
           </div>
 
@@ -601,24 +673,24 @@ export function LifeInsuranceLanding() {
             {/* Basic */}
             <div className="bg-white rounded-3xl p-8 border-2 border-gray-200 hover:border-[#1a5ab8]/30 transition-all">
               <div className="text-center mb-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Basis</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t('pricing.basic.name')}</h3>
                 <div className="text-4xl font-bold text-gray-900 mb-2">
-                  ab CHF 29
+                  {t('pricing.basic.price')}
                 </div>
-                <div className="text-sm text-gray-600">pro Monat</div>
+                <div className="text-sm text-gray-600">{t('pricing.perMonth')}</div>
               </div>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-600">Bis CHF 150,000 Deckung</span>
+                  <span className="text-gray-600">{t('pricing.basic.coverage')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-600">Todesfallschutz</span>
+                  <span className="text-gray-600">{t('pricing.basic.deathBenefit')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-600">Online Support</span>
+                  <span className="text-gray-600">{t('pricing.basic.support')}</span>
                 </li>
               </ul>
             </div>
@@ -626,31 +698,31 @@ export function LifeInsuranceLanding() {
             {/* Premium - Highlighted */}
             <div className="relative bg-gradient-to-b from-[#1a5ab8] to-[#1548a0] rounded-3xl p-8 border-2 border-[#1a5ab8] shadow-2xl shadow-blue-500/20 sm:transform sm:scale-105">
               <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 bg-[#7cb50d] text-white px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-semibold">
-                Beliebt
+                {t('pricing.popular')}
               </div>
               <div className="text-center mb-8">
-                <h3 className="text-xl font-bold text-white mb-2">Premium</h3>
+                <h3 className="text-xl font-bold text-white mb-2">{t('pricing.premium.name')}</h3>
                 <div className="text-4xl font-bold text-white mb-2">
-                  ab CHF 49
+                  {t('pricing.premium.price')}
                 </div>
-                <div className="text-sm text-white/80">pro Monat</div>
+                <div className="text-sm text-white/80">{t('pricing.perMonth')}</div>
               </div>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                  <span className="text-white">Bis CHF 300,000 Deckung</span>
+                  <span className="text-white">{t('pricing.premium.coverage')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                  <span className="text-white">Todes- & Invaliditätsschutz</span>
+                  <span className="text-white">{t('pricing.premium.protection')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                  <span className="text-white">Prioritäts-Support</span>
+                  <span className="text-white">{t('pricing.premium.support')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                  <span className="text-white">Schnelle Auszahlung</span>
+                  <span className="text-white">{t('pricing.premium.fastPayout')}</span>
                 </li>
               </ul>
               <Button
@@ -667,10 +739,10 @@ export function LifeInsuranceLanding() {
                   {isNavigating ? (
                     <>
                       <Zap className="mr-2 h-5 w-5 animate-pulse" />
-                      Wird geladen...
+                      {t('hero.loading')}
                     </>
                   ) : (
-                    "Jetzt starten"
+                    t('hero.cta')
                   )}
                 </Link>
               </Button>
@@ -679,33 +751,30 @@ export function LifeInsuranceLanding() {
             {/* Ultimate */}
             <div className="bg-white rounded-3xl p-8 border-2 border-gray-200 hover:border-[#1a5ab8]/30 transition-all">
               <div className="text-center mb-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Ultimate</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t('pricing.ultimate.name')}</h3>
                 <div className="text-4xl font-bold text-gray-900 mb-2">
-                  ab CHF 89
+                  {t('pricing.ultimate.price')}
                 </div>
-                <div className="text-sm text-gray-600">pro Monat</div>
+                <div className="text-sm text-gray-600">{t('pricing.perMonth')}</div>
               </div>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-600">Bis CHF 400,000+ Deckung</span>
+                  <span className="text-gray-600">{t('pricing.ultimate.coverage')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-600">Vollständiger Schutz</span>
+                  <span className="text-gray-600">{t('pricing.ultimate.protection')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-600">Persönlicher Berater</span>
+                  <span className="text-gray-600">{t('pricing.ultimate.advisor')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-[#7cb50d] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-600">24/7 Premium-Support</span>
+                  <span className="text-gray-600">{t('pricing.ultimate.support')}</span>
                 </li>
               </ul>
-              <Button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900" size="lg">
-                Mehr erfahren
-              </Button>
             </div>
           </div>
         </div>
@@ -727,18 +796,17 @@ export function LifeInsuranceLanding() {
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 sm:mb-8 border border-white/20">
               <Sparkles className="w-3 sm:w-4 h-3 sm:h-4 text-[#7cb50d]" />
               <span className="text-xs sm:text-sm font-semibold text-white">
-                Bereit loszulegen?
+                {t('cta.badge')}
               </span>
             </div>
 
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 tracking-tight leading-tight px-4">
-              Schütze was dir wichtig ist.
-              <span className="text-[#7cb50d] block mt-1 sm:mt-2">Starte heute.</span>
+              {t('cta.title')}
+              <span className="text-[#7cb50d] block mt-1 sm:mt-2">{t('cta.titleHighlight')}</span>
             </h2>
 
             <p className="text-base sm:text-lg md:text-xl text-white/90 mb-8 sm:mb-10 md:mb-12 leading-relaxed max-w-2xl mx-auto px-4">
-              Schließe dich tausenden Schweizer Familien an, die uns vertrauen.
-              Einfache Beantragung, transparente Preise und jahrzehntelange Erfahrung.
+              {t('cta.description')}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -756,11 +824,11 @@ export function LifeInsuranceLanding() {
                   {isNavigating ? (
                     <>
                       <Zap className="mr-2 h-5 w-5 animate-pulse" />
-                      Wird geladen...
+                      {t('hero.loading')}
                     </>
                   ) : (
                     <>
-                      Antrag starten
+                      {t('cta.startApplication')}
                       <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
@@ -771,26 +839,26 @@ export function LifeInsuranceLanding() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-3xl mx-auto">
               <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
                 <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">
-                  5 Min
+                  {t('stats.duration')}
                 </div>
                 <div className="text-sm sm:text-base text-white/80">
-                  Antragsdauer
+                  {t('stats.durationLabel')}
                 </div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
                 <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">
-                  0 CHF
+                  {t('stats.hiddenCosts')}
                 </div>
                 <div className="text-sm sm:text-base text-white/80">
-                  Versteckte Kosten
+                  {t('stats.hiddenCostsLabel')}
                 </div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
                 <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">
-                  24/7
+                  {t('stats.support')}
                 </div>
                 <div className="text-sm sm:text-base text-white/80">
-                  Support verfügbar
+                  {t('stats.supportAvailable')}
                 </div>
               </div>
             </div>
@@ -818,31 +886,37 @@ export function LifeInsuranceLanding() {
                   height={56}
                   className="brightness-0 invert"
                 />
+                <Image
+                  src="/nag.png"
+                  alt="NAG Logo"
+                  width={80}
+                  height={40}
+                  className="brightness-0 invert"
+                />
               </div>
               <p className="text-gray-400 mb-4">
-                Moderne Lebensversicherung für die Schweiz. 
-                Einfach, transparent und sicher.
+                {t('footer.description')}
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Produkt</h4>
+              <h4 className="font-semibold mb-4">{t('footer.product')}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#benefits" className="hover:text-white transition-colors">Vorteile</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">Preise</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">{t('nav.features')}</a></li>
+                <li><a href="#benefits" className="hover:text-white transition-colors">{t('nav.benefits')}</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">{t('nav.pricing')}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Unternehmen</h4>
+              <h4 className="font-semibold mb-4">{t('footer.company')}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Über uns</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Kontakt</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Datenschutz</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.aboutUs')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.contact')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.privacy')}</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Underwaise. Alle Rechte vorbehalten.</p>
+            <p>{t('footer.copyright')}</p>
           </div>
         </div>
       </footer>

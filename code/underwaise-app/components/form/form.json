@@ -1,0 +1,110 @@
+{
+  "formUuid": "550e8400-e29b-41d4-a716-446655440000",
+  "firstName": "John",
+  "lastName": "Doe",
+  "birthDate": "1990-05-15",
+  "email": "john.doe@example.com",
+  "height": 175,
+  "weight": 70,
+  "isSmoker": false,
+  "isDrugUser": false,
+  "specialSportActivities": [
+    "Rock climbing",
+    "Scuba diving",
+    "Marathon running"
+  ],
+  "physicalHealthConditions": [
+    {
+      "startDate": "2024-01-10",
+      "endDate": null,
+      "reason": "Chronic back pain therapy",
+      "isTreatmentCompleted": false,
+      "treatmentFacilityAddress": "123 Medical Center Dr, Springfield, IL 62701"
+    },
+    {
+      "startDate": "2023-12-05",
+      "endDate": "2024-01-05",
+      "reason": "Physical therapy after knee replacement",
+      "isTreatmentCompleted": true,
+      "treatmentFacilityAddress": "456 Rehabilitation Ave, Chicago, IL 60601"
+    }
+  ],
+  "mentalHealthConditions": [
+    {
+      "startDate": "2024-02-01",
+      "endDate": null,
+      "reason": "Anxiety disorder counseling",
+      "isTreatmentCompleted": false,
+      "treatmentFacilityAddress": "789 Mental Health Clinic, Boston, MA 02101"
+    }
+  ],
+  "medicationForm": [
+    {
+      "startDate": "2024-01-15",
+      "endDate": "2024-02-15",
+      "reason": "Pain management after surgery",
+      "isTreatmentCompleted": true,
+      "medicationNameAndDosage": "Ibuprofen 200mg",
+      "medicationPeriodicity": "DAILY"
+    },
+    {
+      "startDate": "2024-03-01",
+      "endDate": null,
+      "reason": "Diabetes management",
+      "isTreatmentCompleted": false,
+      "medicationNameAndDosage": "Insulin 10 units",
+      "medicationPeriodicity": "DAILY"
+    }
+  ],
+  "incapacityForm": [
+    {
+      "startDate": "2024-01-08",
+      "endDate": "2024-01-22",
+      "reason": "Recovery from appendectomy",
+      "isTreatmentCompleted": true
+    }
+  ]
+}
+ 
+
+
+
+"sections": [
+    {
+      "id": "lifestyle",
+      "title": "Lifestyle Questions",
+      "questions": [
+        {
+          "id": "smoke",
+          "question": "Do you smoke?",
+          "type": "boolean",
+          "default": "no",
+          "required": true
+        },
+        {
+          "id": "drug_usage",
+          "question": "Have you ever consumed drugs or are you consuming drugs?",
+          "type": "boolean",
+          "default": "no",
+          "required": true
+        },
+        {
+          "id": "special_sports",
+          "question": "Do you practice any special sports or leisure activities, such as mountaineering, car or motorcycle sports, diving, sailing, or extreme sports?",
+          "type": "boolean",
+          "followUp": {
+            "trigger": "yes",
+            "fields": [
+              {
+                "id": "special_sports_details",
+                "label": "List your special sports or leisure activities",
+                "type": "textarea"
+              }
+            ]
+          }
+        }
+      ]
+    },
+
+    
+  ]

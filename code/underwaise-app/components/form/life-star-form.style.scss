@@ -25,9 +25,10 @@
   }
 
   h2 {
-    font-size: 1.2rem;
+    font-size: 0.8rem;
     font-weight: 700;
     width: 100%;
+    margin-bottom: 16px;
   }
 
   .subtitle {
@@ -41,11 +42,17 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding-bottom: 80px;
+    padding-bottom: 70px;
 
     .form-label {
       font-size: 0.8rem;
       font-weight: 600;
+    }
+
+    .question {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
     }
 
     .form-actions {
@@ -55,7 +62,7 @@
       right: 0;
       display: flex;
       justify-content: center;
-      height: 80px;
+      height: 70px;
       background-color: #fff;
       border-top: 1px solid #d8d8d8;
 
@@ -72,6 +79,10 @@
         .secondary-action {
           flex: 1;
           max-width: 200px;
+        }
+
+        .primary-action {
+          margin-left: auto;
         }
       }
     }
