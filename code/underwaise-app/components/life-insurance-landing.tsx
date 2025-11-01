@@ -338,9 +338,9 @@ export function LifeInsuranceLanding() {
                   <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
                     <div className="flex items-center gap-3">
                       <div className="flex -space-x-2">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-white shadow-sm" />
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 border-2 border-white shadow-sm" />
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-white shadow-sm" />
+                        <img src="/customer1.webp" alt="Kunde 1" className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" />
+                        <img src="/customer2.webp" alt="Kunde 2" className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" />
+                        <img src="/customer3.webp" alt="Kunde 3" className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" />
                       </div>
                       <div>
                         <div className="text-white font-bold">2,500+ Kunden</div>
