@@ -1,4 +1,3 @@
-// app/components/MultiStepForm.tsx
 "use client";
 
 import { useState } from "react";
@@ -31,10 +30,24 @@ const postApplication = async (data: FormValues) => {
   return res.data;
 };
 
+const postCaptcha = async (token: string) => {
+  const res = await fetch("/api/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ recaptchaResponse: token }),
+  });
+  return await res.json();
+};
+
+const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY;
+
 export function MultiStepForm({ sections }: Props) {
   const router = useRouter();
 
   const [step, setStep] = useState(0);
+  const [isCaptchaGettingReady, setIsCaptchaGettingReady] = useState(false);
   const form = useForm<FormValues>({
     defaultValues: {
       firstName: "",
@@ -103,6 +116,13 @@ export function MultiStepForm({ sections }: Props) {
     },
   });
 
+  const { mutate: submitCaptcha, isPending: isCaptchaPending } = useMutation({
+    mutationFn: postCaptcha,
+    onError: () => {
+      toast.error("There was an error verifying the captcha.");
+    },
+  });
+
   const sanitizeArrayWithEndDate = (
     array: HealthCondition[] | Medication[] | Incapacity[]
   ): HealthCondition[] | Medication[] | Incapacity[] => {
@@ -116,45 +136,67 @@ export function MultiStepForm({ sections }: Props) {
     if (step < sections.length - 1) {
       setStep(step + 1);
     } else {
-      const output: FormValues = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        birthDate: data.birthDate,
-        email: data.email,
-        height: data.height,
-        weight: data.weight,
+      try {
+        setIsCaptchaGettingReady(true);
+        (window as any).grecaptcha.ready(() => {
+          (window as any).grecaptcha
+            .execute(SITE_KEY, { action: "submit" })
+            .then(async (token: string) => {
+              submitCaptcha(token, {
+                onSuccess: (captchaResponse) => {
+                  const output: FormValues & { captcha: string } = {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    birthDate: data.birthDate,
+                    email: data.email,
+                    height: data.height,
+                    weight: data.weight,
 
-        isSmoker: data.isSmoker,
-        isDrugUser: data.isDrugUser,
-        hasSpecialSports: data.hasSpecialSports,
+                    isSmoker: data.isSmoker,
+                    isDrugUser: data.isDrugUser,
+                    hasSpecialSports: data.hasSpecialSports,
 
-        specialSportActivities: data.hasSpecialSports
-          ? data.specialSportActivities
-          : "",
+                    specialSportActivities: data.hasSpecialSports
+                      ? data.specialSportActivities
+                      : "",
 
-        physicalHealthConditions: data.hasPhysicalHealthConditions
-          ? (sanitizeArrayWithEndDate(
-              data.physicalHealthConditions
-            ) as HealthCondition[])
-          : [],
+                    physicalHealthConditions: data.hasPhysicalHealthConditions
+                      ? (sanitizeArrayWithEndDate(
+                          data.physicalHealthConditions
+                        ) as HealthCondition[])
+                      : [],
 
-        mentalHealthConditions: data.hasMentalHealthConditions
-          ? (sanitizeArrayWithEndDate(
-              data.mentalHealthConditions
-            ) as HealthCondition[])
-          : [],
+                    mentalHealthConditions: data.hasMentalHealthConditions
+                      ? (sanitizeArrayWithEndDate(
+                          data.mentalHealthConditions
+                        ) as HealthCondition[])
+                      : [],
 
-        medicationForm: data.hasMedicationUsage
-          ? (sanitizeArrayWithEndDate(data.medicationForm) as Medication[])
-          : [],
+                    medicationForm: data.hasMedicationUsage
+                      ? (sanitizeArrayWithEndDate(
+                          data.medicationForm
+                        ) as Medication[])
+                      : [],
 
-        incapacityForm: data.hasIncapacity
-          ? (sanitizeArrayWithEndDate(data.incapacityForm) as Incapacity[])
-          : [],
-      };
+                    incapacityForm: data.hasIncapacity
+                      ? (sanitizeArrayWithEndDate(
+                          data.incapacityForm
+                        ) as Incapacity[])
+                      : [],
 
-      console.log("Structured form output:", output);
-      submitApplication(output);
+                    captcha: captchaResponse,
+                  };
+                  console.log("Structured form output:", output);
+                  submitApplication(output);
+                },
+              });
+            });
+        });
+      } catch {
+        toast.error("There was an error preparing the captcha.");
+      } finally {
+        setIsCaptchaGettingReady(false);
+      }
     }
   };
 
@@ -220,9 +262,17 @@ export function MultiStepForm({ sections }: Props) {
                 className="primary-action"
                 type="submit"
                 variant="default"
-                disabled={isPending || !form.formState.isValid}
+                disabled={
+                  isCaptchaGettingReady ||
+                  isPending ||
+                  isCaptchaPending ||
+                  !form.formState.isValid
+                }
               >
                 {step === sections.length - 1 ? "Submit" : "Next"}
+                {isCaptchaGettingReady || isPending || isCaptchaPending
+                  ? "..."
+                  : ""}
               </Button>
             </div>
           </div>
