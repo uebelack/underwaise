@@ -29,6 +29,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.time.ZoneId;
+import java.util.ArrayList;
 
 @SpringBootApplication
 @EnableProcessApplication
@@ -51,13 +52,17 @@ public class UnderwaiseApplication {
             var underwaiseTestEmail = System.getenv("UNDERWAISE_TEST_EMAIL");
             var applicationForm = new ApplicationForm();
             applicationForm.setEmail(underwaiseTestEmail);
-            applicationForm.setHobbies(Faker.instance().howIMetYourMother().catchPhrase());
             applicationForm.setFirstName(Faker.instance().name().firstName());
             applicationForm.setLastName(Faker.instance().name().lastName());
             applicationForm.setBirthDate(Faker.instance().date().birthday().toInstant()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate());
-            applicationForm.setHealthConditions(Faker.instance().backToTheFuture().quote());
+
+            applicationForm.setPhysicalHealthConditions(new ArrayList<>());
+            applicationForm.setMentalHealthConditions(new ArrayList<>());
+            applicationForm.setMedicationForm(new ArrayList<>());
+            applicationForm.setIncapacityForm(new ArrayList<>());
+
             underwritingService.start(applicationForm);
         }
     }
