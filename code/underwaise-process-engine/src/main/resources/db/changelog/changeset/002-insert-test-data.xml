@@ -6,7 +6,9 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
     <changeSet id="002-insert-test-data" author="system">
-        <insert tableName="applications">
+        <!-- Insert test data into application_form table -->
+        <insert tableName="application_form">
+            <column name="form_uuid" value="550e8400-e29b-41d4-a716-446655440001"/>
             <column name="first_name" value="John"/>
             <column name="last_name" value="Doe"/>
             <column name="birth_date" value="1990-05-15"/>
@@ -14,6 +16,12 @@
             <column name="smoker" valueBoolean="false"/>
             <column name="hobbies" value="reading, swimming"/>
             <column name="health_conditions" value="none"/>
+        </insert>
+
+        <!-- Insert corresponding application record -->
+        <insert tableName="application">
+            <column name="application_uuid" value="550e8400-e29b-41d4-a716-446655440002"/>
+            <column name="fk_form_id" value="550e8400-e29b-41d4-a716-446655440001"/>
         </insert>
     </changeSet>
 

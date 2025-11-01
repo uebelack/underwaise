@@ -1,8 +1,9 @@
 package cloud.underwaise.services;
 
+import cloud.underwaise.UnderwaiseProperties;
 import cloud.underwaise.model.Application;
 import cloud.underwaise.model.ApplicationForm;
-import cloud.underwaise.processes.UnderwritingProcess;
+import cloud.underwaise.processes.UnderwritingProcessInstanceWrapper;
 import cloud.underwaise.repository.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,38 +13,30 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
+import static cloud.underwaise.processes.UnderwritingProcessInstanceWrapper.APPLICATION_ID_VARIABLE;
+import static cloud.underwaise.processes.UnderwritingProcessInstanceWrapper.TRAINING_VARIABLE;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UnderwritingService {
     private final RuntimeService runtimeService;
     private final ApplicationRepository applicationRepository;
+    private final UnderwaiseProperties underwaiseProperties;
 
     @Transactional
     public Application start(ApplicationForm applicationForm) {
-        // Create and persist the application
         var application = new Application();
         application.setApplicationForm(applicationForm);
 
         Application savedApplication = applicationRepository.save(application);
-        log.info("Application saved with ID: {}", savedApplication.getId());
 
-        // Start the process with the application ID as a process variable
         runtimeService.startProcessInstanceByKey(
-                UnderwritingProcess.PROCESS_DEFINITION_KEY,
-                Map.of("applicationId", savedApplication.getId())
+                UnderwritingProcessInstanceWrapper.PROCESS_DEFINITION_KEY,
+                Map.of(APPLICATION_ID_VARIABLE, savedApplication.getApplicationUuid(),
+                        TRAINING_VARIABLE, underwaiseProperties.isTrainingActive())
         );
 
         return savedApplication;
-    }
-
-    public Application findById(Long id) {
-        return applicationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Application not found with ID: " + id));
-    }
-
-    public Application findByEmail(String email) {
-        return applicationRepository.findByApplicationFormEmail(email)
-                .orElseThrow(() -> new RuntimeException("Application not found with email: " + email));
     }
 }

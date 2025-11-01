@@ -20,7 +20,6 @@ spring:
 
   # JPA Configuration
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: validate
     show-sql: true
@@ -42,7 +41,7 @@ spring:
 
 underwaise:
   aiServiceUrl: http://localhost:8000
-  mailgun-domain: underwaise.ch
+  mailgun-domain: mg.underwaise.ch
   mailgun-api-key: 123
 
 cibseven:
@@ -55,3 +54,15 @@ cibseven:
     # BPM provider for Enterprise Edition
     # bpm:
     #   provider: org.cibseven.webapp.providers.SevenProviderEE
+
+---
+# Profile for MS SQL Server
+spring:
+  config:
+    activate:
+      on-profile: mssql
+  jpa:
+    properties:
+      hibernate:
+        type:
+          preferred_uuid_jdbc_type: CHAR

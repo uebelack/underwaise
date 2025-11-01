@@ -10,3 +10,4 @@ data/
 *.db
 *.mv.db
 *.trace.db
+code/underwaise-process-engine/src/main/resources/update.sh

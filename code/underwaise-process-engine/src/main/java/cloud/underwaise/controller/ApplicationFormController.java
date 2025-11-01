@@ -1,7 +1,9 @@
 package cloud.underwaise.controller;
 
 import cloud.underwaise.model.ApplicationForm;
+import cloud.underwaise.services.UnderwritingService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +14,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/application")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class ApplicationFormController {
+
+    private final UnderwritingService underwritingService;
 
     @PostMapping("/submit")
     public ResponseEntity<Map<String, Object>> submitForm(@Valid @RequestBody ApplicationForm applicationForm) {
@@ -29,6 +34,9 @@ public class ApplicationFormController {
             response.put("submittedData", applicationForm);
             response.put("timestamp", java.time.LocalDateTime.now());
 
+
+            underwritingService.start(applicationForm);
+
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
@@ -41,13 +49,5 @@ public class ApplicationFormController {
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
-    }
-
-    @GetMapping("/health")
-    public ResponseEntity<Map<String, String>> healthCheck() {
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "healthy");
-        response.put("service", "Form Controller");
-        return ResponseEntity.ok(response);
     }
 }

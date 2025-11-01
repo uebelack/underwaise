@@ -46,12 +46,12 @@
 :root {
   --radius: 0.5rem;
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --foreground: #4a4a4a;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #7cb50d;
+  --primary: #8ccc0f;
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(100% 0.00011 271.152);
   --secondary-foreground: #757575;
@@ -76,6 +76,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --max-width: 720px;
 }
 
 .dark {
@@ -85,7 +87,7 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: #7cb50d;
+  --primary: #8ccc0f;
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(100% 0.00011 271.152);
   --secondary-foreground: oklch(0.205 0 0);
@@ -168,5 +170,14 @@
 
   input[type="number"] {
     -moz-appearance: textfield;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

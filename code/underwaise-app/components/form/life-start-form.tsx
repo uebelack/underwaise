@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,12 +17,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formSchema } from "@/schemas/form-schema";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Label } from "../ui/label";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import "./life-star-form.style.scss";
 import { ButtonGroup } from "../ui/button-group";
+import Link from "next/link";
+import { toast } from "sonner";
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -38,11 +38,31 @@ const postApplication = async (data: z.infer<typeof formSchema>) => {
 
 type FormValues = z.infer<typeof formSchema>;
 
+const calculateFormCompletion = (values: FormValues): number => {
+  const fields = [
+    values.firstName,
+    values.lastName,
+    values.email,
+    values.birthDate,
+    values.smoker !== undefined, // For boolean field, check if it's defined
+    values.hobbies,
+    values.healthConditions,
+  ];
+
+  const filledFields = fields.filter((field) => {
+    if (typeof field === "boolean") return true; // Boolean fields are always considered filled
+    if (typeof field === "string") return field.trim().length > 0;
+    return false;
+  });
+
+  const percentage = Math.round((filledFields.length / fields.length) * 100);
+  return percentage;
+};
+
 export function LifeStarForm() {
   const router = useRouter();
-  const [submitStatus, setSubmitStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
+
+  const [completionPercentage, setCompletionPercentage] = useState<number>(14);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -55,27 +75,41 @@ export function LifeStarForm() {
       hobbies: "",
       healthConditions: "",
     },
+    mode: "onTouched",
   });
 
-  const mutation = useMutation({
+  const watchedValues = form.watch();
+
+  useEffect(() => {
+    const percentage = calculateFormCompletion(watchedValues);
+    setCompletionPercentage(percentage);
+  }, [watchedValues]);
+
+  const { mutate: submitApplication, isPending } = useMutation({
     mutationFn: postApplication,
-    onSuccess: () => {
-      router.push("/lifestar/thank-you");
+    onSuccess: (data) => {
+      console.log(data);
+      router.push("/spar-lebensversicherung/thank-you");
     },
     onError: () => {
-      console.log("ERROR");
-      setSubmitStatus("error");
+      toast.error("There was an error submitting your application.");
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    mutation.mutate(values);
+    submitApplication(values);
   }
 
   return (
     <div className="form-container">
-      <h2>TBD</h2>
+      <div className="form-progress">
+        <div
+          className="progress-indicator"
+          style={{ width: `${completionPercentage}%` }}
+        />
+      </div>
+
+      <h2>Apply now for your life Spar Lebensversicherung</h2>
       <p className="subtitle">Please fill out the form with your information</p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -84,7 +118,7 @@ export function LifeStarForm() {
             name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>First Name *</FormLabel>
+                <FormLabel className="form-label">First Name *</FormLabel>
                 <FormControl>
                   <div className="relative group">
                     <Input placeholder="John" {...field} />
@@ -99,7 +133,7 @@ export function LifeStarForm() {
             name="lastName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Last Name *</FormLabel>
+                <FormLabel className="form-label">Last Name *</FormLabel>
                 <FormControl>
                   <div className="relative group">
                     <Input
@@ -118,7 +152,7 @@ export function LifeStarForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email Address *</FormLabel>
+                <FormLabel className="form-label">Email Address *</FormLabel>
                 <FormControl>
                   <div className="relative group">
                     <Input
@@ -139,7 +173,7 @@ export function LifeStarForm() {
             name="birthDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Date of Birth *</FormLabel>
+                <FormLabel className="form-label">Date of Birth *</FormLabel>
                 <FormControl>
                   <div className="relative group">
                     <Input
@@ -159,7 +193,7 @@ export function LifeStarForm() {
             name="smoker"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Do you smoke? *</FormLabel>
+                <FormLabel className="form-label">Do you smoke? *</FormLabel>
                 <FormControl>
                   <ButtonGroup className="w-full">
                     <Button
@@ -181,24 +215,6 @@ export function LifeStarForm() {
                       No
                     </Button>
                   </ButtonGroup>
-                  {/* <div className="relative group">
-                    <RadioGroup
-                      onValueChange={(value) =>
-                        field.onChange(value === "true")
-                      }
-                      defaultValue={field.value ? "true" : "false"}
-                      className="flex flex-col space-y-1"
-                    >
-                      <div className="flex items-center gap-3">
-                        <RadioGroupItem value="true" id="r1" />
-                        <Label htmlFor="r1">Yes</Label>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <RadioGroupItem value="false" id="r2" />
-                        <Label htmlFor="r2">No</Label>
-                      </div>
-                    </RadioGroup>
-                  </div> */}
                 </FormControl>
                 <FormMessage className="text-xs mt-1.5" />
               </FormItem>
@@ -210,7 +226,9 @@ export function LifeStarForm() {
             name="hobbies"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Please tell us your hobbies *</FormLabel>
+                <FormLabel className="form-label">
+                  Please tell us your hobbies *
+                </FormLabel>
                 <FormControl>
                   <div className="relative group">
                     <Textarea
@@ -231,7 +249,7 @@ export function LifeStarForm() {
             name="healthConditions"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
+                <FormLabel className="form-label">
                   Are you currently having any health conditions? *
                 </FormLabel>
                 <FormControl>
@@ -253,12 +271,21 @@ export function LifeStarForm() {
             <div className="wrapper">
               <Button
                 size="lg"
+                variant="secondary"
+                type="submit"
+                className="secondary-action"
+                asChild
+              >
+                <Link href="/">Cancel</Link>
+              </Button>
+              <Button
+                size="lg"
                 variant="default"
                 type="submit"
-                className="w-full"
-                disabled={mutation.isPending || !form.formState.isValid}
+                className="primary-action"
+                disabled={isPending || !form.formState.isValid}
               >
-                {mutation.isPending ? (
+                {isPending ? (
                   <span>Submitting Application...</span>
                 ) : (
                   <span>Submit Application</span>

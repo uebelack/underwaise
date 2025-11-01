@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class UnderwaiseProperties {
     private String aiServiceUrl;
-
     private String mailgunApiKey;
     private String mailgunDomain;
+    private boolean trainingActive;
 }

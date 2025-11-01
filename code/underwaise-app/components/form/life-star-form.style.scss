@@ -1,9 +1,28 @@
 .form-container {
   width: 100%;
-  max-width: 600px;
+  max-width: var(--max-width);
   margin: 0 auto;
   flex-direction: column;
   padding: 1rem;
+
+  .form-progress {
+    position: sticky;
+    width: 100%;
+    height: 4px;
+    top: calc(50px + 0.5rem);
+    margin-bottom: 1rem;
+    background-color: #e0e0e0;
+
+    .progress-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background-color: var(--primary);
+      transition: width 0.3s ease;
+      z-index: 1;
+    }
+  }
 
   h2 {
     font-size: 1.2rem;
@@ -24,6 +43,11 @@
     gap: 24px;
     padding-bottom: 80px;
 
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
     .form-actions {
       position: fixed;
       bottom: 0;
@@ -33,13 +57,22 @@
       justify-content: center;
       height: 80px;
       background-color: #fff;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid #d8d8d8;
 
       .wrapper {
         width: 100%;
-        max-width: 600px;
+        max-width: var(--max-width);
         padding: 0 1rem;
         margin: auto;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+
+        .primary-action,
+        .secondary-action {
+          flex: 1;
+          max-width: 200px;
+        }
       }
     }
   }

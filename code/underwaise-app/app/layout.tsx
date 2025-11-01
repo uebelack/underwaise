@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Lato, Geist_Mono } from "next/font/google"; // Replace Geist with Lato
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const lato = Lato({
+  variable: "--font-lato",
   subsets: ["latin"],
+  weight: ["100", "300", "400", "700", "900"],
 });
 
 const geistMono = Geist_Mono({
@@ -13,8 +14,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PAX Life Insurance - Protect Your Family Since 1876",
-  description: "Life insurance that protects your loved ones financially if something happens to you. Death and disability coverage from Switzerland's trusted member-owned cooperative.",
+  title: "Underwaise - Moderne Lebensversicherung in 5 Minuten | Schweiz",
+  description:
+    "Moderne Lebensversicherung mit transparenten Konditionen. Todes- und Invaliditätsschutz ab CHF 29/Monat. Jetzt in nur 5 Minuten online abschliessen.",
+  keywords: [
+    "Lebensversicherung Schweiz",
+    "Online Lebensversicherung",
+    "Todesfallschutz",
+    "Invaliditätsschutz",
+    "günstige Versicherung",
+  ],
+  openGraph: {
+    title: "Underwaise - Moderne Lebensversicherung für die Schweiz",
+    description:
+      "In nur 5 Minuten zur Lebensversicherung. Transparente Preise, umfassender Schutz, 24/7 Support.",
+    type: "website",
+    locale: "de_CH",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Underwaise - Lebensversicherung neu gedacht",
+    description:
+      "Moderne Lebensversicherung in 5 Minuten. Ab CHF 29/Monat. Jetzt starten!",
+  },
 };
 
 export default function RootLayout({
@@ -24,9 +46,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${lato.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>
