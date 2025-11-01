@@ -5,14 +5,10 @@ load_dotenv()
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 import json
 
 from llm import get_gpt_mini_llm
-
-
-class Joke(BaseModel):
-    joke: str
 
 
 app = FastAPI()
@@ -20,7 +16,7 @@ app = FastAPI()
 # Add CORS middleware to allow requests from other devices
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for local network testing
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -33,127 +29,94 @@ def read_root():
 
 
 @app.get("/joke")
-def get_joke() -> Joke:
-    """
-    Get a joke from the LLM.
-    """
+def get_joke():
+    """Get a joke from the LLM."""
     joke = get_gpt_mini_llm().invoke(
         "Tell me a joke, just return the joke, no other text"
     )
-    return Joke(joke=joke.content)
+    return {"joke": joke.content}
 
 
-# ------------ SIMPLIFIED: Underwriting MVP endpoint ------------
+# ------------ Hobbies Risk Assessment ------------
 
 class UnderwriteRequest(BaseModel):
-    text: str = Field(..., description="Freitext zu Hobbys, Aktivitäten, Verhalten, ...")
-
-
-class DetectedActivity(BaseModel):
-    name: str
-    frequency: str  # "rarely", "occasionally", "regularly", "frequently"
-
-
-class RiskVector(BaseModel):
-    """
-    Fixed 6-dimension risk vector matching underwriting schema (all values 0-10):
-    - physiological_risk: Physical health conditions and organ function (0-10 scale)
-    - psychological_risk: Mental health, stress, psychological conditions (0-10 scale)
-    - medication_risk: Medication use and substance dependency (0-10 scale)
-    - fitness_risk: Physical fitness risk - LOWER is better (0-10 scale: 0=very fit, 10=sedentary/unfit)
-    - bmi_risk: Body mass index related risks (0-10 scale)
-    - activity_risk: Risk from sports, hobbies, and leisure activities (0-10 scale)
-    """
-    physiological_risk: float  # 0-10
-    psychological_risk: float  # 0-10
-    medication_risk: float  # 0-10
-    fitness_risk: float  # 0-10 (0=sehr fit, 10=sedentär)
-    bmi_risk: float  # 0-10
-    activity_risk: float  # 0-10
+    text: str = Field(..., description="Freitext zu Hobbys, Aktivitäten, Verhalten")
 
 
 class UnderwriteResponse(BaseModel):
-    total_risk_score: float  # Overall risk: 0.0 (low) to 1.0 (high)
-    activities: List[DetectedActivity]
-    risk_vector: RiskVector
-    explanation: str  # Why these risk scores were chosen
+    risk_score: float  # 0.0 (low) to 10.0 (high)
+    explanation: str
 
 
 @app.post("/get_risk_from_hobbies", response_model=UnderwriteResponse)
 def get_risk_from_hobbies(req: UnderwriteRequest):
-    """
-    Simplified underwriting: Extract activities and calculate a fixed 6-dimension risk vector.
-    """
+    """Assess risk from hobbies/activities with a single score."""
 
     prompt = f"""
-Du bist ein erfahrener Underwriting-Assistant für Lebens- und Berufsunfähigkeitsversicherungen. Analysiere den Text und denke ganzheitlich über Risiken nach.
+Du bist ein Underwriting-Assistant. Analysiere die Hobbys/Aktivitäten und gib EINEN Risikowert zurück.
 
-**WICHTIG: Erkenne indirekte Risikofaktoren!**
-Beispiele:
-- Viele Partys/Clubbing → erhöhtes Medikamentenrisiko (Alkohol, Drogen bei Techno/Raves)
-- Extremsport → Unfallrisiko (activity_risk), aber KEINE automatische psychische Störung
-- Sedentärer Lebensstil (Gaming, Netflix) → hohes Fitness-Risiko, BMI-Risiko, physiologische Risiken
-- Hochstress-Hobbies (Börsenhandel, Wettbewerbe) → psychologisches Risiko
-- Kampfsport regelmäßig → höheres Unfallrisiko, aber GUTES Fitness-Level (niedriges fitness_risk)
-- Vegane/spezielle Ernährung erwähnt → könnte auf Gesundheitsbewusstsein hinweisen (positiv)
-
-**Beispiel-Analysen (korrigiert):**
-1. "Ich gehe gerne feiern, Techno-Partys am Wochenende" 
-   → activity_risk: 2, medication_risk: 6-7 (Alkohol/Partykultur), fitness_risk: 4-5, psychological_risk: 3
-   Erklärung: Partys erhöhen Substanzkonsum-Risiko, aber keine schwere Sportgefahr
-
-2. "Wingsuit-Fliegen ist meine Leidenschaft, mache es monatlich"
-   → activity_risk: 10 (extrem gefährlich!), fitness_risk: 1-2 (sehr fit für Extremsport), physiological_risk: 3, psychological_risk: 2
-   Erklärung: Wingsuit ist lebensgefährlich, aber Person ist körperlich fit und mental stabil genug dafür
-
-3. "Entspanne mit Netflix, Pizza, am Wochenende nichts Besonderes"
-   → fitness_risk: 8-9 (sehr inaktiv!), bmi_risk: 6-7, physiological_risk: 5, activity_risk: 0
-   Erklärung: Sedentärer Lebensstil = hohes Fitness-Risiko und BMI-Probleme zu erwarten
-
-4. "Marathonläufer, trainiere 5x/Woche, gesunde Ernährung"
-   → fitness_risk: 0-1 (exzellent!), physiological_risk: 1-2, bmi_risk: 1, activity_risk: 2, psychological_risk: 1
-   Erklärung: Sehr aktiv und gesund, niedriges Gesamt-Risiko
+**Beispiele:**
+1. "Wingsuit-Fliegen monatlich" → risk_score: 9.5 (extrem gefährlich, hohes Todesrisiko)
+2. "Netflix und Pizza am Wochenende" → risk_score: 5.0 (sedentär, mittleres Gesundheitsrisiko)
+3. "Marathonläufer, 5x/Woche Training" → risk_score: 1.5 (sehr gesund, niedriges Risiko)
+4. "Gelegentlich Wandern" → risk_score: 1.0 (gesund und sicher)
 
 **Antworte NUR mit gültigem JSON:**
 
 {{
-  "total_risk_score": <float 0.0-1.0>,
-  "activities": [
-    {{"name": "<activity>", "frequency": "<rarely|occasionally|regularly|frequently>"}}
-  ],
-  "risk_vector": {{
-    "physiological_risk": <float 0-10>,
-    "psychological_risk": <float 0-10>,
-    "medication_risk": <float 0-10>,
-    "fitness_risk": <float 0-10>,
-    "bmi_risk": <float 0-10>,
-    "activity_risk": <float 0-10>
-  }},
-  "explanation": "<Kurze Begründung der Risikobewertung in 1-2 Sätzen>"
+  "risk_score": <float 0.0-10.0>,
+  "explanation": "<Kurze Begründung warum dieser Wert gewählt wurde, 1-2 Sätze>"
 }}
 
-**Skalen-Bedeutung (WICHTIG!):**
-- physiological_risk: 0=kerngesund, 10=schwere Organprobleme zu erwarten
-- psychological_risk: 0=mental stabil, 10=psychische Erkrankungen wahrscheinlich (NUR bei echten Anzeichen!)
-- medication_risk: 0=kein Substanzkonsum, 10=hohe Abhängigkeitsgefahr
-- fitness_risk: 0=sehr fit/aktiv, 10=komplett inaktiv/sedentär (NIEDRIGER IST BESSER!)
-- bmi_risk: 0=optimales Gewicht zu erwarten, 10=starkes Über-/Untergewicht zu erwarten
-- activity_risk: 0=sichere Aktivitäten, 10=lebensgefährliche Extremsportarten
-- total_risk_score: Gewichteter Durchschnitt für Versicherungsentscheidung (0.0-1.0)
+**Skala:**
+- 0.0-2.0: Sehr niedriges Risiko (gesunde, sichere Aktivitäten)
+- 2.1-4.0: Niedriges Risiko (normale Aktivitäten)
+- 4.1-6.0: Mittleres Risiko (sedentärer Lebensstil oder moderate Risiken)
+- 6.1-8.0: Hohes Risiko (gefährliche Sportarten, ungesunder Lebensstil)
+- 8.1-10.0: Sehr hohes Risiko (Extremsport, lebensgefährliche Aktivitäten)
 
-**Wichtige Regeln:**
-- psychological_risk NUR erhöhen bei echten Anzeichen (Stress, Burnout, Depression erwähnt)
-- Extremsportler sind oft FIT → fitness_risk NIEDRIG, nicht hoch!
-- Berücksichtige Häufigkeit: "selten Fallschirmspringen" ≠ "wöchentlich Fallschirmspringen"
-- Erkenne Lifestyle-Muster und Zusammenhänge
-- Sei präzise und fair bei der Risikobewertung
-- Nur gültiges JSON ohne zusätzliche Erklärungen außerhalb des JSONs
-- Dezimaltrenner ist Punkt (.)
+**Regeln:**
+- Berücksichtige Häufigkeit: "selten" vs "regelmäßig"
+- Nur gültiges JSON, Dezimaltrenner ist Punkt (.)
+- Erklärung soll konkret auf den Text eingehen
 
-**Zu analysierender Text:**
+**Text:**
 \"\"\"{req.text}\"\"\"
 """
 
+    return _assess_risk(prompt)
+
+
+# ------------ Health Questions Risk Assessment ------------
+
+class TreatmentLine(BaseModel):
+    period: str
+    reason: str
+    therapist_name: Optional[str] = None
+    therapist_address: Optional[str] = None
+    treatment_completed: Optional[bool] = None
+
+
+class HealthQuestionRequest(BaseModel):
+    treatments: List[str] = Field(..., description="List of treatment entries, one per line")
+
+
+class TreatmentRiskScore(BaseModel):
+    line_number: int
+    treatment_text: str
+    risk_score: float  # 0.0 to 10.0
+    explanation: str
+
+
+class HealthQuestionResponse(BaseModel):
+    overall_risk_score: float  # 0.0 to 10.0
+    treatment_scores: List[TreatmentRiskScore]
+    summary: str
+
+
+# Reusable function to assess risk
+def _assess_risk(prompt: str) -> UnderwriteResponse:
+    """Reusable function to get risk assessment from LLM."""
     llm = get_gpt_mini_llm()
     
     try:
@@ -168,37 +131,214 @@ Beispiele:
         
         parsed = json.loads(raw)
         
-        # Validate and clip values
-        total_risk = max(0.0, min(1.0, float(parsed["total_risk_score"])))
+        risk_score = max(0.0, min(10.0, float(parsed["risk_score"])))
         explanation = parsed.get("explanation", "No explanation provided")
         
-        activities = [
-            DetectedActivity(
-                name=a["name"],
-                frequency=a["frequency"] if a["frequency"] in ["rarely", "occasionally", "regularly", "frequently"] else "occasionally"
-            )
-            for a in parsed["activities"]
-        ]
-        
-        rv = parsed["risk_vector"]
-        risk_vector = RiskVector(
-            physiological_risk=max(0.0, min(10.0, float(rv["physiological_risk"]))),
-            psychological_risk=max(0.0, min(10.0, float(rv["psychological_risk"]))),
-            medication_risk=max(0.0, min(10.0, float(rv["medication_risk"]))),
-            fitness_risk=max(0.0, min(10.0, float(rv["fitness_risk"]))),
-            bmi_risk=max(0.0, min(10.0, float(rv["bmi_risk"]))),
-            activity_risk=max(0.0, min(10.0, float(rv["activity_risk"])))
-        )
-        
         return UnderwriteResponse(
-            total_risk_score=total_risk,
-            activities=activities,
-            risk_vector=risk_vector,
+            risk_score=risk_score,
             explanation=explanation
         )
         
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Failed to process LLM response: {str(e)}")
+
+
+# Reusable function for health question assessment
+def _assess_health_treatments(treatments: List[str], question_context: str) -> HealthQuestionResponse:
+    """Reusable function to assess multiple treatment lines."""
+    
+    prompt = f"""
+Du bist ein Underwriting-Assistant für Kranken- und Berufsunfähigkeitsversicherungen.
+
+**Kontext:** {question_context}
+
+**Aufgabe:** Bewerte jede Behandlung einzeln mit einem Risiko-Score von 0.0 bis 10.0.
+
+**Behandlungen:**
+{chr(10).join(f"{i+1}. {t}" for i, t in enumerate(treatments))}
+
+**Antworte NUR mit gültigem JSON:**
+
+{{
+  "overall_risk_score": <float 0.0-10.0>,
+  "treatment_scores": [
+    {{
+      "line_number": 1,
+      "treatment_text": "<Originaltext>",
+      "risk_score": <float 0.0-10.0>,
+      "explanation": "<Begründung für diesen Score>"
+    }},
+    ...
+  ],
+  "summary": "<Gesamteinschätzung aller Behandlungen zusammen>"
+}}
+
+**Risiko-Skala:**
+- 0.0-2.0: Sehr niedriges Risiko (abgeschlossene Routinebehandlungen, normale Erkältungen)
+- 2.1-4.0: Niedriges Risiko (kleinere Beschwerden, vollständig ausgeheilt)
+- 4.1-6.0: Mittleres Risiko (chronische aber gut behandelbare Erkrankungen)
+- 6.1-8.0: Hohes Risiko (schwere Erkrankungen, laufende Behandlungen)
+- 8.1-10.0: Sehr hohes Risiko (lebensbedrohliche Erkrankungen, Berufsunfähigkeit)
+
+**Bewertungskriterien:**
+- Schweregrad der Erkrankung
+- Ist die Behandlung abgeschlossen oder laufend?
+- Dauer der Behandlung
+- Art der Therapie (ambulant vs. stationär)
+- Prognose und Heilungschancen
+
+**Regeln:**
+- Nur gültiges JSON
+- Dezimaltrenner ist Punkt (.)
+- Jede Behandlung einzeln bewerten
+- Overall_risk_score ist der Durchschnitt oder höchster Wert wenn eine Behandlung sehr kritisch ist
+"""
+
+    llm = get_gpt_mini_llm()
+    
+    try:
+        llm_response = llm.invoke(prompt)
+        raw = llm_response.content.strip()
+        
+        if not raw.startswith("{"):
+            start = raw.index("{")
+            end = raw.rindex("}") + 1
+            raw = raw[start:end]
+        
+        parsed = json.loads(raw)
+        
+        overall_risk = max(0.0, min(10.0, float(parsed["overall_risk_score"])))
+        summary = parsed.get("summary", "No summary provided")
+        
+        treatment_scores = []
+        for ts in parsed["treatment_scores"]:
+            treatment_scores.append(TreatmentRiskScore(
+                line_number=int(ts["line_number"]),
+                treatment_text=ts["treatment_text"],
+                risk_score=max(0.0, min(10.0, float(ts["risk_score"]))),
+                explanation=ts["explanation"]
+            ))
+        
+        return HealthQuestionResponse(
+            overall_risk_score=overall_risk,
+            treatment_scores=treatment_scores,
+            summary=summary
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Failed to process LLM response: {str(e)}")
+
+
+@app.post("/assess_physical_health", response_model=HealthQuestionResponse)
+def assess_physical_health(req: HealthQuestionRequest):
+    """
+    Endpoint 1: Physical health complaints, illnesses, accidents in past 5 years
+    
+    Question: Have you had any health complaints, illnesses, consequences of accidents, 
+    or congenital conditions in the past five years for which you sought treatment?
+    
+    Expected format per line: Period, Reason, Name and address of therapist, Treatment completed?
+    """
+    
+    context = """
+Frage: Hatten Sie in den letzten fünf Jahren gesundheitliche Beschwerden, Krankheiten, 
+Unfallfolgen oder angeborene Leiden, wegen derer Sie in ärztlicher Behandlung waren?
+
+Bewerte jede Behandlung basierend auf:
+- Art der Erkrankung/Beschwerde
+- Zeitraum (kürzlich vs. vor Jahren)
+- Ob die Behandlung abgeschlossen ist
+- Schweregrad der Erkrankung
+"""
+    
+    return _assess_health_treatments(req.treatments, context)
+
+
+@app.post("/assess_mental_health", response_model=HealthQuestionResponse)
+def assess_mental_health(req: HealthQuestionRequest):
+    """
+    Endpoint 2: Psychiatric, psychological, or psychotherapeutic treatment
+    
+    Question: Have you ever been advised or treated by a psychiatrist, psychologist, 
+    or psychotherapist?
+    
+    Expected format per line: Period, Reason, Name and address of therapist, Treatment completed?
+    """
+    
+    context = """
+Frage: Waren Sie jemals in psychiatrischer, psychologischer oder psychotherapeutischer 
+Beratung oder Behandlung?
+
+WICHTIG: Psychische Erkrankungen haben oft ein HÖHERES Risiko für Berufsunfähigkeit!
+
+Bewerte jede Behandlung basierend auf:
+- Art der psychischen Erkrankung (Depression, Burnout, Angststörung, etc.)
+- Schweregrad (leicht vs. schwer)
+- Zeitraum und Dauer
+- Ob die Behandlung abgeschlossen ist
+- Rezidivrisiko (Rückfallgefahr)
+- Auswirkungen auf Arbeitsfähigkeit
+"""
+    
+    return _assess_health_treatments(req.treatments, context)
+
+
+@app.post("/assess_medication", response_model=HealthQuestionResponse)
+def assess_medication(req: HealthQuestionRequest):
+    """
+    Endpoint 3: Regular medication use in past 5 years
+    
+    Question: Have you taken or do you take medication regularly in the past five years 
+    (excluding contraception)?
+    
+    Expected format per line: Period, Reason, Name of medication, Dosis, Treatment completed?
+    """
+    
+    context = """
+Frage: Haben Sie in den letzten fünf Jahren regelmäßig Medikamente eingenommen 
+(außer Verhütungsmittel)?
+
+Bewerte jede Medikation basierend auf:
+- Art des Medikaments (z.B. Blutdrucksenker, Antidepressiva, Schmerzmittel)
+- Grund für die Medikation (zugrunde liegende Erkrankung)
+- Dauer der Einnahme (kurz vs. dauerhaft)
+- Dosierung
+- Ob die Medikation noch läuft oder abgeschlossen ist
+- Schweregrad der zugrunde liegenden Erkrankung
+"""
+    
+    return _assess_health_treatments(req.treatments, context)
+
+
+@app.post("/assess_work_disability", response_model=HealthQuestionResponse)
+def assess_work_disability(req: HealthQuestionRequest):
+    """
+    Endpoint 4: Work disability or inability to work in past 5 years
+    
+    Question: Is your ability to work or earn currently restricted, or have you been 
+    fully or partially unable to work for more than four consecutive weeks in the past 
+    five years due to health reasons?
+    
+    Expected format per line: Period, Reason, Treatment completed?
+    """
+    
+    context = """
+Frage: Ist Ihre Arbeits- oder Erwerbsfähigkeit derzeit eingeschränkt oder waren Sie in den 
+letzten fünf Jahren länger als vier Wochen durchgehend ganz oder teilweise 
+arbeitsunfähig aus gesundheitlichen Gründen?
+
+SEHR WICHTIG: Arbeitsunfähigkeit ist ein STARKER Indikator für hohes Risiko!
+
+Bewerte jede Phase der Arbeitsunfähigkeit basierend auf:
+- Dauer der Arbeitsunfähigkeit (4 Wochen vs. Monate)
+- Grund (Art der Erkrankung)
+- Vollständige vs. teilweise Arbeitsunfähigkeit
+- Ist die Person wieder voll arbeitsfähig?
+- Rezidivrisiko
+- Chronische vs. akute Ursache
+"""
+    
+    return _assess_health_treatments(req.treatments, context)
 
 
 if __name__ == "__main__":
