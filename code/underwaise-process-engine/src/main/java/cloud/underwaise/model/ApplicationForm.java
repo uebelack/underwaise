@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -36,12 +37,31 @@ public class ApplicationForm {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "smoker", nullable = false)
-    private boolean smoker;
+    @Column(name = "height", nullable = false)
+    private int height;
 
-    @Column(name = "hobbies")
-    private String hobbies;
+    @Column(name = "weight", nullable = false)
+    private int weight;
 
-    @Column(name = "health_conditions")
-    private String healthConditions;
+    @Column(name = "is_smoker", nullable = false)
+    private boolean isSmoker;
+
+    @Column(name = "is_drug_user", nullable = false)
+    private boolean isDrugUser;
+
+    @Column(name = "special_sport_activities", nullable = true)
+    String specialSportActivities;
+
+    // Section for questions with complex answers v1.5 ;P
+    @OneToMany(mappedBy = "applicationForm", cascade = CascadeType.ALL, orphanRemoval = true)
+    ArrayList<HealthConditionForm> physicalHealthConditions;
+
+    @OneToMany(mappedBy = "applicationForm", cascade = CascadeType.ALL, orphanRemoval = true)
+    ArrayList<HealthConditionForm> mentalHealthConditions;
+
+    @OneToMany(mappedBy = "applicationForm", cascade = CascadeType.ALL, orphanRemoval = true)
+    ArrayList<MedicationForm> medicationForm;
+
+    @OneToMany(mappedBy = "applicationForm", cascade = CascadeType.ALL, orphanRemoval = true)
+    ArrayList<IncapacityForm> incapacityForm;
 }
