@@ -3,7 +3,6 @@ package cloud.underwaise.services;
 import cloud.underwaise.UnderwaiseProperties;
 import cloud.underwaise.ai.analyzeform.api.DefaultApi;
 import cloud.underwaise.ai.analyzeform.model.UnderwriteRequest;
-import cloud.underwaise.enums.Risk;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,7 @@ public class AnalyzeFormAiService {
 
     private final UnderwaiseProperties underwaiseProperties;
 
-    public Risk getRiskForSpecialSportActivities(String sportActivities) {
+    public Integer getRiskForSpecialSportActivities(String sportActivities) {
         log.debug("Getting risk for sport activities: {}", sportActivities);
         var api = new DefaultApi();
         api.getApiClient().setBasePath(underwaiseProperties.getAnalyzeFormAiUrl());
@@ -26,6 +25,6 @@ public class AnalyzeFormAiService {
 
         log.debug("risk result: {} {}", result.getRiskScore(), result.getExplanation());
 
-        return Risk.fromValue(result.getRiskScore());
+        return result.getRiskScore();
     }
 }

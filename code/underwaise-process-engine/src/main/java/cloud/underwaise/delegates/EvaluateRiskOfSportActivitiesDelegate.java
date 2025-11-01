@@ -9,6 +9,8 @@ import org.cibseven.bpm.engine.delegate.DelegateExecution;
 import org.cibseven.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -27,7 +29,9 @@ public class EvaluateRiskOfSportActivitiesDelegate implements JavaDelegate {
         if (application.getApplicationForm().getSpecialSportActivities() != null && !application.getApplicationForm().getSpecialSportActivities().isEmpty()) {
             var risk = analyzeFormAiService.getRiskForSpecialSportActivities(application.getApplicationForm().getSpecialSportActivities());
 
-
+            if (risk != null) {
+                application.getApplicationFeature().setHobbyScore(new BigDecimal(risk.toString()));
+            }
         }
     }
 }

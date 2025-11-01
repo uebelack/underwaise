@@ -2,6 +2,7 @@ package cloud.underwaise.services;
 
 import cloud.underwaise.UnderwaiseProperties;
 import cloud.underwaise.model.Application;
+import cloud.underwaise.model.ApplicationFeature;
 import cloud.underwaise.model.ApplicationForm;
 import cloud.underwaise.processes.UnderwritingProcessInstanceWrapper;
 import cloud.underwaise.repository.ApplicationRepository;
@@ -24,25 +25,6 @@ public class UnderwritingService {
     private final ApplicationRepository applicationRepository;
     private final UnderwaiseProperties underwaiseProperties;
 
-    @Transactional
-    public Application start(ApplicationForm applicationForm) {
-        // Set the parent reference for all child entities before saving
-        assignFkToChildEntities(applicationForm);
-
-        var application = new Application();
-        application.setApplicationForm(applicationForm);
-
-        Application savedApplication = applicationRepository.save(application);
-
-        runtimeService.startProcessInstanceByKey(
-                UnderwritingProcessInstanceWrapper.PROCESS_DEFINITION_KEY,
-                Map.of(APPLICATION_ID_VARIABLE, savedApplication.getApplicationUuid(),
-                        TRAINING_VARIABLE, underwaiseProperties.isTrainingActive())
-        );
-
-        return savedApplication;
-    }
-
     private static void assignFkToChildEntities(ApplicationForm applicationForm) {
         applicationForm.getPhysicalHealthConditions().forEach(condition -> {
             condition.setApplicationForm(applicationForm);
@@ -59,5 +41,24 @@ public class UnderwritingService {
         applicationForm.getIncapacityForm().forEach(incapacity -> {
             incapacity.setApplicationForm(applicationForm);
         });
+    }
+
+    @Transactional
+    public Application start(ApplicationForm applicationForm) {
+        // Set the parent reference for all child entities before saving
+        assignFkToChildEntities(applicationForm);
+
+        var application = new Application();
+        application.setApplicationForm(applicationForm);
+        application.setApplicationFeature(new ApplicationFeature());
+        Application savedApplication = applicationRepository.save(application);
+
+        runtimeService.startProcessInstanceByKey(
+                UnderwritingProcessInstanceWrapper.PROCESS_DEFINITION_KEY,
+                Map.of(APPLICATION_ID_VARIABLE, savedApplication.getApplicationUuid(),
+                        TRAINING_VARIABLE, underwaiseProperties.isTrainingActive())
+        );
+
+        return savedApplication;
     }
 }

@@ -159,7 +159,7 @@
         <bpmn:incoming>Flow_1quaexm</bpmn:incoming>
         <bpmn:outgoing>Flow_1k3zyaz</bpmn:outgoing>
       </bpmn:serviceTask>
-      <bpmn:serviceTask id="Activity_1u7n057" name="Asses Work Disabilty">
+      <bpmn:serviceTask id="Activity_1u7n057" name="Assess Work Disabilty" camunda:delegateExpression="${assessWorkDisabiltyDelegate}">
         <bpmn:incoming>Flow_07pjufb</bpmn:incoming>
         <bpmn:outgoing>Flow_0kzio46</bpmn:outgoing>
       </bpmn:serviceTask>
@@ -546,6 +546,7 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_077iqh9_di" bpmnElement="Activity_1u7n057">
         <dc:Bounds x="430" y="750" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_17omzi0_di" bpmnElement="Association_17omzi0">
         <di:waypoint x="1253" y="789" />
