@@ -45,18 +45,20 @@ class DetectedActivity(BaseModel):
 
 class RiskVector(BaseModel):
     """
-    Fixed 5-dimension risk vector (all values 0.0 to 1.0):
-    - mortality_risk: Risk of death from activities
-    - disability_risk: Risk of permanent disability
-    - illness_risk: Risk of chronic illness or health issues
-    - accident_risk: Risk of accidents/injuries
-    - lifestyle_risk: General lifestyle health risks (sedentary, stress, etc.)
+    Fixed 6-dimension risk vector matching underwriting schema (all values 0-10):
+    - physiological_risk: Physical health conditions and organ function (0-10 scale)
+    - psychological_risk: Mental health, stress, psychological conditions (0-10 scale)
+    - medication_risk: Medication use and substance dependency (0-10 scale)
+    - fitness_risk: Physical fitness and activity level (0-10 scale, inverted: 10=very fit, 0=sedentary)
+    - bmi_risk: Body mass index related risks (0-10 scale)
+    - activity_risk: Risk from sports, hobbies, and leisure activities (0-10 scale)
     """
-    mortality_risk: float
-    disability_risk: float
-    illness_risk: float
-    accident_risk: float
-    lifestyle_risk: float
+    physiological_risk: float  # 0-10
+    psychological_risk: float  # 0-10
+    medication_risk: float  # 0-10
+    fitness_risk: float  # 0-10 (higher = fitter)
+    bmi_risk: float  # 0-10
+    activity_risk: float  # 0-10
 
 
 class UnderwriteResponse(BaseModel):
@@ -68,35 +70,68 @@ class UnderwriteResponse(BaseModel):
 @app.post("/get_risk_from_hobbies", response_model=UnderwriteResponse)
 def get_risk_from_hobbies(req: UnderwriteRequest):
     """
-    Simplified underwriting: Extract activities and calculate a fixed 5-dimension risk vector.
+    Simplified underwriting: Extract activities and calculate a fixed 6-dimension risk vector.
     """
 
     prompt = f"""
-Du bist ein Underwriting-Assistant. Analysiere den folgenden Text und antworte NUR mit gültigem JSON.
+Du bist ein erfahrener Underwriting-Assistant für Lebens- und Berufsunfähigkeitsversicherungen. Analysiere den Text und denke ganzheitlich über Risiken nach.
 
-Erforderliches JSON-Format:
+**WICHTIG: Erkenne indirekte Risikofaktoren!**
+Beispiele:
+- Viele Partys/Clubbing → erhöhtes Medikamentenrisiko (Alkohol, Drogen bei Techno/Raves)
+- Extremsport → Unfallrisiko, aber auch psychologisches Risiko (Adrenalinsucht)
+- Sedentärer Lebensstil (Gaming, Netflix) → niedriges Fitness-Level, BMI-Risiko, physiologische Risiken
+- Hochstress-Hobbies (Börsenhandel, Wettbewerbe) → psychologisches Risiko
+- Kampfsport regelmäßig → höheres Unfallrisiko, aber besseres Fitness-Level
+- Vegane/spezielle Ernährung erwähnt → könnte auf Gesundheitsbewusstsein hinweisen (positiv)
+
+**Beispiel-Analysen:**
+1. "Ich gehe gerne feiern, Techno-Partys am Wochenende" 
+   → activity_risk: 3-4, medication_risk: 6-7 (Partykultur), psychological_risk: 4-5
+
+2. "Wingsuit-Fliegen ist meine Leidenschaft, mache es monatlich"
+   → activity_risk: 10, physiological_risk: 8, psychological_risk: 7
+
+3. "Entspanne mit Netflix, Pizza, am Wochenende nichts Besonderes"
+   → fitness_risk: 2-3 (schlecht), bmi_risk: 6-7, activity_risk: 1
+
+4. "Marathonläufer, trainiere 5x/Woche, gesunde Ernährung"
+   → fitness_risk: 9-10 (sehr gut!), physiological_risk: 2-3, bmi_risk: 2
+
+**Antworte NUR mit gültigem JSON:**
+
 {{
   "total_risk_score": <float 0.0-1.0>,
   "activities": [
     {{"name": "<activity>", "frequency": "<rarely|occasionally|regularly|frequently>"}}
   ],
   "risk_vector": {{
-    "mortality_risk": <float 0.0-1.0>,
-    "disability_risk": <float 0.0-1.0>,
-    "illness_risk": <float 0.0-1.0>,
-    "accident_risk": <float 0.0-1.0>,
-    "lifestyle_risk": <float 0.0-1.0>
+    "physiological_risk": <float 0-10>,
+    "psychological_risk": <float 0-10>,
+    "medication_risk": <float 0-10>,
+    "fitness_risk": <float 0-10>,
+    "bmi_risk": <float 0-10>,
+    "activity_risk": <float 0-10>
   }}
 }}
 
-Regeln:
-- total_risk_score: Gesamtrisiko (0.0 = sehr niedrig, 1.0 = extrem hoch)
-- activities: Erkannte Aktivitäten mit Häufigkeit
-- risk_vector: 5 fixe Dimensionen für verschiedene Risikoarten
-- Nur gültiges JSON ohne zusätzlichen Text
+**Skalen-Bedeutung:**
+- physiological_risk: 0=kerngesund, 10=schwere Organprobleme zu erwarten
+- psychological_risk: 0=mental stabil, 10=hohes psychisches Risiko
+- medication_risk: 0=kein Substanzkonsum, 10=hohe Abhängigkeitsgefahr
+- fitness_risk: 0=komplett inaktiv, 10=Hochleistungssportler (ACHTUNG: höher ist besser!)
+- bmi_risk: 0=optimales Gewicht, 10=starkes Über-/Untergewicht
+- activity_risk: 0=sichere Aktivitäten, 10=lebensgefährliche Extremsportarten
+- total_risk_score: Gewichteter Durchschnitt für Versicherungsentscheidung (0.0-1.0)
+
+**Regeln:**
+- Berücksichtige Häufigkeit: "selten Fallschirmspringen" ≠ "wöchentlich Fallschirmspringen"
+- Erkenne Lifestyle-Muster und Zusammenhänge
+- Sei präzise bei der Risikobewertung
+- Nur gültiges JSON ohne Erklärungen
 - Dezimaltrenner ist Punkt (.)
 
-Text:
+**Zu analysierender Text:**
 \"\"\"{req.text}\"\"\"
 """
 
@@ -127,11 +162,12 @@ Text:
         
         rv = parsed["risk_vector"]
         risk_vector = RiskVector(
-            mortality_risk=max(0.0, min(1.0, float(rv["mortality_risk"]))),
-            disability_risk=max(0.0, min(1.0, float(rv["disability_risk"]))),
-            illness_risk=max(0.0, min(1.0, float(rv["illness_risk"]))),
-            accident_risk=max(0.0, min(1.0, float(rv["accident_risk"]))),
-            lifestyle_risk=max(0.0, min(1.0, float(rv["lifestyle_risk"])))
+            physiological_risk=max(0.0, min(10.0, float(rv["physiological_risk"]))),
+            psychological_risk=max(0.0, min(10.0, float(rv["psychological_risk"]))),
+            medication_risk=max(0.0, min(10.0, float(rv["medication_risk"]))),
+            fitness_risk=max(0.0, min(10.0, float(rv["fitness_risk"]))),
+            bmi_risk=max(0.0, min(10.0, float(rv["bmi_risk"]))),
+            activity_risk=max(0.0, min(10.0, float(rv["activity_risk"])))
         )
         
         return UnderwriteResponse(
@@ -142,3 +178,9 @@ Text:
         
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Failed to process LLM response: {str(e)}")
+
+
+if __name__ == "__main__":
+    import uvicorn
+    # Expose to local network: accessible via your IP 192.168.22.72
+    uvicorn.run(app, host="0.0.0.0", port=8000)
