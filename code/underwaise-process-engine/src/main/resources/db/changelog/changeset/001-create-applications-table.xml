@@ -38,6 +38,9 @@
             <column name="fk_form_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
+            <column name="fk_feature_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <!-- Add foreign key constraint -->

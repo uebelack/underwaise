@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="003-create-applications-feature-table" author="system">
+        <!-- Create application_feature table -->
+        <createTable tableName="application_feature">
+            <column name="feature_uuid" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="age" type="INT">
+                <constraints nullable="false"/>
+                 <defaultValueNumeric>0</defaultValueNumeric>
+            </column>
+            <column name="height_in_cm" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+                 <defaultValueNumeric>172.0</defaultValueNumeric>
+            </column>
+            <column name="weight_in_kg" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+                  <defaultValueNumeric>73.9</defaultValueNumeric>
+            </column>
+            <column name="BMI" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+                <defaultValueNumeric>25.0</defaultValueNumeric>
+            </column>
+            <column name="smoker" type="BOOLEAN">
+                <constraints nullable="false"/>
+                <defaultValueBoolean>false</defaultValueBoolean>
+            </column>
+            <column name="drugs" type="BOOLEAN">
+              <constraints nullable="false"/>
+                <defaultValueBoolean>false</defaultValueBoolean>
+            </column>
+
+            <column name="hobby_score" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+                <defaultValueNumeric>5.0</defaultValueNumeric>
+            </column>
+
+              <column name="physical_health_score" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+                <defaultValueNumeric>5.0</defaultValueNumeric>
+            </column>
+
+              <column name="psychological_health_score" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+                <defaultValueNumeric>5.0</defaultValueNumeric>
+            </column>
+
+            <column name="medication_health_score" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+                <defaultValueNumeric>5.0</defaultValueNumeric>
+            </column>
+
+            <column name="restrictions_score" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+                <defaultValueNumeric>5.0</defaultValueNumeric>
+            </column>
+            
+        </createTable>
+
+
+        <!-- Add foreign key constraint -->
+        <addForeignKeyConstraint
+                baseTableName="application"
+                baseColumnNames="fk_feature_id"
+                referencedTableName="application_feature"
+                referencedColumnNames="feature_uuid"
+                constraintName="fk_application_feature"/>
+
+    </changeSet>
+
+</databaseChangeLog>
