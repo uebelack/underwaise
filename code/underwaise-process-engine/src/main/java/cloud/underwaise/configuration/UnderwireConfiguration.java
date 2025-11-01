@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class MailgunConfiguration {
+public class UnderwireConfiguration {
 
     @Bean
     public MailgunMessagesApi mailgunClient(UnderwaiseProperties underwaiseProperties) {
