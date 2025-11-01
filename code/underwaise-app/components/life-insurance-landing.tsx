@@ -15,11 +15,17 @@ import {
   Sparkles,
   Zap,
   Star,
+  Menu,
+  X,
 } from "lucide-react";
 import confetti from "canvas-confetti";
+import { useCallback, useState } from "react";
 
 export function LifeInsuranceLanding() {
-  const triggerConfetti = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const triggerConfetti = useCallback(() => {
     const paxTextShape = confetti.shapeFromPath({
       path: 'M313.288 144.806l44.794-58.06-44.365-57.495h43.368l25.82 34.954 26.11-34.954h38.802L403.309 86.46l45.79 58.347h-44.936l-25.391-33.952-25.968 33.952h-39.516zm-43.082-35.092V92.31c-4.992.71-9.416 1.425-22.111 3.566-13.41 2.283-17.835 7.418-17.835 13.84 0 7.131 3.995 12.266 14.269 12.266 7.704 0 18.402-5.278 25.677-12.267m4.99 35.092l-2.712-11.842c-12.266 9.988-23.965 14.698-39.368 14.698-22.974 0-39.092-13.124-39.092-34.382 0-21.543 14.55-33.528 43.94-38.09 16.69-2.57 25.11-3.853 31.383-4.563V66.77c0-10.412-5.277-15.122-17.114-15.122-13.13 0-17.835 5.282-18.407 14.126h-34.81c2.569-29.529 24.966-39.373 55.782-39.373 37.518 0 50.786 16.118 50.786 47.787v39.092c0 12.839.286 18.545 3.137 31.526h-33.524zM125.69 73.478c17.978 0 24.251-7.418 24.251-19.975 0-12.553-6.273-19.97-24.251-19.97h-18.83v39.945h18.83zm-56.207 71.328V5h59.344c41.233 0 59.348 20.256 59.348 48.503 0 28.251-18.115 48.507-59.348 48.507h-21.968v42.796H69.482z',
     });
@@ -72,9 +78,24 @@ export function LifeInsuranceLanding() {
         shapes: [paxTextShape],
       });
     }, 300);
-  };
+  }, []);
+
+  const scrollToSection = useCallback((sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setMobileMenuOpen(false);
+    }
+  }, []);
+
+  const handleCTAClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    setIsNavigating(true);
+    triggerConfetti();
+    // Navigation will happen automatically via Link
+  }, [triggerConfetti]);
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white scroll-smooth">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-white min-h-[90vh] flex items-center">
         {/* Decorative background elements */}
@@ -86,95 +107,164 @@ export function LifeInsuranceLanding() {
 
         <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-8">
           {/* Navigation */}
-          <nav className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
+          <nav className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-3 sm:gap-6">
               <Image
                 src="/logo.png"
-                alt="Underwaise Logo"
+                alt="Underwaise - Moderne Lebensversicherung"
                 width={200}
                 height={67}
+                className="h-12 sm:h-16 w-auto"
               />
               <Image
                 src="/baselhack.svg"
-                alt="baselhack Logo"
+                alt="baselhack Hackathon"
                 width={120}
                 height={67}
-                className="brightness-0"
+                className="brightness-0 h-10 sm:h-12 w-auto"
               />
             </div>
+
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
-              <a
-                href="#benefits"
+              <button
+                onClick={() => scrollToSection('features')}
+                className="text-sm font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors"
+              >
+                Features
+              </button>
+              <button
+                onClick={() => scrollToSection('benefits')}
                 className="text-sm font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors"
               >
                 Benefits
-              </a>
-              <a
-                href="#pricing"
+              </button>
+              <button
+                onClick={() => scrollToSection('pricing')}
                 className="text-sm font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors"
               >
                 Pricing
-              </a>
+              </button>
               <Button size="sm" asChild className="bg-[#7cb50d] hover:bg-[#6ba00b] text-white">
                 <Link href="/spar-lebensversicherung">
                   Get Started
                 </Link>
               </Button>
             </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-gray-600 hover:text-[#1a5ab8] transition-colors"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </nav>
 
-          <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black backdrop-blur-xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-gray-700 mb-20">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Mobile Navigation Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden absolute top-24 left-4 right-4 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 p-6 animate-in slide-in-from-top-5 duration-200">
+              <div className="flex flex-col gap-4">
+                <button
+                  onClick={() => scrollToSection('features')}
+                  className="text-left text-base font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors py-2"
+                >
+                  Features
+                </button>
+                <button
+                  onClick={() => scrollToSection('benefits')}
+                  className="text-left text-base font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors py-2"
+                >
+                  Benefits
+                </button>
+                <button
+                  onClick={() => scrollToSection('pricing')}
+                  className="text-left text-base font-medium text-gray-600 hover:text-[#1a5ab8] transition-colors py-2"
+                >
+                  Pricing
+                </button>
+                <div className="pt-2 border-t border-gray-200">
+                  <Button size="lg" asChild className="w-full bg-[#7cb50d] hover:bg-[#6ba00b] text-white">
+                    <Link href="/spar-lebensversicherung">
+                      Get Started
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Menu Overlay */}
+          {mobileMenuOpen && (
+            <div
+              className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+          )}
+
+          <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black backdrop-blur-xl rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-8 md:p-12 shadow-2xl border border-gray-700 mb-12 sm:mb-20 mt-8">
+            <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
               {/* Hero Content */}
               <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#7cb50d]/20 backdrop-blur-sm rounded-full mb-6 border border-[#7cb50d]/40">
-                <Sparkles className="w-4 h-4 text-[#7cb50d]" />
-                <span className="text-sm font-semibold text-[#7cb50d]">
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#7cb50d]/20 backdrop-blur-sm rounded-full mb-4 sm:mb-6 border border-[#7cb50d]/40">
+                <Sparkles className="w-3 sm:w-4 h-3 sm:h-4 text-[#7cb50d]" />
+                <span className="text-xs sm:text-sm font-semibold text-[#7cb50d]">
                   Versicherung neu gedacht
                 </span>
               </div>
 
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-[1.1] tracking-tight">
                 Deine Zukunft.
-                <span className="text-[#7cb50d] block mt-2">Deine Sicherheit.</span>
+                <span className="text-[#7cb50d] block mt-1 sm:mt-2">Deine Sicherheit.</span>
               </h1>
 
-              <p className="text-xl text-gray-300 mb-10 leading-relaxed">
-                Moderne Lebensversicherung mit transparenten Konditionen und 
+              <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 md:mb-10 leading-relaxed">
+                Moderne Lebensversicherung mit transparenten Konditionen und
                 blitzschneller Beantragung. In nur 5 Minuten zum Versicherungsschutz.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <Button 
-                  size="lg" 
-                  asChild 
-                  className="bg-[#7cb50d] hover:bg-[#6ba00b] text-white shadow-lg shadow-green-500/30"
-                  onClick={triggerConfetti}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-10 md:mb-12">
+                <Button
+                  size="lg"
+                  asChild
+                  disabled={isNavigating}
+                  className="bg-[#7cb50d] hover:bg-[#6ba00b] text-white shadow-lg shadow-green-500/30 disabled:opacity-70"
                 >
                   <Link
                     href="/spar-lebensversicherung"
-                    className="group inline-flex items-center"
+                    className="group inline-flex items-center justify-center"
+                    onClick={handleCTAClick}
                   >
-                    Jetzt starten
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    {isNavigating ? (
+                      <>
+                        <Zap className="mr-2 h-5 w-5 animate-pulse" />
+                        Wird geladen...
+                      </>
+                    ) : (
+                      <>
+                        Jetzt starten
+                        <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
                   </Link>
                 </Button>
               </div>
 
               {/* Trust Indicators & Info Cards */}
-              <div className="space-y-6">
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
-                    <div className="text-2xl font-bold text-white mb-1">5 Min</div>
-                    <div className="text-xs text-gray-300">Antragsdauer</div>
+              <div className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+                  <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 border border-white/20 shadow-sm">
+                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1">5 Min</div>
+                    <div className="text-[10px] sm:text-xs text-gray-300">Antragsdauer</div>
                   </div>
-                  <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
-                    <div className="text-2xl font-bold text-white mb-1">0 CHF</div>
-                    <div className="text-xs text-gray-300">Versteckte Kosten</div>
+                  <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 border border-white/20 shadow-sm">
+                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1">0 CHF</div>
+                    <div className="text-[10px] sm:text-xs text-gray-300">Versteckte Kosten</div>
                   </div>
-                  <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
-                    <div className="text-2xl font-bold text-white mb-1">24/7</div>
-                    <div className="text-xs text-gray-300">Support</div>
+                  <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 border border-white/20 shadow-sm">
+                    <div className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1">24/7</div>
+                    <div className="text-[10px] sm:text-xs text-gray-300">Support</div>
                   </div>
                 </div>
 
@@ -222,19 +312,19 @@ export function LifeInsuranceLanding() {
             </div>
 
             {/* Hero Visual - iPhone Image */}
-            <div className="relative flex items-center justify-center">
+            <div className="relative flex items-center justify-center mt-8 lg:mt-0">
               {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#7cb50d]/30 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#1a5ab8]/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-              
+              <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-[#7cb50d]/30 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute bottom-0 left-0 w-24 sm:w-32 h-24 sm:h-32 bg-[#1a5ab8]/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+
               {/* iPhone Image */}
               <div className="relative z-10">
                 <Image
                   src="/hero-iphone.png"
-                  alt="AI Ally App on iPhone"
+                  alt="Underwaise Lebensversicherung App auf iPhone"
                   width={400}
                   height={800}
-                  className="drop-shadow-2xl"
+                  className="drop-shadow-2xl w-full max-w-[280px] sm:max-w-[320px] md:max-w-[400px] h-auto"
                   priority
                 />
               </div>
@@ -245,21 +335,21 @@ export function LifeInsuranceLanding() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 bg-gray-50">
+      <section id="features" className="py-12 sm:py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 tracking-tight">
               Alles was du brauchst,
-              <span className="text-[#1a5ab8] block mt-2">in einer Lösung</span>
+              <span className="text-[#1a5ab8] block mt-1 sm:mt-2">in einer Lösung</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Moderne Lebensversicherung mit allen wichtigen Features für deine 
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
+              Moderne Lebensversicherung mit allen wichtigen Features für deine
               finanzielle Sicherheit und die deiner Familie.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             {/* Feature 1 */}
             <div className="group relative bg-white rounded-3xl p-8 border border-gray-200 hover:border-[#1a5ab8]/50 transition-all hover:shadow-xl">
               <div className="absolute -top-4 -right-4 w-16 h-16 bg-[#7cb50d] rounded-2xl rotate-12 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg shadow-green-500/20" />
@@ -357,9 +447,9 @@ export function LifeInsuranceLanding() {
       </section>
 
       {/* Benefits Section */}
-      <section id="benefits" className="py-24 bg-white">
+      <section id="benefits" className="py-12 sm:py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-gray-50/80 to-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-gray-200/50">
+          <div className="bg-gradient-to-br from-gray-50/80 to-white rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-8 md:p-12 shadow-2xl border border-gray-200/50">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="order-2 lg:order-1">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#7cb50d]/10 rounded-full mb-6 border border-[#7cb50d]/20">
@@ -488,26 +578,26 @@ export function LifeInsuranceLanding() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-24 bg-gradient-to-b from-gray-50 to-white">
+      <section id="pricing" className="py-12 sm:py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1a5ab8]/10 rounded-full mb-6 border border-[#1a5ab8]/20">
-              <TrendingUp className="w-4 h-4 text-[#1a5ab8]" />
-              <span className="text-sm font-semibold text-[#1a5ab8]">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#1a5ab8]/10 rounded-full mb-4 sm:mb-6 border border-[#1a5ab8]/20">
+              <TrendingUp className="w-3 sm:w-4 h-3 sm:h-4 text-[#1a5ab8]" />
+              <span className="text-xs sm:text-sm font-semibold text-[#1a5ab8]">
                 Pricing
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 tracking-tight">
               Faire Preise.
-              <span className="text-[#1a5ab8] block mt-2">Keine Überraschungen.</span>
+              <span className="text-[#1a5ab8] block mt-1 sm:mt-2">Keine Überraschungen.</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Transparente Preisgestaltung ohne versteckte Kosten. Erhalte sofort 
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
+              Transparente Preisgestaltung ohne versteckte Kosten. Erhalte sofort
               ein persönliches Angebot.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
             {/* Basic */}
             <div className="bg-white rounded-3xl p-8 border-2 border-gray-200 hover:border-[#1a5ab8]/30 transition-all">
               <div className="text-center mb-8">
@@ -534,8 +624,8 @@ export function LifeInsuranceLanding() {
             </div>
 
             {/* Premium - Highlighted */}
-            <div className="relative bg-gradient-to-b from-[#1a5ab8] to-[#1548a0] rounded-3xl p-8 border-2 border-[#1a5ab8] shadow-2xl shadow-blue-500/20 transform scale-105">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#7cb50d] text-white px-4 py-1 rounded-full text-sm font-semibold">
+            <div className="relative bg-gradient-to-b from-[#1a5ab8] to-[#1548a0] rounded-3xl p-8 border-2 border-[#1a5ab8] shadow-2xl shadow-blue-500/20 sm:transform sm:scale-105">
+              <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 bg-[#7cb50d] text-white px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-semibold">
                 Beliebt
               </div>
               <div className="text-center mb-8">
@@ -563,14 +653,25 @@ export function LifeInsuranceLanding() {
                   <span className="text-white">Schnelle Auszahlung</span>
                 </li>
               </ul>
-              <Button 
-                className="w-full bg-[#7cb50d] hover:bg-[#6ba00b] text-white" 
-                size="lg" 
+              <Button
+                className="w-full bg-[#7cb50d] hover:bg-[#6ba00b] text-white disabled:opacity-70"
+                size="lg"
                 asChild
-                onClick={triggerConfetti}
+                disabled={isNavigating}
               >
-                <Link href="/spar-lebensversicherung">
-                  Jetzt starten
+                <Link
+                  href="/spar-lebensversicherung"
+                  className="inline-flex items-center justify-center"
+                  onClick={handleCTAClick}
+                >
+                  {isNavigating ? (
+                    <>
+                      <Zap className="mr-2 h-5 w-5 animate-pulse" />
+                      Wird geladen...
+                    </>
+                  ) : (
+                    "Jetzt starten"
+                  )}
                 </Link>
               </Button>
             </div>
@@ -611,71 +712,84 @@ export function LifeInsuranceLanding() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#1a5ab8] via-[#1548a0] to-[#1a5ab8] py-24">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#1a5ab8] via-[#1548a0] to-[#1a5ab8] py-12 sm:py-16 md:py-24">
         {/* Animated background */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#7cb50d]/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute top-1/4 -left-20 w-64 sm:w-96 h-64 sm:h-96 bg-[#7cb50d]/20 rounded-full blur-3xl animate-pulse" />
           <div
-            className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#7cb50d]/20 rounded-full blur-3xl animate-pulse"
+            className="absolute bottom-1/4 -right-20 w-64 sm:w-96 h-64 sm:h-96 bg-[#7cb50d]/20 rounded-full blur-3xl animate-pulse"
             style={{ animationDelay: "1s" }}
           />
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-8 border border-white/20">
-              <Sparkles className="w-4 h-4 text-[#7cb50d]" />
-              <span className="text-sm font-semibold text-white">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 sm:mb-8 border border-white/20">
+              <Sparkles className="w-3 sm:w-4 h-3 sm:h-4 text-[#7cb50d]" />
+              <span className="text-xs sm:text-sm font-semibold text-white">
                 Bereit loszulegen?
               </span>
             </div>
 
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 tracking-tight leading-tight px-4">
               Schütze was dir wichtig ist.
-              <span className="text-[#7cb50d] block mt-2">Starte heute.</span>
+              <span className="text-[#7cb50d] block mt-1 sm:mt-2">Starte heute.</span>
             </h2>
 
-            <p className="text-xl text-white/90 mb-12 leading-relaxed max-w-2xl mx-auto">
-              Schließe dich tausenden Schweizer Familien an, die uns vertrauen. 
+            <p className="text-base sm:text-lg md:text-xl text-white/90 mb-8 sm:mb-10 md:mb-12 leading-relaxed max-w-2xl mx-auto px-4">
+              Schließe dich tausenden Schweizer Familien an, die uns vertrauen.
               Einfache Beantragung, transparente Preise und jahrzehntelange Erfahrung.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Button 
-                size="lg" 
-                asChild 
-                className="bg-[#7cb50d] hover:bg-[#6ba00b] text-white shadow-xl shadow-green-500/20"
-                onClick={triggerConfetti}
+              <Button
+                size="lg"
+                asChild
+                disabled={isNavigating}
+                className="bg-[#7cb50d] hover:bg-[#6ba00b] text-white shadow-xl shadow-green-500/20 disabled:opacity-70"
               >
-                <Link href="/spar-lebensversicherung" className="group">
-                  Antrag starten
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <Link
+                  href="/spar-lebensversicherung"
+                  className="group inline-flex items-center justify-center"
+                  onClick={handleCTAClick}
+                >
+                  {isNavigating ? (
+                    <>
+                      <Zap className="mr-2 h-5 w-5 animate-pulse" />
+                      Wird geladen...
+                    </>
+                  ) : (
+                    <>
+                      Antrag starten
+                      <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
                 </Link>
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="text-4xl font-bold text-white mb-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-3xl mx-auto">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
+                <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">
                   5 Min
                 </div>
-                <div className="text-white/80">
+                <div className="text-sm sm:text-base text-white/80">
                   Antragsdauer
                 </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="text-4xl font-bold text-white mb-2">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
+                <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">
                   0 CHF
                 </div>
-                <div className="text-white/80">
+                <div className="text-sm sm:text-base text-white/80">
                   Versteckte Kosten
                 </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="text-4xl font-bold text-white mb-2">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
+                <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">
                   24/7
                 </div>
-                <div className="text-white/80">
+                <div className="text-sm sm:text-base text-white/80">
                   Support verfügbar
                 </div>
               </div>
