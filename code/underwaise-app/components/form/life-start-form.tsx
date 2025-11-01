@@ -17,8 +17,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formSchema } from "@/schemas/form-schema";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Label } from "../ui/label";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import "./life-star-form.style.scss";
@@ -55,12 +53,13 @@ export function LifeStarForm() {
       hobbies: "",
       healthConditions: "",
     },
+    mode: "onTouched",
   });
 
   const mutation = useMutation({
     mutationFn: postApplication,
     onSuccess: () => {
-      router.push("/lifestar/thank-you");
+      router.push("/spar-lebensversicherung/thank-you");
     },
     onError: () => {
       console.log("ERROR");
@@ -181,24 +180,6 @@ export function LifeStarForm() {
                       No
                     </Button>
                   </ButtonGroup>
-                  {/* <div className="relative group">
-                    <RadioGroup
-                      onValueChange={(value) =>
-                        field.onChange(value === "true")
-                      }
-                      defaultValue={field.value ? "true" : "false"}
-                      className="flex flex-col space-y-1"
-                    >
-                      <div className="flex items-center gap-3">
-                        <RadioGroupItem value="true" id="r1" />
-                        <Label htmlFor="r1">Yes</Label>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <RadioGroupItem value="false" id="r2" />
-                        <Label htmlFor="r2">No</Label>
-                      </div>
-                    </RadioGroup>
-                  </div> */}
                 </FormControl>
                 <FormMessage className="text-xs mt-1.5" />
               </FormItem>
@@ -255,7 +236,7 @@ export function LifeStarForm() {
                 size="lg"
                 variant="default"
                 type="submit"
-                className="w-full"
+                className="w-3/5"
                 disabled={mutation.isPending || !form.formState.isValid}
               >
                 {mutation.isPending ? (
