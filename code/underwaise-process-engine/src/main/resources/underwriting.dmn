@@ -1,0 +1,772 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="underwriting_definitions" name="Underwriting" namespace="http://example.com/dmn/underwriting" exporter="Camunda Modeler" exporterVersion="5.40.1">
+  <decision id="underwritingDecision" name="Underwriting Decision" camunda:historyTimeToLive="60">
+    <variable name="result" typeRef="string" />
+    <decisionTable id="table_underwriting" hitPolicy="FIRST">
+      <input id="inp_age" label="Age" biodi:width="150">
+        <inputExpression id="inp_expr_age" typeRef="integer">
+          <text>underwritingDecisionInput.age</text>
+        </inputExpression>
+      </input>
+      <input id="inp_bmi" label="BMI" biodi:width="150">
+        <inputExpression id="inp_expr_bmi" typeRef="number">
+          <text>underwritingDecisionInput.bmi</text>
+        </inputExpression>
+      </input>
+      <input id="inp_smoker" label="Smoker" biodi:width="150">
+        <inputExpression id="inp_expr_smoker" typeRef="string">
+          <text>underwritingDecisionInput.smoker</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_0e8mh37">
+          <text>"yes","no"</text>
+        </inputValues>
+      </input>
+      <input id="InputClause_1mcnffb" label="Drugs" biodi:width="150">
+        <inputExpression id="LiteralExpression_09gyndy" typeRef="string">
+          <text>underwritingDecisionInput.drugs</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_1wpwt4p">
+          <text>"yes","no"</text>
+        </inputValues>
+      </input>
+      <input id="inp_hasChronic" label="Special Sport Risk" biodi:width="150">
+        <inputExpression id="inp_expr_hasChronic" typeRef="string">
+          <text>underwritingDecisionInput.sportRisk</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_01mdg3s">
+          <text>"high","medium","low","none"</text>
+        </inputValues>
+      </input>
+      <input id="inp_severity" label="Physical Condition Severity" biodi:width="150">
+        <inputExpression id="inp_expr_severity" typeRef="string">
+          <text>underwritingDecisionInput.physicalSeverity</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_0pxlyzd">
+          <text>"none","low","moderate","high","severe"</text>
+        </inputValues>
+      </input>
+      <input id="InputClause_1d9kaut" label="Psychological Condition Severity" biodi:width="150">
+        <inputExpression id="LiteralExpression_1o3qsqw" typeRef="string">
+          <text>underwritingDecisionInput.psychologicalSeverity</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_1pffcs6">
+          <text>"none","low","moderate","high","severe"</text>
+        </inputValues>
+      </input>
+      <input id="InputClause_1jnk4sk" label="Severity of need for Medication" biodi:width="150">
+        <inputExpression id="LiteralExpression_15o52sz" typeRef="string">
+          <text>medicationSeverity</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_0ku7smw">
+          <text>"low","moderate","high","severe","none"</text>
+        </inputValues>
+      </input>
+      <input id="InputClause_0geftzp" label="Severity of Work restriction" biodi:width="150">
+        <inputExpression id="LiteralExpression_1cfmgoh" typeRef="string">
+          <text>workRestrictionSeverity</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_0d0wi3s">
+          <text>"none","low","medium","high"</text>
+        </inputValues>
+      </input>
+      <output id="out_decision" name="decision" typeRef="string" biodi:width="150">
+        <outputValues id="UnaryTests_1p88ihe">
+          <text>"Acceptance","Risk surcharge indicated","Additional clarification indicated","Rejection"</text>
+        </outputValues>
+      </output>
+      <output id="out_multiplier" name="premiumMultiplier" typeRef="number" />
+      <output id="out_reason" name="reason" typeRef="string" />
+      <rule id="r1">
+        <inputEntry id="r1_c1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r1_c5">
+          <text>&gt;=40</text>
+        </inputEntry>
+        <inputEntry id="r1_c2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1eh008i">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="r1_c3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r1_c4">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1n2bjxj">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1d1o69b">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1p1s3oa">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="r1_o1">
+          <text>"Rejection"</text>
+        </outputEntry>
+        <outputEntry id="r1_o2">
+          <text>0</text>
+        </outputEntry>
+        <outputEntry id="r1_o3">
+          <text>"BMI &gt;40"</text>
+        </outputEntry>
+      </rule>
+      <rule id="r2">
+        <inputEntry id="r2_c1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r2_c5">
+          <text>&lt;= 16</text>
+        </inputEntry>
+        <inputEntry id="r2_c2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0spob5u">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="r2_c3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r2_c4">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1hs37s7">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_05fs7bq">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ne9623">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="r2_o1">
+          <text>"Rejection"</text>
+        </outputEntry>
+        <outputEntry id="r2_o2">
+          <text>0</text>
+        </outputEntry>
+        <outputEntry id="r2_o3">
+          <text>"BMI &lt; 16"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1gzaceh">
+        <inputEntry id="UnaryTests_1fesoxj">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1cr1crj">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_16m62m3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1hv91ui">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1sfofsm">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0vihyy3">
+          <text>"severe"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0bg6ga1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1hi74p3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1v6e8lb">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0vyma7d">
+          <text>"Rejection"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0rpby6m">
+          <text>0</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0zajz0x">
+          <text>"Physical Condition"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_06eqcze">
+        <inputEntry id="UnaryTests_03be1ek">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0jzx6xk">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1q6x1sy">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0a4vvm9">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0akr7c3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0iiank2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1qkfabo">
+          <text>"severe"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0e1mjks">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1oz5t2z">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0sgfj2b">
+          <text>"Rejection"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_199heod">
+          <text>0</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1cr2xi6">
+          <text>"Psychological Condition"</text>
+        </outputEntry>
+      </rule>
+      <rule id="r9">
+        <inputEntry id="r9_c1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r9_c5">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r9_c2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ppg0kr">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="r9_c3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r9_c4">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_13o7inw">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0d57hd0">
+          <text>"severe"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1w6knmx">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="r9_o1">
+          <text>"Rejection"</text>
+        </outputEntry>
+        <outputEntry id="r9_o2">
+          <text>0</text>
+        </outputEntry>
+        <outputEntry id="r9_o3">
+          <text>"Medication"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0xvocjm">
+        <inputEntry id="UnaryTests_0mv21zn">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0vlox2s">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1kw8s9x">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1g4jj74">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0q84cwf">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_13yby7x">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0cvfqmo">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_17uspd2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1eu874n">
+          <text>"high"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1dhtk62">
+          <text>"Rejection"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0bdbokh">
+          <text>0</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1f9m1mx">
+          <text>"Work restriction"</text>
+        </outputEntry>
+      </rule>
+      <rule id="r3">
+        <inputEntry id="r3_c1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r3_c5">
+          <text>[30-39.9]</text>
+        </inputEntry>
+        <inputEntry id="r3_c2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1vytkiv">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="r3_c3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r3_c4">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_18y7i4c">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ekv75n">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0u1xr2n">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="r3_o1">
+          <text>"Additional clarification indicated"</text>
+        </outputEntry>
+        <outputEntry id="r3_o2">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="r3_o3">
+          <text>"BMI"</text>
+        </outputEntry>
+      </rule>
+      <rule id="r4">
+        <inputEntry id="r4_c1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r4_c5">
+          <text>[16.1-18.4]</text>
+        </inputEntry>
+        <inputEntry id="r4_c2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0gd6vh6">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="r4_c3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r4_c4">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1dwqf9i">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1sttgy6">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1rm9a2j">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="r4_o1">
+          <text>"Additional clarification indicated"</text>
+        </outputEntry>
+        <outputEntry id="r4_o2">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="r4_o3">
+          <text>"BMI"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0ha997j">
+        <inputEntry id="UnaryTests_0jk91cs">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_10r19j6">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0xo1rsc">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_063f1vx">
+          <text>"yes"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0lf3h7c">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0i4hg7u">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ny6ifj">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ac2d5w">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1j07f9o">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_164xu09">
+          <text>"Additional clarification indicated"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0z30m7s">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_155935e">
+          <text>"Using drugs"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_07f1fsc">
+        <inputEntry id="UnaryTests_1vz82tp">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_14kkqyl">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_18n3auo">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0px2tj8">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1r892nm">
+          <text>"high"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0vlu2wg">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_16tcyrj">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_15dizez">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1yzv1gv">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0x7vdw6">
+          <text>"Additional clarification indicated"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_09tq44e">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1h3zdgb">
+          <text>"High risk sport"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_15ktvq8">
+        <inputEntry id="UnaryTests_0814i4v">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1i0f3u2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_08ilii7">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0r4f7ja">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1i0fof0">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_115eeha">
+          <text>"moderate","high"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_15l3wp1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1gw3z8h">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1mgychb">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1xsv7ix">
+          <text>"Additional clarification indicated"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_05jika8">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1lumbwh">
+          <text>"Physical Condition"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_10z35ej">
+        <inputEntry id="UnaryTests_0v42cux">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0sr2euv">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0cfivvg">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1py632k">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_15g0wnz">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1va1exv">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_148f3fs">
+          <text>"moderate","high"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0csm1h2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1jb7vvd">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_022feds">
+          <text>"Additional clarification indicated"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0sbc1ww">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1brjp2s">
+          <text>"Psychological Condition"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1l3e98k">
+        <inputEntry id="UnaryTests_05818t2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1uudjyr">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_12zl8zz">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1prs55m">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1joy9v3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1gq8wjr">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_10mjb16">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1yfexby">
+          <text>"moderate","high"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_167pzpn">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1pj0j9c">
+          <text>"Additional clarification indicated"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1qer0zs">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_08rsoq9">
+          <text>"Medication"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1pam217">
+        <inputEntry id="UnaryTests_024o5p7">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_05o32fp">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0jhn51w">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1suykls">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_08k1l40">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0tzuzsr">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1n28sla">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0bfln1s">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1bmtgeq">
+          <text>"medium"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_19ouv69">
+          <text>"Additional clarification indicated"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0mn31sw">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1rhn6rv">
+          <text>"Work restriction"</text>
+        </outputEntry>
+      </rule>
+      <rule id="r5">
+        <inputEntry id="r5_c1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r5_c5">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r5_c2">
+          <text>"yes"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0k8sh1v">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r5_c3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r5_c4">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1mt4j5b">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_12rqw01">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_077c0hx">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="r5_o1">
+          <text>"Risk surcharge indicated"</text>
+        </outputEntry>
+        <outputEntry id="r5_o2">
+          <text>1.3</text>
+        </outputEntry>
+        <outputEntry id="r5_o3">
+          <text>"Smoking"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0cgo57w">
+        <inputEntry id="UnaryTests_16hqoaf">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0gcl5ow">
+          <text>[18.5-29.9]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1gdzv7j">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0r15usk">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0fh7q49">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1uphqqr">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1op389n">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ldy1ok">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1f79mpo">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1kmaato">
+          <text>"Acceptance"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0csqkqs">
+          <text></text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1j9zz1q">
+          <text>"Slightly elevated BMI"</text>
+        </outputEntry>
+      </rule>
+      <rule id="r7">
+        <inputEntry id="r7_c1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r7_c5">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="r7_c2">
+          <text>"no"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1nscprn">
+          <text>"no"</text>
+        </inputEntry>
+        <inputEntry id="r7_c3">
+          <text>"low","none"</text>
+        </inputEntry>
+        <inputEntry id="r7_c4">
+          <text>"none","low"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_00ve80q">
+          <text>"none","low"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_153i9d7">
+          <text>"low","none"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1kurbnm">
+          <text>"none","low"</text>
+        </inputEntry>
+        <outputEntry id="r7_o1">
+          <text>"Acceptance"</text>
+        </outputEntry>
+        <outputEntry id="r7_o2">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="r7_o3">
+          <text>"healthy BMI and no active severe conditions"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0v888tn">
+        <inputEntry id="UnaryTests_0edmgae">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0sjcrot">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0892lt7">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_02cm9mf">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_163ra3i">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1dcnayu">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_06mmf68">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0vioytd">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1pttswj">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0yyhwpk">
+          <text>"Error"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1w4hyz9">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0zb3l1s">
+          <text>"ERROR!"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_1kvjwnv">
+      <dmndi:DMNShape id="DMNShape_1ygmuz9" dmnElementRef="underwritingDecision">
+        <dc:Bounds height="80" width="180" x="180" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

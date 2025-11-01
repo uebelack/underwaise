@@ -7,10 +7,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class StoreStructuresApplicationDataDelegate implements JavaDelegate {
+public class StoreManualDecisionDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution delegateExecution) {
-        log.info("Will store structured application data ...");
-
+        log.info("Will store manual decision to database ...");
     }
 }

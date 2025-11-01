@@ -36,6 +36,21 @@
             <version>${cibseven.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.cibseven.bpm</groupId>
+            <artifactId>cibseven-engine-plugin-spin</artifactId>
+            <version>${cibseven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.cibseven.spin</groupId>
+            <artifactId>cibseven-spin-core</artifactId>
+            <version>${cibseven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.cibseven.spin</groupId>
+            <artifactId>cibseven-spin-dataformat-json-jackson</artifactId>
+            <version>${cibseven.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
             <version>2.2.39</version>
@@ -79,13 +94,18 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <optional>true</optional>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
