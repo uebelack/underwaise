@@ -5,27 +5,27 @@
       "title": "Personal Information",
       "fields": [
         {
-          "id": "first_name",
+          "id": "firstName",
           "label": "First Name",
           "type": "text",
           "required": true,
           "placeholder": "Enter your first name"
         },
         {
-          "id": "last_name",
+          "id": "lastName",
           "label": "Last Name",
           "type": "text",
           "required": true,
           "placeholder": "Enter your last name"
         },
         {
-          "id": "birth_date",
+          "id": "birthDate",
           "label": "Date of Birth",
           "type": "date",
           "required": true,
           "placeholder": "YYYY-MM-DD",
-          "min": 18,
-          "max": 80,
+          "max": "2007-11-02",
+          "min": "1945-11-02",
           "helperText": "You must be at least 18 years old"
         },
         {
@@ -33,21 +33,23 @@
           "label": "Email Address",
           "type": "email",
           "required": true,
-          "placeholder": "example@email.com"
+          "placeholder": "e.g. example@email.com"
         },
         {
           "id": "height",
           "label": "Height in cm",
           "type": "number",
           "required": true,
-          "placeholder": "180"
+          "placeholder": "e.g. 180",
+          "suffix": "cm"
         },
         {
           "id": "weight",
           "label": "Weight in kg",
           "type": "number",
           "required": true,
-          "placeholder": "70"
+          "placeholder": "e.g. 70",
+          "suffix": "kg"
         }
       ]
     },
@@ -56,30 +58,32 @@
       "title": "Lifestyle Questions",
       "fields": [
         {
-          "id": "smoke",
+          "id": "isSmoker",
           "question": "Do you smoke?",
           "type": "boolean",
-          "default": "no",
+          "defaultValue": "no",
           "required": true
         },
         {
-          "id": "drug_usage",
+          "id": "isDrugUser",
           "question": "Have you ever consumed drugs or are you consuming drugs?",
           "type": "boolean",
-          "default": "no",
+          "defaultValue": "no",
           "required": true
         },
         {
-          "id": "special_sports",
+          "id": "hasSpecialSports",
           "question": "Do you practice any special sports or leisure activities, such as mountaineering, car or motorcycle sports, diving, sailing, or extreme sports?",
           "type": "boolean",
           "followUp": {
             "trigger": "yes",
             "fields": [
               {
-                "id": "special_sports_details",
+                "id": "specialSportActivities",
                 "label": "List your special sports or leisure activities",
-                "type": "textarea"
+                "type": "text",
+                "placeholder": "e.g., Rock climbing, Scuba diving",
+                "required": true
               }
             ]
           }
@@ -91,7 +95,8 @@
       "title": "Health Questions",
       "fields": [
         {
-          "id": "physical_health_issues",
+          "id": "hasPhysicalHealthConditions",
+          "defaultValue": false,
           "question": "Have you had any health complaints, illnesses, consequences of accidents, or congenital conditions in the past five years for which you sought treatment for your physical health?",
           "type": "boolean",
           "required": true,
@@ -99,9 +104,36 @@
             "trigger": "yes",
             "fields": [
               {
-                "id": "physical_health_details",
-                "label": "Please provide details (Period, Reason, Name and address of the therapist, Treatment completed)",
-                "type": "textarea"
+                "id": "physicalHealthConditions.0.startDate",
+                "label": "Start Date",
+                "type": "date",
+                "required": true,
+                "max": "2025-11-02"
+              },
+              {
+                "id": "physicalHealthConditions.0.endDate",
+                "label": "End Date",
+                "type": "date",
+                "required": false,
+                "max": "2025-11-02"
+              },
+              {
+                "id": "physicalHealthConditions.0.reason",
+                "label": "Reason",
+                "type": "textarea",
+                "required": true
+              },
+              {
+                "id": "physicalHealthConditions.0.isTreatmentCompleted",
+                "label": "Is Treatment Completed?",
+                "type": "boolean",
+                "defaultValue": false
+              },
+              {
+                "id": "physicalHealthConditions.0.treatmentFacilityAddress",
+                "label": "Treatment Facility Address",
+                "type": "text",
+                "required": false
               }
             ]
           }
@@ -113,7 +145,8 @@
       "title": "Health Questions",
       "fields": [
         {
-          "id": "mental_health_treatment",
+          "id": "hasMentalHealthConditions",
+          "defaultValue": false,
           "question": "Have you ever been advised or treated by a psychiatrist, psychologist, or psychotherapist?",
           "type": "boolean",
           "required": true,
@@ -121,9 +154,36 @@
             "trigger": "yes",
             "fields": [
               {
-                "id": "mental_health_details",
-                "label": "Please provide details (Period, Reason, Name and address of the therapist, Treatment completed)",
-                "type": "textarea"
+                "id": "mentalHealthConditions.0.startDate",
+                "label": "Start Date",
+                "type": "date",
+                "required": true,
+                "max": "2025-11-02"
+              },
+              {
+                "id": "mentalHealthConditions.0.endDate",
+                "label": "End Date",
+                "type": "date",
+                "required": false,
+                "max": "2025-11-02"
+              },
+              {
+                "id": "mentalHealthConditions.0.reason",
+                "label": "Reason",
+                "type": "textarea",
+                "required": true
+              },
+              {
+                "id": "mentalHealthConditions.0.isTreatmentCompleted",
+                "label": "Is Treatment Completed?",
+                "type": "boolean",
+                "defaultValue": false
+              },
+              {
+                "id": "mentalHealthConditions.0.treatmentFacilityAddress",
+                "label": "Treatment Facility Address",
+                "type": "text",
+                "required": false
               }
             ]
           }
@@ -135,7 +195,7 @@
       "title": "Health Questions",
       "fields": [
         {
-          "id": "medication_usage",
+          "id": "hasMedicationUsage",
           "question": "Have you taken or do you take medication regularly in the past five years (excluding contraception)?",
           "type": "boolean",
           "required": true,
@@ -143,9 +203,50 @@
             "trigger": "yes",
             "fields": [
               {
-                "id": "medication_details",
-                "label": "Please provide details (Period, Reason, Name of the medication, Dosage, Treatment completed)",
-                "type": "textarea"
+                "id": "medicationForm.0.startDate",
+                "label": "Start Date",
+                "type": "date",
+                "required": true,
+                "max": "2025-11-02"
+              },
+              {
+                "id": "medicationForm.0.endDate",
+                "label": "End Date",
+                "type": "date",
+                "required": false,
+                "max": "2025-11-02"
+              },
+              {
+                "id": "medicationForm.0.reason",
+                "label": "Reason",
+                "type": "textarea",
+                "required": true
+              },
+              {
+                "id": "medicationForm.0.isTreatmentCompleted",
+                "label": "Is Treatment Completed?",
+                "type": "boolean",
+                "defaultValue": false
+              },
+              {
+                "id": "medicationForm.0.medicationNameAndDosage",
+                "label": "Medication Name and Dosage",
+                "type": "text",
+                "required": true,
+                "helpterText": "e.g., Ibuprofen 200mg"
+              },
+              {
+                "id": "medicationForm.0.medicationPeriodicity",
+                "label": "Medication Periodicity",
+                "type": "select",
+                "defaultValue": "AS_NEEDED",
+                "options": [
+                  { "label": "Daily", "value": "DAILY" },
+                  { "label": "Weekly", "value": "WEEKLY" },
+                  { "label": "Monthly", "value": "MONTHLY" },
+                  { "label": "As needed", "value": "AS_NEEDED" }
+                ],
+                "required": true
               }
             ]
           }
@@ -157,7 +258,7 @@
       "title": "Health Questions",
       "fields": [
         {
-          "id": "work_ability_restriction",
+          "id": "hasIncapacity",
           "question": "Is your ability to work or earn currently restricted, or have you been fully or partially unable to work (or children unable to attend school) for more than four consecutive weeks in the past five years due to health reasons?",
           "type": "boolean",
           "required": true,
@@ -165,9 +266,30 @@
             "trigger": "yes",
             "fields": [
               {
-                "id": "work_restriction_details",
-                "label": "Please provide details (Period, Reason, Treatment completed)",
-                "type": "textarea"
+                "id": "incapacityForm.0.startDate",
+                "label": "Start Date",
+                "type": "date",
+                "required": true,
+                "max": "2025-11-02"
+              },
+              {
+                "id": "incapacityForm.0.endDate",
+                "label": "End Date",
+                "type": "date",
+                "required": false,
+                "max": "2025-11-02"
+              },
+              {
+                "id": "incapacityForm.0.reason",
+                "label": "Reason",
+                "type": "textarea",
+                "required": true
+              },
+              {
+                "id": "incapacityForm.0.isTreatmentCompleted",
+                "label": "Is Treatment Completed?",
+                "type": "boolean",
+                "defaultValue": false
               }
             ]
           }
