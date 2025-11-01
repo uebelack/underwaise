@@ -108,8 +108,7 @@ print("Training complete.")
 # 7. Evaluate Model
 # -------------------------------
 y_pred = model.predict(X_test_scaled)
-print(y_pred)
-print(model.decision_function(X_test_scaled).tolist())
+
 accuracy = accuracy_score(y_test, y_pred)
 
 print("\n--- Model Evaluation ---")

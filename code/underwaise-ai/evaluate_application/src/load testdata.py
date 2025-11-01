@@ -3,11 +3,9 @@ import pyodbc
 
 conn = pyodbc.connect(os.getenv("SQL_CONN_STRING"))
 
-query = """
-    SELECT * FROM dbo.application_feature;
-    """
 
-with open('../../../../assets/health_applications_test_data.sql', 'r') as inserts:
+
+with open('../../../../assets/application_and_feature_inserts_2.sql', 'r') as inserts:
     sql_script = inserts.read()  # read the entire file as a single string
     statements = sql_script.split(';')  # split by semicolon
 
