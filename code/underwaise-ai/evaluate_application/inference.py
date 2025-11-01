@@ -1,56 +1,59 @@
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, HTTPException, Form
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+import pandas as pd
 import numpy as np
 import joblib
-from sklearn.datasets import make_classification
 
 app = FastAPI(title="SVM Inference API")
 
-@app.get("/infer")
-def infer(model_file: str = Query(..., description="Path to the model file (.joblib)"),
-          scaler_file: str = Query(..., description="Path to the scaler file (.joblib)")):
+# Define expected input schema
+class InferenceRequest(BaseModel):
+    data: list[list[float]]  # 2D array (list of samples)
+    model_file: str          # path to .joblib model
+    scaler_file: str         # path to .joblib scaler
+
+@app.post("/infer")
+def infer(request: InferenceRequest):
     logs = []
 
     try:
         logs.append("Loading model and scaler for inference...")
-        loaded_model = joblib.load(model_file)
-        loaded_scaler = joblib.load(scaler_file)
+        loaded_model = joblib.load(request.model_file)
+        loaded_scaler = joblib.load(request.scaler_file)
 
-        # Generate dummy data for example inference
-        X, y = make_classification(
-            n_samples=10,
-            n_features=20,
-            n_informative=10,
-            n_redundant=2,
-            n_classes=4,
-            n_clusters_per_class=1,
-            random_state=42
-        )
+        # Convert input JSON to numpy array
+        X = np.array(request.data)
+        logs.append(f"Received input data with shape: {X.shape}")
 
+        # Scale input data
+        X_scaled = loaded_scaler.transform(X)
+        logs.append("Data scaled successfully.")
+
+        # Predict
+        predictions = loaded_model.predict(X_scaled)
+
+        # Optionally get prediction probabilities
+        if hasattr(loaded_model, "predict_proba"):
+            prediction_prob = loaded_model.predict_proba(X_scaled).tolist()
+        else:
+            prediction_prob = "Not available for this model"
+
+        # Optional mapping
         label_map = {
             0: 'Acceptance',
             1: 'Risk surcharge indicated',
             2: 'Additional clarification indicated',
             3: 'Rejection'
         }
-
-        # Example inference
-        new_sample = X[0].reshape(1, -1)
-        new_sample_scaled = loaded_scaler.transform(new_sample)
-        prediction = loaded_model.predict(new_sample_scaled)
-
-        if hasattr(loaded_model, "predict_proba"):
-            prediction_prob = loaded_model.predict_proba(new_sample_scaled).tolist()
-        else:
-            prediction_prob = "Not available for this strategy"
-
-        logs.append(f"Predicted class: {prediction[0]}")
-        logs.append(f"Class probabilities: {prediction_prob}")
+        mapped_predictions = [label_map.get(p, str(p)) for p in predictions]
 
         return JSONResponse(content={
             "success": True,
             "logs": logs,
-            "prediction": int(prediction[0]),
+            "num_samples": len(X),
+            "predictions": mapped_predictions,
+            "raw_predictions": predictions.tolist(),
             "prediction_probabilities": prediction_prob
         })
 
