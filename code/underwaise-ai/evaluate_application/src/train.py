@@ -23,17 +23,16 @@ SCALER_FILENAME = f"scaler_{MULTI_CLASS_STRATEGY}.joblib"
 conn = pyodbc.connect(os.getenv("SQL_CONN_STRING"))
 
 query = """
-    SELECT * FROM dbo.application_feature as a JOIN dbo.application as b ON a.feature_uuid = b.fk_feature_id;
+    SELECT a.*,b.status FROM dbo.application_feature as a JOIN dbo.application as b ON a.feature_uuid = b.fk_feature_id;
     """
 
     # Run the query
 df = pd.read_sql(query, conn)
+df.drop('feature_uuid', axis=1, inplace=True)
 
 print("📋 Available Tables:")
 print(df)
 
-
-df = pd.read_csv('../../../../assets/testdaten_underwriting.csv', encoding='latin1',delimiter=';')
 
 label_map = {
     'Acceptance': 0,
@@ -43,17 +42,17 @@ label_map = {
 }
 
 
-target_col = 'Target'
-non_relevant_features = ['First name','Last name']
+target_col = 'status'
 
-non_relevant_features.append(target_col)
 
 # Separate features and target
 y = df[target_col].map(label_map).values
-X = df.drop(columns=non_relevant_features)
+X = df.drop(columns=[target_col])
 
-# Convert categorical variables to numeric (e.g., one-hot encoding)
-X = pd.get_dummies(X, drop_first=True)
+
+bool_cols = X.select_dtypes(include='bool').columns
+X[bool_cols] = X[bool_cols].astype(int)
+
 
 # Convert to NumPy arrays for sklearn compatibility
 X = X.values
