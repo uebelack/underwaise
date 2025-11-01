@@ -23,12 +23,7 @@ SCALER_FILENAME = f"scaler_{MULTI_CLASS_STRATEGY}.joblib"
 conn = pyodbc.connect(os.getenv("SQL_CONN_STRING"))
 
 query = """
-    SELECT 
-        TABLE_SCHEMA, 
-        TABLE_NAME
-    FROM INFORMATION_SCHEMA.TABLES
-    WHERE TABLE_TYPE = 'BASE TABLE'
-    ORDER BY TABLE_SCHEMA, TABLE_NAME;
+    SELECT * FROM dbo.application_feature as a JOIN dbo.application as b ON a.feature_uuid = b.fk_feature_id;
     """
 
     # Run the query
