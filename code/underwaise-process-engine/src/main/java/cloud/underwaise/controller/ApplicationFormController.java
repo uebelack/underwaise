@@ -50,12 +50,4 @@ public class ApplicationFormController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
-
-    @GetMapping("/health")
-    public ResponseEntity<Map<String, String>> healthCheck() {
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "healthy");
-        response.put("service", "Form Controller");
-        return ResponseEntity.ok(response);
-    }
 }

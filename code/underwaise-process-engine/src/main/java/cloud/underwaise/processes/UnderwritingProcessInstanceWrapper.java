@@ -5,6 +5,8 @@ import org.cibseven.bpm.engine.delegate.DelegateExecution;
 import org.cibseven.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.cibseven.bpm.engine.runtime.ProcessInstance;
 
+import java.util.UUID;
+
 public class UnderwritingProcessInstanceWrapper {
     public static final String PROCESS_DEFINITION_KEY = "underwriting";
 
@@ -24,8 +26,8 @@ public class UnderwritingProcessInstanceWrapper {
         }
     }
 
-    public Long getApplicationId() {
-        return (Long) runtimeService.getVariable(processInstance.getProcessInstanceId(), APPLICATION_ID_VARIABLE);
+    public UUID getApplicationId() {
+        return (UUID) runtimeService.getVariable(processInstance.getProcessInstanceId(), APPLICATION_ID_VARIABLE);
     }
 
     public Boolean getTraining() {

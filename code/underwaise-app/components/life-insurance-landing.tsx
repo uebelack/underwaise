@@ -29,9 +29,9 @@ export function LifeInsuranceLanding() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-100/20 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-8">
           {/* Navigation */}
-          <nav className="flex items-center justify-between mb-20">
+          <nav className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Image
                 src="/logo.png"
@@ -61,28 +61,29 @@ export function LifeInsuranceLanding() {
             </div>
           </nav>
 
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Hero Content */}
-            <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#7cb50d]/10 backdrop-blur-sm rounded-full mb-6 border border-[#7cb50d]/20">
+          <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black backdrop-blur-xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-gray-700 mb-20">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              {/* Hero Content */}
+              <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#7cb50d]/20 backdrop-blur-sm rounded-full mb-6 border border-[#7cb50d]/40">
                 <Sparkles className="w-4 h-4 text-[#7cb50d]" />
                 <span className="text-sm font-semibold text-[#7cb50d]">
                   Versicherung neu gedacht
                 </span>
               </div>
 
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-[1.1] tracking-tight">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
                 Deine Zukunft.
-                <span className="text-[#1a5ab8] block mt-2">Deine Sicherheit.</span>
+                <span className="text-[#7cb50d] block mt-2">Deine Sicherheit.</span>
               </h1>
 
-              <p className="text-xl text-gray-600 mb-10 leading-relaxed">
+              <p className="text-xl text-gray-300 mb-10 leading-relaxed">
                 Moderne Lebensversicherung mit transparenten Konditionen und 
                 blitzschneller Beantragung. In nur 5 Minuten zum Versicherungsschutz.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <Button size="lg" asChild className="bg-[#1a5ab8] hover:bg-[#1548a0] text-white shadow-lg shadow-blue-500/20">
+                <Button size="lg" asChild className="bg-[#7cb50d] hover:bg-[#6ba00b] text-white shadow-lg shadow-green-500/30">
                   <Link
                     href="/spar-lebensversicherung"
                     className="group inline-flex items-center"
@@ -91,80 +92,86 @@ export function LifeInsuranceLanding() {
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="border-2 border-gray-300 hover:border-[#1a5ab8] hover:text-[#1a5ab8]">
-                  Mehr erfahren
-                </Button>
               </div>
 
-              {/* Trust Indicators */}
-              <div className="grid grid-cols-3 gap-6">
-                <div className="flex flex-col">
-                  <div className="text-3xl font-bold text-gray-900 mb-1">5 Min</div>
-                  <div className="text-sm text-gray-600">Antragsdauer</div>
+              {/* Trust Indicators & Info Cards */}
+              <div className="space-y-6">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
+                    <div className="text-2xl font-bold text-white mb-1">5 Min</div>
+                    <div className="text-xs text-gray-300">Antragsdauer</div>
+                  </div>
+                  <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
+                    <div className="text-2xl font-bold text-white mb-1">0 CHF</div>
+                    <div className="text-xs text-gray-300">Versteckte Kosten</div>
+                  </div>
+                  <div className="flex flex-col bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
+                    <div className="text-2xl font-bold text-white mb-1">24/7</div>
+                    <div className="text-xs text-gray-300">Support</div>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <div className="text-3xl font-bold text-gray-900 mb-1">0 CHF</div>
-                  <div className="text-sm text-gray-600">Versteckte Kosten</div>
-                </div>
-                <div className="flex flex-col">
-                  <div className="text-3xl font-bold text-gray-900 mb-1">24/7</div>
-                  <div className="text-sm text-gray-600">Support</div>
+
+                {/* Key Info Cards */}
+                <div className="space-y-3">
+                  <div className="bg-gradient-to-r from-[#1a5ab8]/30 to-[#1a5ab8]/20 backdrop-blur-sm rounded-2xl p-4 border border-[#1a5ab8]/40 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm text-gray-300 mb-1">Versicherungssumme bis</div>
+                        <div className="text-2xl font-bold text-white">CHF 400,000</div>
+                      </div>
+                      <div className="w-12 h-12 bg-[#1a5ab8] rounded-xl flex items-center justify-center shadow-lg">
+                        <Shield className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-[#7cb50d]/30 to-[#7cb50d]/20 backdrop-blur-sm rounded-2xl p-4 border border-[#7cb50d]/40 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm text-gray-300 mb-1">Monatliche Prämie ab</div>
+                        <div className="text-2xl font-bold text-white">CHF 49</div>
+                      </div>
+                      <div className="w-12 h-12 bg-[#7cb50d] rounded-xl flex items-center justify-center shadow-lg">
+                        <TrendingUp className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="flex -space-x-2">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-white shadow-sm" />
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 border-2 border-white shadow-sm" />
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-white shadow-sm" />
+                      </div>
+                      <div>
+                        <div className="text-white font-bold">2,500+ Kunden</div>
+                        <div className="text-gray-300 text-sm">vertrauen uns bereits</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Hero Visual */}
-            <div className="relative">
-              <div className="relative bg-gradient-to-br from-[#1a5ab8] to-[#1548a0] rounded-3xl p-12 shadow-2xl shadow-blue-500/20">
-                <div className="absolute -top-4 -right-4 w-24 h-24 bg-[#7cb50d] rounded-2xl rotate-12 shadow-lg shadow-green-500/20" />
-                <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-white rounded-2xl -rotate-12 shadow-lg" />
-                
-                <div className="relative space-y-4">
-                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <div className="text-white/80 text-sm mb-1">Versicherungssumme</div>
-                        <div className="text-3xl font-bold text-white">CHF 400,000</div>
-                      </div>
-                      <div className="w-12 h-12 bg-[#7cb50d] rounded-xl flex items-center justify-center">
-                        <Shield className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-white/80">
-                      <CheckCircle2 className="h-4 w-4 text-[#7cb50d]" />
-                      <span>Todesfall & Invalidität</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <div className="text-white/80 text-sm mb-1">Monatliche Prämie ab</div>
-                        <div className="text-3xl font-bold text-white">CHF 49</div>
-                      </div>
-                      <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-                        <TrendingUp className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-white/80">
-                      <CheckCircle2 className="h-4 w-4 text-[#7cb50d]" />
-                      <span>Transparente Preise</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
-                    <div className="flex -space-x-2">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-white" />
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 border-2 border-white" />
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-white" />
-                    </div>
-                    <div>
-                      <div className="text-white font-semibold">2,500+ Kunden</div>
-                      <div className="text-white/70 text-sm">vertrauen uns bereits</div>
-                    </div>
-                  </div>
-                </div>
+            {/* Hero Visual - iPhone Image */}
+            <div className="relative flex items-center justify-center">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#7cb50d]/30 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#1a5ab8]/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+              
+              {/* iPhone Image */}
+              <div className="relative z-10">
+                <Image
+                  src="/hero-iphone.png"
+                  alt="AI Ally App on iPhone"
+                  width={400}
+                  height={800}
+                  className="drop-shadow-2xl"
+                  priority
+                />
               </div>
+            </div>
             </div>
           </div>
         </div>
@@ -285,8 +292,9 @@ export function LifeInsuranceLanding() {
       {/* Benefits Section */}
       <section id="benefits" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="order-2 lg:order-1">
+          <div className="bg-gradient-to-br from-gray-50/80 to-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-gray-200/50">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <div className="order-2 lg:order-1">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#7cb50d]/10 rounded-full mb-6 border border-[#7cb50d]/20">
                 <Star className="w-4 h-4 text-[#7cb50d]" />
                 <span className="text-sm font-semibold text-[#7cb50d]">
@@ -407,6 +415,7 @@ export function LifeInsuranceLanding() {
               <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-[#7cb50d]/20 rounded-full blur-3xl -z-10" />
               <div className="absolute -top-8 -right-8 w-32 h-32 bg-[#1a5ab8]/20 rounded-full blur-3xl -z-10" />
             </div>
+            </div>
           </div>
         </div>
       </section>
@@ -455,9 +464,6 @@ export function LifeInsuranceLanding() {
                   <span className="text-gray-600">Online Support</span>
                 </li>
               </ul>
-              <Button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900" size="lg">
-                Mehr erfahren
-              </Button>
             </div>
 
             {/* Premium - Highlighted */}

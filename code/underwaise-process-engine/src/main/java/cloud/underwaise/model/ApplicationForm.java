@@ -1,18 +1,29 @@
 package cloud.underwaise.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Embeddable //todo replace with 1 to 1 relation
+@Data
+@Entity
+@Table(name = "application_form")
 public class ApplicationForm {
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Column(name = "form_uuid", updatable = false, nullable = false, unique = true, columnDefinition = "uniqueidentifier")
+    private UUID formUuid;
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
