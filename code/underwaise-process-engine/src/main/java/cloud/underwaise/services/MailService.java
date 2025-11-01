@@ -18,10 +18,7 @@ public class MailService {
         var text = new StringBuilder();
 
         text.append("Dear %s %s,\n\n".formatted(application.getApplicationForm().getFirstName(), application.getApplicationForm().getLastName()));
-        text.append("\n\n");
         text.append("Thank you for your application for Spar Lebensversicherung.\n\n");
-        text.append("\n\n");
-        text.append("\n\n");
 
         if (application.getStatus().equals("Acceptance")) {
             text.append("We are pleased to inform you that your application has been accepted. Our team will contact you shortly with further details regarding your policy.\n\n");
@@ -31,9 +28,9 @@ public class MailService {
             text.append("Reason for rejection: %s\n\n".formatted(application.getReason()));
         } else {
             text.append("Your application is currently under review. We will notify you once a decision has been made. Thank you for your patience.\n\n");
+            text.append("Reason: %s\n\n".formatted(application.getReason()));
         }
 
-        text.append("\n\n");
         text.append("Best regards,\n");
         text.append("The Underwaise Team\n");
 
