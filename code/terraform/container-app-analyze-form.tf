@@ -48,7 +48,7 @@ resource "azurerm_container_app" "analyze-form" {
       }
 
       env {
-        name  = "OPENAI_API_KEY"
+        name  = "AZURE_OPENAI_API_KEY"
         secret_name = "openai-api-key"
       }
     }
