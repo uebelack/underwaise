@@ -33,7 +33,7 @@ public class UnderwritingService {
 
         runtimeService.startProcessInstanceByKey(
                 UnderwritingProcessInstanceWrapper.PROCESS_DEFINITION_KEY,
-                Map.of(APPLICATION_ID_VARIABLE, savedApplication.getId(),
+                Map.of(APPLICATION_ID_VARIABLE, savedApplication.getApplicationUuid(),
                         TRAINING_VARIABLE, underwaiseProperties.isTrainingActive())
         );
 
