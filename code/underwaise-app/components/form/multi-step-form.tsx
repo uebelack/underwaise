@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button } from "../ui/button";
 import { Form } from "../ui/form";
@@ -20,6 +20,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { MedicationPeriodicity } from "@/enum";
+import FormProgress from "./form-progress";
 
 interface Props {
   sections: Section[];
@@ -103,6 +104,7 @@ export function MultiStepForm({ sections }: Props) {
     },
     mode: "onTouched",
   });
+
   const currentStep = sections[step];
 
   const { mutate: submitApplication, isPending } = useMutation({
@@ -214,7 +216,7 @@ export function MultiStepForm({ sections }: Props) {
 
     if (field.type === "boolean") {
       return (
-        <div key={field.id} className="space-y-4">
+        <div key={field.id} className="space-y-8">
           <BooleanField
             key={field.id}
             name={field.id}
@@ -238,6 +240,7 @@ export function MultiStepForm({ sections }: Props) {
 
   return (
     <div className="form-container">
+      <FormProgress step={step} sections={sections} form={form} />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <h2 className="section-heading">{currentStep.title}</h2>
