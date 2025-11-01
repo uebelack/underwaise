@@ -320,7 +320,7 @@ export function LifeInsuranceLanding() {
               {/* iPhone Image */}
               <div className="relative z-10">
                 <Image
-                  src="/hero-iphone.png"
+                  src="/hero-iphone-2.png"
                   alt="Underwaise Lebensversicherung App auf iPhone"
                   width={400}
                   height={800}
