@@ -32,6 +32,9 @@ public class AssessPhysicalHealthDelegate implements JavaDelegate {
             if (risk != null) {
                 application.getApplicationFeature().setPhysicalHealthScore(new BigDecimal(risk.toString()));
             }
+        } else {
+            // No physical health risks were reported, set a positive score
+            application.getApplicationFeature().setPhysicalHealthScore(new BigDecimal("0.5"));
         }
     }
 }

@@ -16,6 +16,7 @@ public class UnderwritingProcessInstanceWrapper {
     public static final String UNDERWRITING_DECISION_INPUT_VARIABLE = "underwritingDecisionInput";
     public static final String UNDERWRITING_DECISION_RESULT_VARIABLE = "underwritingDecisionResult";
     public static final String DECISION = "decision";
+    public static final String REASON = "reason";
 
     private final RuntimeService runtimeService;
     private final ProcessInstance processInstance;

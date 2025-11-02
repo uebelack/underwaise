@@ -43,6 +43,8 @@ const postCaptcha = async (token: string) => {
 };
 
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY;
+const CAPTCHA_ACTIVATED =
+  process.env.NEXT_PUBLIC_RECAPTCHA_ACTIVATED === "true";
 
 export function MultiStepForm({ sections }: Props) {
   const router = useRouter();
@@ -134,70 +136,74 @@ export function MultiStepForm({ sections }: Props) {
     }));
   };
 
+  const sendFormData = (data: FormValues, captchaResponse?: any) => {
+    const output: FormValues & { captcha?: string } = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      birthDate: data.birthDate,
+      email: data.email,
+      height: data.height,
+      weight: data.weight,
+
+      isSmoker: data.isSmoker,
+      isDrugUser: data.isDrugUser,
+      hasSpecialSports: data.hasSpecialSports,
+
+      specialSportActivities: data.hasSpecialSports
+        ? data.specialSportActivities
+        : "",
+
+      physicalHealthConditions: data.hasPhysicalHealthConditions
+        ? (sanitizeArrayWithEndDate(
+            data.physicalHealthConditions
+          ) as HealthCondition[])
+        : [],
+
+      mentalHealthConditions: data.hasMentalHealthConditions
+        ? (sanitizeArrayWithEndDate(
+            data.mentalHealthConditions
+          ) as HealthCondition[])
+        : [],
+
+      medicationForm: data.hasMedicationUsage
+        ? (sanitizeArrayWithEndDate(data.medicationForm) as Medication[])
+        : [],
+
+      incapacityForm: data.hasIncapacity
+        ? (sanitizeArrayWithEndDate(data.incapacityForm) as Incapacity[])
+        : [],
+
+      ...(captchaResponse ? { captcha: captchaResponse } : {}),
+    };
+    console.log("Structured form output:", output);
+    submitApplication(output);
+  };
+
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     if (step < sections.length - 1) {
       setStep(step + 1);
     } else {
-      try {
-        setIsCaptchaGettingReady(true);
-        (window as any).grecaptcha.ready(() => {
-          (window as any).grecaptcha
-            .execute(SITE_KEY, { action: "submit" })
-            .then(async (token: string) => {
-              submitCaptcha(token, {
-                onSuccess: (captchaResponse) => {
-                  const output: FormValues & { captcha: string } = {
-                    firstName: data.firstName,
-                    lastName: data.lastName,
-                    birthDate: data.birthDate,
-                    email: data.email,
-                    height: data.height,
-                    weight: data.weight,
-
-                    isSmoker: data.isSmoker,
-                    isDrugUser: data.isDrugUser,
-                    hasSpecialSports: data.hasSpecialSports,
-
-                    specialSportActivities: data.hasSpecialSports
-                      ? data.specialSportActivities
-                      : "",
-
-                    physicalHealthConditions: data.hasPhysicalHealthConditions
-                      ? (sanitizeArrayWithEndDate(
-                          data.physicalHealthConditions
-                        ) as HealthCondition[])
-                      : [],
-
-                    mentalHealthConditions: data.hasMentalHealthConditions
-                      ? (sanitizeArrayWithEndDate(
-                          data.mentalHealthConditions
-                        ) as HealthCondition[])
-                      : [],
-
-                    medicationForm: data.hasMedicationUsage
-                      ? (sanitizeArrayWithEndDate(
-                          data.medicationForm
-                        ) as Medication[])
-                      : [],
-
-                    incapacityForm: data.hasIncapacity
-                      ? (sanitizeArrayWithEndDate(
-                          data.incapacityForm
-                        ) as Incapacity[])
-                      : [],
-
-                    captcha: captchaResponse,
-                  };
-                  console.log("Structured form output:", output);
-                  submitApplication(output);
-                },
+      if (CAPTCHA_ACTIVATED) {
+        try {
+          setIsCaptchaGettingReady(true);
+          (window as any).grecaptcha.ready(() => {
+            (window as any).grecaptcha
+              .execute(SITE_KEY, { action: "submit" })
+              .then(async (token: string) => {
+                submitCaptcha(token, {
+                  onSuccess: (captchaResponse) => {
+                    sendFormData(data, captchaResponse);
+                  },
+                });
               });
-            });
-        });
-      } catch {
-        toast.error("There was an error preparing the captcha.");
-      } finally {
-        setIsCaptchaGettingReady(false);
+          });
+        } catch {
+          toast.error("There was an error preparing the captcha.");
+        } finally {
+          setIsCaptchaGettingReady(false);
+        }
+      } else {
+        sendFormData(data);
       }
     }
   };

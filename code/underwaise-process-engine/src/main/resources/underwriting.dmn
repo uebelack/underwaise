@@ -722,44 +722,6 @@
           <text>"healthy BMI and no active severe conditions"</text>
         </outputEntry>
       </rule>
-      <rule id="DecisionRule_0v888tn">
-        <inputEntry id="UnaryTests_0edmgae">
-          <text></text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_0sjcrot">
-          <text></text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_0892lt7">
-          <text></text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_02cm9mf">
-          <text></text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_163ra3i">
-          <text></text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_1dcnayu">
-          <text></text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_06mmf68">
-          <text></text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_0vioytd">
-          <text></text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_1pttswj">
-          <text></text>
-        </inputEntry>
-        <outputEntry id="LiteralExpression_0yyhwpk">
-          <text>"Error"</text>
-        </outputEntry>
-        <outputEntry id="LiteralExpression_1w4hyz9">
-          <text>1</text>
-        </outputEntry>
-        <outputEntry id="LiteralExpression_0zb3l1s">
-          <text>"ERROR!"</text>
-        </outputEntry>
-      </rule>
     </decisionTable>
   </decision>
   <dmndi:DMNDI>
