@@ -47,6 +47,11 @@ resource "azurerm_container_app" "process_engine" {
     value = var.mailgun_api_key
   }
 
+  secret {
+    name  = "process-engine-admin-password"
+    value = var.process_engine_admin_password
+  }
+
   template {
     min_replicas = var.process_engine_min_replicas
     max_replicas = var.process_engine_max_replicas
