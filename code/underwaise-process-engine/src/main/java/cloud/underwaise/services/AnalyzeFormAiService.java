@@ -6,6 +6,7 @@ import cloud.underwaise.ai.analyzeform.model.TreatmentRiskScore;
 import cloud.underwaise.ai.analyzeform.model.UnderwriteRequest;
 import cloud.underwaise.model.HealthConditionForm;
 import cloud.underwaise.model.MedicationForm;
+import cloud.underwaise.model.IncapacityForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -62,6 +63,17 @@ public class AnalyzeFormAiService {
         api.getApiClient().setBasePath(underwaiseProperties.getAnalyzeFormAiUrl());
         var result = api.assessMedicationAssessMedicationPost(
                 mapToRequest(medicationForms));
+
+        log.info("AI overall estimate: [{}] [{}]", result.getOverallRiskScore(), result.getSummary());
+        return result.getTreatmentScores().stream().mapToInt(TreatmentRiskScore::getRiskScore).max().orElse(0);
+    }
+
+    public Integer accessRiskFromWorkDisability(List<IncapacityForm> incapacityForms) {
+        log.info("Sending request to AnalyzeForm AI to assess work disability report: {}", incapacityForms);
+        var api = new DefaultApi();
+        api.getApiClient().setBasePath(underwaiseProperties.getAnalyzeFormAiUrl());
+        var result = api.assessWorkDisabilityAssessWorkDisabilityPost(
+                mapToRequest(incapacityForms));
 
         log.info("AI overall estimate: [{}] [{}]", result.getOverallRiskScore(), result.getSummary());
         return result.getTreatmentScores().stream().mapToInt(TreatmentRiskScore::getRiskScore).max().orElse(0);

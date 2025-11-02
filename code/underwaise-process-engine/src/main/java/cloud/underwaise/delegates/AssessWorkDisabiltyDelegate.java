@@ -1,5 +1,6 @@
 package cloud.underwaise.delegates;
 
+import cloud.underwaise.processes.UnderwritingProcessInstanceWrapper;
 import cloud.underwaise.repository.ApplicationRepository;
 import cloud.underwaise.services.AnalyzeFormAiService;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.cibseven.bpm.engine.delegate.DelegateExecution;
 import org.cibseven.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 @Component
 @Slf4j
@@ -17,6 +20,17 @@ public class AssessWorkDisabiltyDelegate implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
-        log.info("Assessing medical condition via AI service...");
+        log.info("Assessing work disability condition risks...");
+
+        var underwritingProcess = new UnderwritingProcessInstanceWrapper(delegateExecution);
+        var application = applicationRepository.getReferenceById(underwritingProcess.getApplicationId());
+
+        if (!application.getApplicationForm().getIncapacityForm().isEmpty()) {
+            var risk = analyzeFormAiService.accessRiskFromWorkDisability(application.getApplicationForm().getIncapacityForm());
+
+            if (risk != null) {
+                application.getApplicationFeature().setRestrictionsScore(new BigDecimal(risk.toString()));
+            }
+        }
     }
 }
