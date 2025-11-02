@@ -11,6 +11,9 @@ RUN uv sync
 
 COPY src/ ./src/
 
+COPY scaler.joblib ./scaler.joblib
+COPY svm_model.joblib ./svm_model.joblib
+
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 
