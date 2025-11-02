@@ -76,7 +76,7 @@ Du bist ein Underwriting-Assistant. Analysiere die Hobbys/Aktivitäten und gib E
 - 9-10: Sehr hohes Risiko (Extremsport, lebensgefährliche Aktivitäten)
 
 **Regeln:**
-- Berücksichtige Häufigkeit: "selten" vs "regelmäßig"
+- Berücksichtige Häufigkeit: "selten" vs "regelmässig"
 - Nur gültiges JSON
 - risk_score muss eine ganze Zahl zwischen 1 und 10 sein
 - Erklärung soll konkret auf den Text eingehen
@@ -116,36 +116,44 @@ class HealthQuestionResponse(BaseModel):
 
 # Reusable function to assess risk
 def _assess_risk(prompt: str) -> UnderwriteResponse:
-    """Reusable function to get risk assessment from LLM."""
+    """Reusable function to get risk assessment from LLM with retry."""
     llm = get_gpt_mini_llm()
     
-    try:
-        llm_response = llm.invoke(prompt)
-        raw = llm_response.content.strip()
-        
-        # Extract JSON if LLM added extra text
-        if not raw.startswith("{"):
-            start = raw.index("{")
-            end = raw.rindex("}") + 1
-            raw = raw[start:end]
-        
-        parsed = json.loads(raw)
-        
-        risk_score = max(1, min(10, int(parsed["risk_score"])))
-        explanation = parsed.get("explanation", "No explanation provided")
-        
-        return UnderwriteResponse(
-            risk_score=risk_score,
-            explanation=explanation
-        )
-        
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Failed to process LLM response: {str(e)}")
+    last_error = None
+    for attempt in range(3):
+        try:
+            llm_response = llm.invoke(prompt)
+            raw = llm_response.content.strip()
+            
+            # Extract JSON if LLM added extra text
+            if not raw.startswith("{"):
+                start = raw.index("{")
+                end = raw.rindex("}") + 1
+                raw = raw[start:end]
+            
+            parsed = json.loads(raw)
+            
+            risk_score = max(1, min(10, int(parsed["risk_score"])))
+            explanation = parsed.get("explanation", "No explanation provided")
+            
+            return UnderwriteResponse(
+                risk_score=risk_score,
+                explanation=explanation
+            )
+            
+        except Exception as e:
+            last_error = e
+            if attempt < 2:  # Don't log on last attempt
+                print(f"Attempt {attempt + 1} failed: {str(e)}. Retrying...")
+                continue
+    
+    # All attempts failed
+    raise HTTPException(status_code=502, detail=f"Failed to process LLM response after 3 attempts: {str(last_error)}")
 
 
 # Reusable function for health question assessment
 def _assess_health_treatments(request_data: dict, question_context: str) -> HealthQuestionResponse:
-    """Reusable function to assess multiple treatment lines."""
+    """Reusable function to assess multiple treatment lines with retry."""
     
     # Extract treatments from whatever field name is provided
     treatments = None
@@ -164,7 +172,7 @@ def _assess_health_treatments(request_data: dict, question_context: str) -> Heal
         treatment_strings.append(f"{i+1}. {treatment_str}")
     
     prompt = f"""
-Du bist ein Underwriting-Assistant für Kranken- und Berufsunfähigkeitsversicherungen.
+Du bist ein Underwriting-Assistant für Lebensversicherungen. Du sollst die Risiken von Behandlungen einschätzen.
 
 **Kontext:** {question_context}
 
@@ -208,44 +216,52 @@ Interpretiere die JSON-Daten flexibel - nicht alle Felder sind immer vorhanden.
 - Nur gültiges JSON zurückgeben
 - Alle risk_score Werte müssen ganze Zahlen zwischen 1 und 10 sein
 - Jede Behandlung einzeln bewerten
-- Overall_risk_score ist der Durchschnitt oder höchster Wert wenn eine Behandlung sehr kritisch ist
+- Overall_risk_score ist der höchste Wert wenn eine Behandlung sehr kritisch ist. Sollten zwei oder mehr höhere Werte vorhanden sein, kann es auch mal eine Zahl höher sein.
 - treatment_text muss den Original-JSON-String der Behandlung enthalten
 - Wenn Informationen fehlen, interpretiere basierend auf vorhandenen Daten
 """
 
     llm = get_gpt_mini_llm()
     
-    try:
-        llm_response = llm.invoke(prompt)
-        raw = llm_response.content.strip()
-        
-        if not raw.startswith("{"):
-            start = raw.index("{")
-            end = raw.rindex("}") + 1
-            raw = raw[start:end]
-        
-        parsed = json.loads(raw)
-        
-        overall_risk = max(1, min(10, int(parsed["overall_risk_score"])))
-        summary = parsed.get("summary", "No summary provided")
-        
-        treatment_scores = []
-        for ts in parsed["treatment_scores"]:
-            treatment_scores.append(TreatmentRiskScore(
-                line_number=int(ts["line_number"]),
-                treatment_text=ts["treatment_text"],
-                risk_score=max(1, min(10, int(ts["risk_score"]))),
-                explanation=ts["explanation"]
-            ))
-        
-        return HealthQuestionResponse(
-            overall_risk_score=overall_risk,
-            treatment_scores=treatment_scores,
-            summary=summary
-        )
-        
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Failed to process LLM response: {str(e)}")
+    last_error = None
+    for attempt in range(3):
+        try:
+            llm_response = llm.invoke(prompt)
+            raw = llm_response.content.strip()
+            
+            if not raw.startswith("{"):
+                start = raw.index("{")
+                end = raw.rindex("}") + 1
+                raw = raw[start:end]
+            
+            parsed = json.loads(raw)
+            
+            overall_risk = max(1, min(10, int(parsed["overall_risk_score"])))
+            summary = parsed.get("summary", "No summary provided")
+            
+            treatment_scores = []
+            for ts in parsed["treatment_scores"]:
+                treatment_scores.append(TreatmentRiskScore(
+                    line_number=int(ts["line_number"]),
+                    treatment_text=ts["treatment_text"],
+                    risk_score=max(1, min(10, int(ts["risk_score"]))),
+                    explanation=ts["explanation"]
+                ))
+            
+            return HealthQuestionResponse(
+                overall_risk_score=overall_risk,
+                treatment_scores=treatment_scores,
+                summary=summary
+            )
+            
+        except Exception as e:
+            last_error = e
+            if attempt < 2:  # Don't log on last attempt
+                print(f"Attempt {attempt + 1} failed: {str(e)}. Retrying...")
+                continue
+    
+    # All attempts failed
+    raise HTTPException(status_code=502, detail=f"Failed to process LLM response after 3 attempts: {str(last_error)}")
 
 
 @app.post("/assess_physical_health", response_model=HealthQuestionResponse)
@@ -323,8 +339,8 @@ async def assess_medication(request_data: dict):
     """
     
     context = """
-Frage: Haben Sie in den letzten fünf Jahren regelmäßig Medikamente eingenommen 
-(außer Verhütungsmittel)?
+Frage: Haben Sie in den letzten fünf Jahren regelmässig Medikamente eingenommen 
+(ausser Verhütungsmittel)?
 
 Erwartete Felder (können variieren):
 - startDate: Startdatum der Medikation (YYYY-MM-DD)
