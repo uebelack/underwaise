@@ -32,6 +32,9 @@ public class EvaluateRiskOfSportActivitiesDelegate implements JavaDelegate {
             if (risk != null) {
                 application.getApplicationFeature().setHobbyScore(new BigDecimal(risk.toString()));
             }
+        } else {
+            // No dangerous sports or activities were reported, set a positive score
+            application.getApplicationFeature().setHobbyScore(new BigDecimal("0.5"));
         }
     }
 }

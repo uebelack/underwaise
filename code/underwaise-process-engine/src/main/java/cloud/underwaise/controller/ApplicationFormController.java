@@ -22,20 +22,15 @@ public class ApplicationFormController {
     @PostMapping("/submit")
     public ResponseEntity<Map<String, Object>> submitForm(@Valid @RequestBody ApplicationForm applicationForm) {
         try {
-            // Log the received form data (for debugging purposes)
             System.out.println("Received application form: " + applicationForm);
 
-            // TODO: Add your business logic here
-            // For now, just return a success response with the received data
+            underwritingService.start(applicationForm);
 
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
             response.put("message", "Application form submitted successfully");
             response.put("submittedData", applicationForm);
             response.put("timestamp", java.time.LocalDateTime.now());
-
-
-            underwritingService.start(applicationForm);
 
             return ResponseEntity.ok(response);
 

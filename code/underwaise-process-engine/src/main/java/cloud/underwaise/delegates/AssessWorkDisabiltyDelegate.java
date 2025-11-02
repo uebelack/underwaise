@@ -31,6 +31,9 @@ public class AssessWorkDisabiltyDelegate implements JavaDelegate {
             if (risk != null) {
                 application.getApplicationFeature().setRestrictionsScore(new BigDecimal(risk.toString()));
             }
+        } else {
+            // No work disability information provided, set a positive score
+            application.getApplicationFeature().setRestrictionsScore(new BigDecimal("0.5"));
         }
     }
 }

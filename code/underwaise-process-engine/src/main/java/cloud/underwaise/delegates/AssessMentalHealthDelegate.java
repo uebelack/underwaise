@@ -32,6 +32,9 @@ public class AssessMentalHealthDelegate implements JavaDelegate {
             if (risk != null) {
                 application.getApplicationFeature().setPsychologicalHealthScore(new BigDecimal(risk.toString()));
             }
+        } else {
+            // No mental health issues were reported, so set a positive score
+            application.getApplicationFeature().setPsychologicalHealthScore(new BigDecimal("0.5"));
         }
     }
 }

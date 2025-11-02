@@ -33,5 +33,9 @@ public class AssessMedicalConditionDelegate implements JavaDelegate {
                 application.getApplicationFeature().setMedicationHealthScore(new BigDecimal(risk.toString()));
             }
         }
+        else {
+            // No medication complications history was provided, set a positive score
+            application.getApplicationFeature().setMedicationHealthScore(new BigDecimal("0.5"));
+        }
     }
 }
