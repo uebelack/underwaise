@@ -396,17 +396,7 @@ Bewerte jede Phase der Arbeitsunfähigkeit basierend auf:
     
     return _assess_health_treatments(request_data, context)
 
-
-# ------------ Debug Endpoint (DELETE AFTER USE) ------------
-
-
-
+# Settings (dev)
 if __name__ == "__main__":
     import uvicorn
-    print("\n" + "="*60)
-    print("Starting Underwriting AI Service")
-    print("Access: http://192.168.22.72:8000")
-    print("Docs: http://192.168.22.72:8000/docs")
-    print("="*60 + "\n")
-    
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
