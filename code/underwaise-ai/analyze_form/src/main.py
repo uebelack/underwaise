@@ -53,7 +53,7 @@ def get_risk_from_hobbies(req: UnderwriteRequest):
     """Assess risk from hobbies/activities with a single score."""
 
     prompt = f"""
-Du bist ein Underwriting-Assistant. Analysiere die Hobbys/Aktivitäten und gib EINEN Risikowert zurück.
+Du bist ein Underwriting-Assistant für Lebensversicherungen. Analysiere die Hobbys/Aktivitäten und gib EINEN Risikowert zurück.
 
 **Beispiele:**
 1. "Wingsuit-Fliegen monatlich" → risk_score: 10 (extrem gefährlich, hohes Todesrisiko)
