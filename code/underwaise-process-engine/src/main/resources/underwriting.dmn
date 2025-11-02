@@ -55,7 +55,7 @@
       </input>
       <input id="InputClause_1jnk4sk" label="Severity of need for Medication" biodi:width="150">
         <inputExpression id="LiteralExpression_15o52sz" typeRef="string">
-          <text>medicationSeverity</text>
+          <text>underwritingDecisionInput.medicationSeverity</text>
         </inputExpression>
         <inputValues id="UnaryTests_0ku7smw">
           <text>"low","moderate","high","severe","none"</text>
@@ -63,7 +63,7 @@
       </input>
       <input id="InputClause_0geftzp" label="Severity of Work restriction" biodi:width="150">
         <inputExpression id="LiteralExpression_1cfmgoh" typeRef="string">
-          <text>workRestrictionSeverity</text>
+          <text>underwritingDecisionInput.workRestrictionSeverity</text>
         </inputExpression>
         <inputValues id="UnaryTests_0d0wi3s">
           <text>"none","low","medium","high"</text>
@@ -78,22 +78,22 @@
       <output id="out_reason" name="reason" typeRef="string" />
       <rule id="r1">
         <inputEntry id="r1_c1">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r1_c5">
           <text>&gt;=40</text>
         </inputEntry>
         <inputEntry id="r1_c2">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="UnaryTests_1eh008i">
           <text></text>
         </inputEntry>
         <inputEntry id="r1_c3">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r1_c4">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="UnaryTests_1n2bjxj">
           <text></text>
@@ -116,7 +116,7 @@
       </rule>
       <rule id="r2">
         <inputEntry id="r2_c1">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r2_c5">
           <text>&lt;= 16</text>
@@ -128,10 +128,10 @@
           <text></text>
         </inputEntry>
         <inputEntry id="r2_c3">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r2_c4">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="UnaryTests_1hs37s7">
           <text></text>
@@ -230,22 +230,22 @@
       </rule>
       <rule id="r9">
         <inputEntry id="r9_c1">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r9_c5">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r9_c2">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="UnaryTests_1ppg0kr">
           <text></text>
         </inputEntry>
         <inputEntry id="r9_c3">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r9_c4">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="UnaryTests_13o7inw">
           <text></text>
@@ -306,22 +306,22 @@
       </rule>
       <rule id="r3">
         <inputEntry id="r3_c1">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r3_c5">
           <text>[30-39.9]</text>
         </inputEntry>
         <inputEntry id="r3_c2">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="UnaryTests_1vytkiv">
           <text></text>
         </inputEntry>
         <inputEntry id="r3_c3">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r3_c4">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="UnaryTests_18y7i4c">
           <text></text>
@@ -344,22 +344,22 @@
       </rule>
       <rule id="r4">
         <inputEntry id="r4_c1">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r4_c5">
           <text>[16.1-18.4]</text>
         </inputEntry>
         <inputEntry id="r4_c2">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="UnaryTests_0gd6vh6">
           <text></text>
         </inputEntry>
         <inputEntry id="r4_c3">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r4_c4">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="UnaryTests_1dwqf9i">
           <text></text>
@@ -610,22 +610,22 @@
       </rule>
       <rule id="r5">
         <inputEntry id="r5_c1">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r5_c5">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r5_c2">
           <text>"yes"</text>
         </inputEntry>
         <inputEntry id="UnaryTests_0k8sh1v">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r5_c3">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r5_c4">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="UnaryTests_1mt4j5b">
           <text></text>
@@ -686,10 +686,10 @@
       </rule>
       <rule id="r7">
         <inputEntry id="r7_c1">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r7_c5">
-          <text>-</text>
+          <text></text>
         </inputEntry>
         <inputEntry id="r7_c2">
           <text>"no"</text>
