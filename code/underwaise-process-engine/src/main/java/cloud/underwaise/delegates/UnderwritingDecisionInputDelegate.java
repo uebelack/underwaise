@@ -38,6 +38,8 @@ public class UnderwritingDecisionInputDelegate implements JavaDelegate {
         var medicationSeverity = Risk.fromValue(applicationFeature.getMedicationHealthScore()).getValue();
         var workRestrictionSeverity = Risk.fromValue(applicationFeature.getRestrictionsScore()).getValue();
 
+        log.info("Underwriting Decision Input - age: {}, bmi: {}, smoker: {}, drugs: {}, sportRisk: {}, physicalSeverity: {}, psychologicalSeverity: {}, medicationSeverity: {}, workRestrictionSeverity: {}",
+                age, bmi, smoker, drugs, sportRisk, physicalSeverity, psychologicalSeverity, medicationSeverity, workRestrictionSeverity);
 
         var decisionInput = new DecisionInput(
                 age,
