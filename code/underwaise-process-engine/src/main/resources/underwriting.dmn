@@ -722,6 +722,44 @@
           <text>"healthy BMI and no active severe conditions"</text>
         </outputEntry>
       </rule>
+      <rule id="DecisionRule_12b3swo">
+        <inputEntry id="UnaryTests_1x25nwv">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_111g3wq">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1sqcmrg">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0vd6wej">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0wofdn5">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1c5pzqy">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ll0yqk">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0cuusjx">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_160kz68">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1wq5qbi">
+          <text>"Additional clarification indicated"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_08rehzf">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1lqs4v1">
+          <text>"Missing information"</text>
+        </outputEntry>
+      </rule>
     </decisionTable>
   </decision>
   <dmndi:DMNDI>
