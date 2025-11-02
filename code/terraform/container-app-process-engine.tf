@@ -101,6 +101,21 @@ resource "azurerm_container_app" "process_engine" {
         name  = "CAMUNDA_BPM_DATABASE_SCHEMA_UPDATE"
         value = "true"
       }
+
+      env {
+        name  = "CAMUNDA_BPM_ADMIN_PASSWORD"
+        secret_name = "process-engine-admin-password"
+      }
+
+      env {
+        name  = "UNDERWAISE_ANALYZE_FORM_AI_URL"
+        value = var.analyze_form_ai_api_url
+      }
+
+      env {
+        name  = "UNDERWAISE_EVALUATE_APPLICATION_AI_URL"
+        value = var.evaluate_application_ai_api_url
+      }
     }
   }
 

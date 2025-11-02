@@ -178,3 +178,19 @@ variable "home_ip" {
   type        = string
   default     = "111.111.111.111"
 }
+
+variable "process_engine_admin_password" {
+  description = "Process engine admin password"
+  type        = string
+  sensitive   = true
+}
+
+variable "analyze_form_ai_api_url" {
+  description = "Analyze form image URL"
+  type        = string
+}
+
+variable "evaluate_application_ai_api_url" {
+  description = "Evaluate application image URL"
+  type        = string
+}

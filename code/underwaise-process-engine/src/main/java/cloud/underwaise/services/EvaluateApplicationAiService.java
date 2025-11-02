@@ -22,8 +22,8 @@ public class EvaluateApplicationAiService {
 
 
         request.setData(List.of(application.getApplicationFeature().getFeatureVector()));
-        request.setModelFile("src/svm_model.joblib");
-        request.setScalerFile("src/scaler.joblib");
+        request.setModelFile("svm_model.joblib");
+        request.setScalerFile("scaler.joblib");
 
         var result = inferenceApi.inferInferPost(request);
 
